@@ -32,13 +32,19 @@ const SensorMonitor = ({ data, isLoading }) => {
   const other = {}
 
   Object.entries(data.data).forEach(([key, value]) => {
-    // Temperature sensors (glycol, kettle, fermenter, mash, ambient)
-    if (['glycol', 'kettle', 'fermenter', 'mash', 'ambient'].includes(key)) {
+    // Temperature sensors - check if key contains temperature-related terms
+    if (key.toLowerCase().includes('temp') || 
+        ['glycol', 'kettle', 'fermenter', 'mash', 'ambient'].includes(key)) {
       temperatures[key] = value
     } 
     // Equipment (pumps, valves, heaters)
-    else if (['mashPump', 'kettlePump', 'glycolPump', 'chillerWortOut', 'chillerWortIn', 
-              'kettleIn', 'mashIn', 'kettleHeater', 'glycolHeater', 'glycolChiller', 'fan'].includes(key)) {
+    else if (key.toLowerCase().includes('pump') || 
+             key.toLowerCase().includes('valve') || 
+             key.toLowerCase().includes('heater') || 
+             key.toLowerCase().includes('chiller') || 
+             key === 'fan' ||
+             ['mashPump', 'kettlePump', 'glycolPump', 'chillerWortOut', 'chillerWortIn', 
+              'kettleIn', 'mashIn', 'kettleHeater', 'glycolHeater', 'glycolChiller'].includes(key)) {
       equipment[key] = value
     } 
     // Other sensors
@@ -105,7 +111,12 @@ const TemperatureCard = ({ name, value, data }) => {
       kettle: 'Kettle Temperature', 
       fermenter: 'Fermenter Temperature',
       mash: 'Mash Temperature',
-      ambient: 'Ambient Temperature'
+      ambient: 'Ambient Temperature',
+      tempFermenter: 'Fermenter Temperature',
+      tempGlycol: 'Glycol Temperature',
+      tempKettle: 'Kettle Temperature',
+      tempMash: 'Mash Temperature',
+      tempAmbient: 'Ambient Temperature'
     }
     return nameMap[name] || name
       .replace(/([A-Z])/g, ' $1')
