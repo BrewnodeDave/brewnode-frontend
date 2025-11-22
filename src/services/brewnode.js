@@ -34,11 +34,8 @@ export const brewnodeAPI = {
     if (Array.isArray(response.data)) {
       response.data.forEach(item => {
         if (item && typeof item === 'object' && item.name && item.value !== undefined) {
-          // Convert sensor names to camelCase keys
+          // Convert sensor names to camelCase keys while preserving uniqueness
           const key = item.name
-            .replace(/^Temp /, '') // Remove 'Temp ' prefix
-            .replace(/^Pump /, '') // Remove 'Pump ' prefix  
-            .replace(/^Valve /, '') // Remove 'Valve ' prefix
             .toLowerCase()
             .replace(/\s+(.)/g, (_, char) => char.toUpperCase()) // Convert spaces to camelCase
             .replace(/[^\w]/g, ''); // Remove special characters
@@ -46,7 +43,7 @@ export const brewnodeAPI = {
           let value = item.value;
           
           // Handle temperature sensor errors (extremely low values likely indicate sensor issues)
-          if (item.name.includes('Temp') && value < -200) {
+          if (item.name.toLowerCase().includes('temp') && value < -200) {
             // Store both the raw value and mark as error for debugging
             parsedData[key + 'Raw'] = value;
             value = null; // Mark as unavailable rather than showing error values
