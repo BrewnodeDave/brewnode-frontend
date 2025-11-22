@@ -30,6 +30,15 @@ api.interceptors.request.use(
     if (authCredentials) {
       config.auth = authCredentials
     }
+    // Debug logging
+    console.log('API Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      baseURL: config.baseURL,
+      params: config.params,
+      data: config.data,
+      fullURL: `${config.baseURL}${config.url}${config.params ? '?' + new URLSearchParams(config.params).toString() : ''}`
+    })
     return config
   },
   (error) => Promise.reject(error)
@@ -37,8 +46,21 @@ api.interceptors.request.use(
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response Success:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data
+    })
+    return response
+  },
   (error) => {
+    console.log('API Response Error:', {
+      status: error.response?.status,
+      url: error.config?.url,
+      responseData: error.response?.data,
+      message: error.message
+    })
     if (error.response?.status === 401) {
       clearAuth()
       window.location.href = '/login'
