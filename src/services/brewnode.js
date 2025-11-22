@@ -4,29 +4,29 @@ import api from './api'
 export const brewnodeAPI = {
   // Core Brewnode endpoints
   getBrewData: (brewname, since) => 
-    api.get('/brewdata', { params: { brewname, since } }),
+    api.get('/api/brewdata', { params: { brewname, since } }),
   
   getCurrentBrew: () => 
-    api.get('/currentbrew'),
+    api.get('/api/currentbrew'),
   
   setBrewname: (name) => 
-    api.put('/brewname', { name }),
+    api.put('/api/brewname', { name }),
   
   deleteLogs: () => 
-    api.delete('/logs'),
+    api.delete('/api/logs'),
   
   getBrewnames: () => 
-    api.get('/mysql/brewnames'),
+    api.get('/api/mysql/brewnames'),
   
   restart: () => 
-    api.put('/restart'),
+    api.put('/api/restart'),
   
   streamLog: () => 
-    api.get('/streamLog'),
+    api.get('/api/streamLog'),
 
   // Sensor status and controls
   getSensorStatus: async (name = 'All') => {
-    const response = await api.get('/sensorStatus', { params: { name } });
+    const response = await api.get('/api/sensorStatus', { params: { name } });
     
     // Parse the sensor data array into a more usable object
     const parsedData = {};
@@ -60,94 +60,94 @@ export const brewnodeAPI = {
     };
   },
   
-  getFanStatus: () => 
-    api.get('/fan/status'),
-  
+  getFanStatus: () =>
+    api.get('/api/fan/status'),
+
   setFan: (onOff) => 
-    api.put('/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
-  getPumpsStatus: () => 
-    api.get('/pumps/status'),
-  
-  getValvesStatus: () => 
-    api.get('/valves/status'),
-  
+  getPumpsStatus: () =>
+    api.get('/api/pumps/status'),
+
+  getValvesStatus: () =>
+    api.get('/api/valves/status'),
+
   setI2C: (bit, value) => 
-    api.put('/i2c', null, { params: { bit, value } }),
+    api.put('/api/i2c', null, { params: { bit, value } }),
 
   // Process controls
   boil: (mins) => 
-    api.put('/boil', null, { params: { mins } }),
+    api.put('/api/boil', null, { params: { mins } }),
   
   chill: (profile) => 
-    api.put('/chill', null, { params: { profile: JSON.stringify(profile) } }),
+    api.put('/api/chill', null, { params: { profile: JSON.stringify(profile) } }),
   
   ferment: (step) => 
-    api.put('/ferment', null, { params: { step: JSON.stringify(step) } }),
+    api.put('/api/ferment', null, { params: { step: JSON.stringify(step) } }),
   
   fill: (litres) => 
-    api.put('/fill', null, { params: { litres } }),
+    api.put('/api/fill', null, { params: { litres } }),
   
   k2f: (flowTimeoutSecs = 5) => 
-    api.put('/k2f', null, { params: { flowTimeoutSecs } }),
+    api.put('/api/k2f', null, { params: { flowTimeoutSecs } }),
   
   k2m: (flowTimeoutSecs = 5) => 
-    api.put('/k2m', null, { params: { flowTimeoutSecs } }),
+    api.put('/api/k2m', null, { params: { flowTimeoutSecs } }),
   
   m2k: (flowTimeoutSecs = 5) => 
-    api.put('/m2k', null, { params: { flowTimeoutSecs } }),
+    api.put('/api/m2k', null, { params: { flowTimeoutSecs } }),
   
   mash: (steps) => 
-    api.put('/mash', null, { params: { steps: JSON.stringify(steps) } }),
+    api.put('/api/mash', null, { params: { steps: JSON.stringify(steps) } }),
   
   setKettleTemp: (temp, mins) => 
-    api.put('/kettleTemp', null, { params: { temp, mins } }),
+    api.put('/api/kettleTemp', null, { params: { temp, mins } }),
 
   // Kettle controls
   setHeat: (onOff) => 
-    api.put('/heat', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/heat', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setKettlePump: (onOff) => 
-    api.put('/pump/kettle', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/pump/kettle', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setKettleInValve: (onOff) => 
-    api.put('/valve/kettlein', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/kettlein', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Glycol controls
   setGlycolChill: (onOff) => 
-    api.put('/glycol/chill', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/glycol/chill', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setGlycolHeat: (onOff) => 
-    api.put('/glycol/heat', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/glycol/heat', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setGlycolPump: (onOff) => 
-    api.put('/pump/glycol', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/pump/glycol', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Mash tun controls
   setMashPump: (onOff) => 
-    api.put('/pump/mash', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/pump/mash', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setMashInValve: (onOff) => 
-    api.put('/valve/mashin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/mashin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Chiller valve controls
   setChillWortInValve: (onOff) => 
-    api.put('/valve/chillwortin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/chillwortin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setChillWortOutValve: (onOff) => 
-    api.put('/valve/chillwortout', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/chillwortout', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Simulator controls
   setKettleVolume: (litres) => 
-    api.put('/kettleVolume', null, { params: { litres } }),
+    api.put('/api/kettleVolume', null, { params: { litres } }),
   
   setSimulationSpeed: (factor) => 
-    api.put('/speedFactor', null, { params: { factor } }),
+    api.put('/api/speedFactor', null, { params: { factor } }),
   
   getSimulationSpeed: () => 
-    api.get('/speedFactor'),
+    api.get('/api/speedFactor'),
 
   // System status
   getSystemStatus: () =>
-    api.get('/systemStatus'),
+    api.get('/api/systemStatus'),
 }

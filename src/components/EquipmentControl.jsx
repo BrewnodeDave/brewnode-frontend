@@ -16,6 +16,9 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState('all')
 
+  // Debug logging
+  console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus })
+
   // Mutation handlers
   const fanMutation = useMutation(
     (state) => brewnodeAPI.setFan(state),
@@ -240,7 +243,10 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
             <ControlCard
               name="Glycol Pump"
               status={pumpsStatus?.data?.glycolPump}
-              onToggle={(state) => pumpMutations.glycol.mutate(state)}
+              onToggle={(state) => {
+                console.log('Glycol pump toggle - current status:', pumpsStatus?.data?.glycolPump, 'new state:', state)
+                pumpMutations.glycol.mutate(state)
+              }}
               isLoading={pumpMutations.glycol.isLoading}
               icon={Droplets}
             />
