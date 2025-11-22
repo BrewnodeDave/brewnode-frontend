@@ -7,6 +7,7 @@ const SystemStatus = () => {
   const { data: fanStatus } = useQuery('fanStatus', () => brewnodeAPI.getFanStatus(), { refetchInterval: 5000 })
   const { data: pumpsStatus } = useQuery('pumpsStatus', () => brewnodeAPI.getPumpsStatus(), { refetchInterval: 5000 })
   const { data: valvesStatus } = useQuery('valvesStatus', () => brewnodeAPI.getValvesStatus(), { refetchInterval: 5000 })
+  const { data: systemStatus } = useQuery('systemStatus', () => brewnodeAPI.getSystemStatus(), { refetchInterval: 30000 })
 
   const handleRestart = async () => {
     if (window.confirm('Are you sure you want to restart the server?')) {
@@ -55,7 +56,32 @@ const SystemStatus = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Hardware Status */}
+        <div className="flex items-center space-x-3">
+          <div className={`p-2 rounded-full ${
+            systemStatus?.data?.isHardware 
+              ? 'bg-green-100' 
+              : 'bg-orange-100'
+          }`}>
+            <Server className={`w-5 h-5 ${
+              systemStatus?.data?.isHardware 
+                ? 'text-green-600' 
+                : 'text-orange-600'
+            }`} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">Hardware</p>
+            <p className={`text-sm ${
+              systemStatus?.data?.isHardware 
+                ? 'text-green-600' 
+                : 'text-orange-600'
+            }`}>
+              {systemStatus?.data?.mode || 'Unknown'}
+            </p>
+          </div>
+        </div>
+
         {/* Connection Status */}
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-green-100 rounded-full">

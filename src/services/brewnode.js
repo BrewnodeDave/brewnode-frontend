@@ -149,4 +149,8 @@ export const brewnodeAPI = {
   
   getSimulationSpeed: () => 
     api.get('/speedFactor'),
+
+  // System status
+  getSystemStatus: () =>
+    api.get('/systemStatus'),
 }

@@ -23,6 +23,12 @@ const Simulator = () => {
     { refetchInterval: 10000 }
   )
 
+  const { data: systemStatus } = useQuery(
+    'systemStatus',
+    () => brewnodeAPI.getSystemStatus(),
+    { refetchInterval: 30000 }
+  )
+
   const volumeMutation = useMutation(
     (litres) => brewnodeAPI.setKettleVolume(litres),
     {
@@ -99,16 +105,30 @@ const Simulator = () => {
             </p>
           </div>
           
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <Play className="w-8 h-8 mx-auto mb-2 text-green-600" />
+          <div className={`text-center p-4 rounded-lg ${
+            systemStatus?.data?.isSimulation ? 'bg-green-50' : 'bg-gray-50'
+          }`}>
+            <Play className={`w-8 h-8 mx-auto mb-2 ${
+              systemStatus?.data?.isSimulation ? 'text-green-600' : 'text-gray-400'
+            }`} />
             <p className="text-sm text-gray-600">Simulation Mode</p>
-            <p className="text-lg font-semibold text-green-900">Active</p>
+            <p className="text-lg font-semibold text-green-900">
+              {systemStatus?.data?.isSimulation ? 'Active' : 'Inactive'}
+            </p>
           </div>
           
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <Zap className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-            <p className="text-sm text-gray-600">Hardware</p>
-            <p className="text-lg font-semibold text-purple-900">Simulated</p>
+          <div className={`text-center p-4 rounded-lg ${
+            systemStatus?.data?.isHardware ? 'bg-green-50' : 'bg-orange-50'
+          }`}>
+            <Zap className={`w-8 h-8 mx-auto mb-2 ${
+              systemStatus?.data?.isHardware ? 'text-green-600' : 'text-orange-600'
+            }`} />
+            <p className="text-sm text-gray-600">Hardware Status</p>
+            <p className={`text-lg font-semibold ${
+              systemStatus?.data?.isHardware ? 'text-green-900' : 'text-orange-900'
+            }`}>
+              {systemStatus?.data?.mode || 'Unknown'}
+            </p>
           </div>
         </div>
       </div>
