@@ -64,7 +64,7 @@ export const brewnodeAPI = {
     api.get('/fan/status'),
   
   setFan: (onOff) => 
-    api.put('/fan', null, { params: { onOff } }),
+    api.put('/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   getPumpsStatus: () => 
     api.get('/pumps/status'),
@@ -105,37 +105,37 @@ export const brewnodeAPI = {
 
   // Kettle controls
   setHeat: (onOff) => 
-    api.put('/heat', null, { params: { onOff } }),
+    api.put('/heat', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setKettlePump: (onOff) => 
-    api.put('/pump/kettle', null, { params: { onOff } }),
+    api.put('/pump/kettle', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setKettleInValve: (onOff) => 
-    api.put('/valve/kettlein', null, { params: { onOff } }),
+    api.put('/valve/kettlein', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Glycol controls
   setGlycolChill: (onOff) => 
-    api.put('/glycol/chill', null, { params: { onOff } }),
+    api.put('/glycol/chill', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setGlycolHeat: (onOff) => 
-    api.put('/glycol/heat', null, { params: { onOff } }),
+    api.put('/glycol/heat', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setGlycolPump: (onOff) => 
-    api.put('/pump/glycol', null, { params: { onOff } }),
+    api.put('/pump/glycol', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Mash tun controls
   setMashPump: (onOff) => 
-    api.put('/pump/mash', null, { params: { onOff } }),
+    api.put('/pump/mash', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setMashInValve: (onOff) => 
-    api.put('/valve/mashin', null, { params: { onOff } }),
+    api.put('/valve/mashin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Chiller valve controls
   setChillWortInValve: (onOff) => 
-    api.put('/valve/chillwortin', null, { params: { onOff } }),
+    api.put('/valve/chillwortin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setChillWortOutValve: (onOff) => 
-    api.put('/valve/chillwortout', null, { params: { onOff } }),
+    api.put('/valve/chillwortout', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Simulator controls
   setKettleVolume: (litres) => 
