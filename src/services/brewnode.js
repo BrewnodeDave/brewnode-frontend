@@ -7,10 +7,10 @@ export const brewnodeAPI = {
     api.get('/brewdata', { params: { brewname, since } }),
   
   getCurrentBrew: () => 
-    api.get('/brewing'),
+    api.get('/currentbrew'),
   
   setBrewname: (name) => 
-    api.put('/brewname', null, { params: { name } }),
+    api.put('/brewname', { name }),
   
   deleteLogs: () => 
     api.delete('/logs'),

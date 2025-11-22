@@ -23,7 +23,14 @@ const Dashboard = () => {
   const { data: currentBrew } = useQuery(
     'currentBrew',
     () => brewnodeAPI.getCurrentBrew(),
-    { refetchInterval: 10000 }
+    { 
+      refetchInterval: 10000,
+      retry: false,
+      onError: (error) => {
+        console.error('getCurrentBrew failed:', error)
+        console.log('Error response:', error.response?.data)
+      }
+    }
   )
 
   const { data: brewnames } = useQuery(
