@@ -121,24 +121,28 @@ const SystemStatus = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Fan Status</h4>
-            <p className="text-gray-600">{fanStatus?.data?.status || 'Unknown'}</p>
+            <p className="text-gray-600">
+              {fanStatus?.data !== undefined 
+                ? (fanStatus.data > 0 ? 'On' : 'Off')
+                : 'Unknown'}
+            </p>
           </div>
           
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Pumps Active</h4>
             <p className="text-gray-600">
-              {pumpsStatus?.data ? 
-                Object.values(pumpsStatus.data).filter(status => status === 'On').length : 0
-              } of {pumpsStatus?.data ? Object.keys(pumpsStatus.data).length : 0}
+              {Array.isArray(pumpsStatus?.data) ? 
+                pumpsStatus.data.filter(pump => pump.value > 0).length : 0
+              } of {Array.isArray(pumpsStatus?.data) ? pumpsStatus.data.length : 0}
             </p>
           </div>
           
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Valves Open</h4>
             <p className="text-gray-600">
-              {valvesStatus?.data ? 
-                Object.values(valvesStatus.data).filter(status => status === 'Open').length : 0
-              } of {valvesStatus?.data ? Object.keys(valvesStatus.data).length : 0}
+              {Array.isArray(valvesStatus?.data) ? 
+                valvesStatus.data.filter(valve => valve.value > 0).length : 0
+              } of {Array.isArray(valvesStatus?.data) ? valvesStatus.data.length : 0}
             </p>
           </div>
         </div>
