@@ -64,7 +64,7 @@ export const brewnodeAPI = {
     api.get('/fan/status'),
   
   setFan: (onOff) => 
-    api.put('/fan', null, { params: { onOff } }),
+    api.put('/fan', { onOff }),
   
   getPumpsStatus: () => 
     api.get('/pumps/status'),
@@ -105,37 +105,37 @@ export const brewnodeAPI = {
 
   // Kettle controls
   setHeat: (onOff) => 
-    api.put('/heat', null, { params: { onOff } }),
+    api.put('/heat', { onOff }),
   
   setKettlePump: (onOff) => 
-    api.put('/pump/kettle', null, { params: { onOff } }),
+    api.put('/pump/kettle', { onOff }),
   
   setKettleInValve: (onOff) => 
-    api.put('/valve/kettlein', null, { params: { onOff } }),
+    api.put('/valve/kettlein', { onOff }),
 
   // Glycol controls
   setGlycolChill: (onOff) => 
-    api.put('/glycol/chill', null, { params: { onOff } }),
+    api.put('/glycol/chill', { onOff }),
   
   setGlycolHeat: (onOff) => 
-    api.put('/glycol/heat', null, { params: { onOff } }),
+    api.put('/glycol/heat', { onOff }),
   
   setGlycolPump: (onOff) => 
-    api.put('/pump/glycol', null, { params: { onOff } }),
+    api.put('/pump/glycol', { onOff }),
 
   // Mash tun controls
   setMashPump: (onOff) => 
-    api.put('/pump/mash', null, { params: { onOff } }),
+    api.put('/pump/mash', { onOff }),
   
   setMashInValve: (onOff) => 
-    api.put('/valve/mashin', null, { params: { onOff } }),
+    api.put('/valve/mashin', { onOff }),
 
   // Chiller valve controls
   setChillWortInValve: (onOff) => 
-    api.put('/valve/chillwortin', null, { params: { onOff } }),
+    api.put('/valve/chillwortin', { onOff }),
   
   setChillWortOutValve: (onOff) => 
-    api.put('/valve/chillwortout', null, { params: { onOff } }),
+    api.put('/valve/chillwortout', { onOff }),
 
   // Simulator controls
   setKettleVolume: (litres) => 
