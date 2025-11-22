@@ -73,44 +73,44 @@ const Dashboard = () => {
         <SensorStatusCard
           title="Kettle Temperature"
           icon={Thermometer}
-          value={sensorData?.data?.kettle !== null && sensorData?.data?.kettle !== undefined 
-            ? sensorData.data.kettle.toFixed(1) 
-            : sensorData?.data?.kettleRaw 
-              ? `Error (${sensorData.data.kettleRaw.toFixed(1)}°C)` 
+          value={sensorData?.data?.tempKettle !== null && sensorData?.data?.tempKettle !== undefined 
+            ? sensorData.data.tempKettle.toFixed(1) 
+            : sensorData?.data?.tempKettleRaw 
+              ? `Error (${sensorData.data.tempKettleRaw.toFixed(1)}°C)` 
               : 'Error'}
-          unit={sensorData?.data?.kettle !== null && sensorData?.data?.kettle !== undefined ? "°C" : ""}
+          unit={sensorData?.data?.tempKettle !== null && sensorData?.data?.tempKettle !== undefined ? "°C" : ""}
           color="red"
           loading={sensorsLoading}
         />
         <SensorStatusCard
           title="Mash Temperature"
           icon={Thermometer}
-          value={sensorData?.data?.mash !== null && sensorData?.data?.mash !== undefined 
-            ? sensorData.data.mash.toFixed(1) 
-            : sensorData?.data?.mashRaw 
-              ? `Error (${sensorData.data.mashRaw.toFixed(1)}°C)` 
+          value={sensorData?.data?.tempMash !== null && sensorData?.data?.tempMash !== undefined 
+            ? sensorData.data.tempMash.toFixed(1) 
+            : sensorData?.data?.tempMashRaw 
+              ? `Error (${sensorData.data.tempMashRaw.toFixed(1)}°C)` 
               : 'Error'}
-          unit={sensorData?.data?.mash !== null && sensorData?.data?.mash !== undefined ? "°C" : ""}
+          unit={sensorData?.data?.tempMash !== null && sensorData?.data?.tempMash !== undefined ? "°C" : ""}
           color="orange"
           loading={sensorsLoading}
         />
         <SensorStatusCard
           title="Fermenter Temperature"
           icon={Thermometer}
-          value={sensorData?.data?.fermenter !== null && sensorData?.data?.fermenter !== undefined 
-            ? sensorData.data.fermenter.toFixed(1) 
-            : sensorData?.data?.fermenterRaw 
-              ? `Error (${sensorData.data.fermenterRaw.toFixed(1)}°C)` 
+          value={sensorData?.data?.tempFermenter !== null && sensorData?.data?.tempFermenter !== undefined 
+            ? sensorData.data.tempFermenter.toFixed(1) 
+            : sensorData?.data?.tempFermenterRaw 
+              ? `Error (${sensorData.data.tempFermenterRaw.toFixed(1)}°C)` 
               : 'Error'}
-          unit={sensorData?.data?.fermenter !== null && sensorData?.data?.fermenter !== undefined ? "°C" : ""}
+          unit={sensorData?.data?.tempFermenter !== null && sensorData?.data?.tempFermenter !== undefined ? "°C" : ""}
           color="blue"
           loading={sensorsLoading}
         />
         <SensorStatusCard
           title="Glycol Temperature"
           icon={Droplets}
-          value={sensorData?.data?.glycol !== null && sensorData?.data?.glycol !== undefined 
-            ? sensorData.data.glycol.toFixed(1) 
+          value={sensorData?.data?.tempGlycol !== null && sensorData?.data?.tempGlycol !== undefined 
+            ? sensorData.data.tempGlycol.toFixed(1) 
             : 'Error'}
           unit="°C"
           color="cyan"
@@ -119,8 +119,8 @@ const Dashboard = () => {
         <SensorStatusCard
           title="Ambient Temperature"
           icon={Thermometer}
-          value={sensorData?.data?.ambient !== null && sensorData?.data?.ambient !== undefined 
-            ? sensorData.data.ambient.toFixed(1) 
+          value={sensorData?.data?.tempAmbient !== null && sensorData?.data?.tempAmbient !== undefined 
+            ? sensorData.data.tempAmbient.toFixed(1) 
             : 'Error'}
           unit="°C"
           color="green"
