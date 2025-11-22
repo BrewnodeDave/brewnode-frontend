@@ -28,10 +28,17 @@ const BatchList = ({ searchTerm, statusFilter }) => {
     }
   )
 
-  const filteredBatches = batches?.data?.filter(batch =>
-    batch.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    batch.recipe?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || []
+  const filteredBatches = batches?.data
+    ?.filter(batch =>
+      batch.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      batch.recipe?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      // Sort by brew date in descending order (most recent first)
+      const dateA = new Date(a.brewDate || a._created || 0)
+      const dateB = new Date(b.brewDate || b._created || 0)
+      return dateB - dateA
+    }) || []
 
   const handleUpdateBatch = (id, updates) => {
     updateBatchMutation.mutate({ id, updates })
