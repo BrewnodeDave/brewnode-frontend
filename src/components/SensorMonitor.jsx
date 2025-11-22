@@ -210,11 +210,19 @@ const StatusCard = ({ name, value }) => {
   }
 
   const getStatusColor = (value) => {
+    const numValue = parseFloat(value)
     const val = value?.toString().toLowerCase()
-    if (val === 'on' || val === 'open' || val === 'active') {
+    
+    // Handle power consumption values - any non-zero value means "on"
+    if (!isNaN(numValue)) {
+      return numValue > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+    }
+    
+    // Handle text values as fallback
+    if (val === 'on' || val === 'open' || val === 'active' || val === 'true') {
       return 'bg-green-100 text-green-800'
     }
-    if (val === 'off' || val === 'closed' || val === 'inactive') {
+    if (val === 'off' || val === 'closed' || val === 'inactive' || val === 'false') {
       return 'bg-gray-100 text-gray-800'
     }
     return 'bg-blue-100 text-blue-800'
@@ -225,12 +233,27 @@ const StatusCard = ({ name, value }) => {
       <h4 className="text-sm font-medium text-gray-600 mb-2">{formatName(name)}</h4>
       <div className="flex items-center justify-between">
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(value)}`}>
-          {value || 'Unknown'}
+          {value !== null && value !== undefined 
+            ? (() => {
+                const numValue = parseFloat(value)
+                if (!isNaN(numValue)) {
+                  return numValue > 0 ? `On (${numValue}W)` : 'Off'
+                }
+                return value.toString()
+              })()
+            : 'Unknown'}
         </span>
         <div className={`w-3 h-3 rounded-full ${
-          value?.toString().toLowerCase() === 'on' || value?.toString().toLowerCase() === 'open' 
-            ? 'bg-green-500' 
-            : 'bg-gray-300'
+          (() => {
+            const numValue = parseFloat(value)
+            if (!isNaN(numValue)) {
+              return numValue > 0 ? 'bg-green-500' : 'bg-gray-300'
+            }
+            const val = value?.toString().toLowerCase()
+            return (val === 'on' || val === 'open' || val === 'active' || val === 'true')
+              ? 'bg-green-500' 
+              : 'bg-gray-300'
+          })()
         }`} />
       </div>
     </div>
