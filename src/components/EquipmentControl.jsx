@@ -19,55 +19,121 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
   // Mutation handlers
   const fanMutation = useMutation(
     (state) => brewnodeAPI.setFan(state),
-    { onSuccess: () => queryClient.invalidateQueries() }
+    { 
+      onSuccess: () => queryClient.invalidateQueries(),
+      onError: (error) => {
+        console.error('Fan control failed:', error)
+        alert(`Fan control failed: ${error.message || 'Unknown error'}`)
+      }
+    }
   )
 
   const pumpMutations = {
     kettle: useMutation(
       (state) => brewnodeAPI.setKettlePump(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Kettle pump control failed:', error)
+          alert(`Kettle pump control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     mash: useMutation(
       (state) => brewnodeAPI.setMashPump(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Mash pump control failed:', error)
+          alert(`Mash pump control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     glycol: useMutation(
       (state) => brewnodeAPI.setGlycolPump(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Glycol pump control failed:', error)
+          alert(`Glycol pump control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     )
   }
 
   const valveMutations = {
     kettlein: useMutation(
       (state) => brewnodeAPI.setKettleInValve(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Kettle In valve control failed:', error)
+          alert(`Kettle In valve control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     mashin: useMutation(
       (state) => brewnodeAPI.setMashInValve(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Mash In valve control failed:', error)
+          alert(`Mash In valve control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     chillwortin: useMutation(
       (state) => brewnodeAPI.setChillWortInValve(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Chill Wort In valve control failed:', error)
+          alert(`Chill Wort In valve control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     chillwortout: useMutation(
       (state) => brewnodeAPI.setChillWortOutValve(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Chill Wort Out valve control failed:', error)
+          alert(`Chill Wort Out valve control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     )
   }
 
   const heaterMutations = {
     kettle: useMutation(
       (state) => brewnodeAPI.setHeat(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Kettle heater control failed:', error)
+          alert(`Kettle heater control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     glycolHeat: useMutation(
       (state) => brewnodeAPI.setGlycolHeat(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Glycol heater control failed:', error)
+          alert(`Glycol heater control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     ),
     glycolChill: useMutation(
       (state) => brewnodeAPI.setGlycolChill(state),
-      { onSuccess: () => queryClient.invalidateQueries() }
+      { 
+        onSuccess: () => queryClient.invalidateQueries(),
+        onError: (error) => {
+          console.error('Glycol chiller control failed:', error)
+          alert(`Glycol chiller control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
     )
   }
 
@@ -260,7 +326,8 @@ const ControlCard = ({
   const displayStatus = isOn ? (stateLabels.on || 'On') : (stateLabels.off || 'Off')
 
   const handleToggle = () => {
-    const newState = isOn ? stateLabels.off || 'Off' : stateLabels.on || 'On'
+    // Always send 'On'/'Off' to the API regardless of display labels
+    const newState = isOn ? 'Off' : 'On'
     onToggle(newState)
   }
 
