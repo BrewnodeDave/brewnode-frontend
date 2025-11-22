@@ -103,10 +103,19 @@ const SensorControl = () => {
         />
         <StatusCard
           title="Fan Status"
-          value={fanStatus?.data?.status || 'Unknown'}
+          value={(() => {
+            const fanValue = sensorData?.data?.fan
+            if (fanValue !== null && fanValue !== undefined) {
+              const numValue = parseFloat(fanValue)
+              if (!isNaN(numValue)) {
+                return numValue > 0 ? `On (${numValue}W)` : 'Off'
+              }
+            }
+            return fanStatus?.data?.status || 'Unknown'
+          })()}
           icon={Fan}
           color="purple"
-          loading={!fanStatus}
+          loading={!fanStatus && isLoading}
           isText={true}
         />
       </div>
