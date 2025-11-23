@@ -221,10 +221,10 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Section Filter */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex flex-wrap gap-3">
           {equipmentSections.map((section) => {
             const Icon = section.icon
             const isActive = activeSection === section.id
@@ -233,13 +233,13 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center px-4 py-3 rounded-md text-base font-medium transition-colors ${
                   isActive 
                     ? 'bg-brewery-100 text-brewery-700' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                <Icon className="w-4 h-4 mr-2" />
+                <Icon className="w-5 h-5 mr-3" />
                 {section.name}
               </button>
             )
@@ -276,7 +276,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       {/* Pumps Control */}
       {shouldShowSection('pumps') && (
         <EquipmentSection title="Pump Control" icon={Droplets} color="blue">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <ControlCard
               name="Kettle Pump"
               status={(pumpsStatus?.data?.find(p => p.name === "Pump Kettle")?.value || 0) > 0 ? "On" : "Off"}
@@ -308,7 +308,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       {/* Valves Control */}
       {shouldShowSection('valves') && (
         <EquipmentSection title="Valve Control" icon={Power} color="green">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <ControlCard
               name="Kettle In"
               status={(valvesStatus?.data?.find(v => v.name === "Valve Kettle-in")?.value || 0) > 0 ? "Open" : "Close"}
@@ -348,7 +348,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       {/* Heaters Control */}
       {shouldShowSection('heaters') && (
         <EquipmentSection title="Heater Control" icon={Flame} color="red">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <ControlCard
               name="Kettle Heater"
               status={(() => {
@@ -430,13 +430,13 @@ const EquipmentSection = ({ title, icon: Icon, color, children }) => {
 
   return (
     <div className="bg-white rounded-lg shadow">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold flex items-center">
-          <Icon className={`w-5 h-5 mr-2 ${colorClasses[color]}`} />
+      <div className="px-8 py-6 border-b border-gray-200">
+        <h3 className="text-xl font-semibold flex items-center">
+          <Icon className={`w-6 h-6 mr-3 ${colorClasses[color]}`} />
           {title}
         </h3>
       </div>
-      <div className="p-6">
+      <div className="p-8">
         {children}
       </div>
     </div>
@@ -461,13 +461,13 @@ const ControlCard = ({
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-2">
-          <Icon className="w-4 h-4 text-gray-600" />
-          <span className="font-medium text-gray-900">{name}</span>
+    <div className="bg-gray-50 rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <Icon className="w-6 h-6 text-gray-600" />
+          <span className="text-lg font-medium text-gray-900">{name}</span>
         </div>
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+        <span className={`px-3 py-1 text-sm font-medium rounded-full ${
           isOn 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
@@ -479,7 +479,7 @@ const ControlCard = ({
       <button
         onClick={handleToggle}
         disabled={isLoading}
-        className={`w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-md font-medium transition-colors ${
+        className={`w-full flex items-center justify-center space-x-3 py-3 px-6 rounded-md text-lg font-medium transition-colors ${
           isLoading
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
             : isOn
@@ -489,15 +489,15 @@ const ControlCard = ({
       >
         {isLoading ? (
           <>
-            <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
             <span>Processing...</span>
           </>
         ) : (
           <>
             {isOn ? (
-              <ToggleRight className="w-4 h-4" />
+              <ToggleRight className="w-6 h-6" />
             ) : (
-              <ToggleLeft className="w-4 h-4" />
+              <ToggleLeft className="w-6 h-6" />
             )}
             <span>
               {isOn ? stateLabels.off || 'Off' : stateLabels.on || 'On'}

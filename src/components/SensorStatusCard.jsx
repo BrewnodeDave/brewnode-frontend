@@ -10,20 +10,20 @@ const SensorStatusCard = ({ title, icon: Icon, value, unit, color, loading }) =>
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-lg shadow p-8">
       <div className="flex items-center">
-        <div className={`p-2 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
-          <Icon className="w-6 h-6" />
+        <div className={`p-3 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
+          <Icon className="w-8 h-8" />
         </div>
-        <div className="ml-4">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="ml-6">
+          <p className="text-base font-medium text-gray-600">{title}</p>
+          <p className="text-3xl font-bold text-gray-900">
             {loading ? (
               <span className="animate-pulse">--</span>
             ) : (
               <>
                 {value}
-                {unit && <span className="text-sm font-normal text-gray-500 ml-1">{unit}</span>}
+                {unit && <span className="text-base font-normal text-gray-500 ml-1">{unit}</span>}
               </>
             )}
           </p>

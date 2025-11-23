@@ -66,23 +66,23 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Hardware Status */}
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-full ${
+        <div className="flex items-center space-x-4">
+          <div className={`p-3 rounded-full ${
             systemStatus?.data?.isHardware 
               ? 'bg-green-100' 
               : 'bg-orange-100'
           }`}>
-            <Server className={`w-5 h-5 ${
+            <Server className={`w-7 h-7 ${
               systemStatus?.data?.isHardware 
                 ? 'text-green-600' 
                 : 'text-orange-600'
             }`} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Hardware</p>
-            <p className={`text-sm ${
+            <p className="text-base font-medium text-gray-900">Hardware</p>
+            <p className={`text-base ${
               systemStatus?.data?.isHardware 
                 ? 'text-green-600' 
                 : 'text-orange-600'
@@ -93,44 +93,44 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
         </div>
 
         {/* Connection Status */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-100 rounded-full">
-            <Wifi className="w-5 h-5 text-green-600" />
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-green-100 rounded-full">
+            <Wifi className="w-7 h-7 text-green-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Connection</p>
-            <p className="text-sm text-green-600">Connected</p>
+            <p className="text-base font-medium text-gray-900">Connection</p>
+            <p className="text-base text-green-600">Connected</p>
           </div>
         </div>
 
         {/* System Health */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-100 rounded-full">
-            <CheckCircle className="w-5 h-5 text-green-600" />
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-green-100 rounded-full">
+            <CheckCircle className="w-7 h-7 text-green-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">System Health</p>
-            <p className="text-sm text-green-600">Operational</p>
+            <p className="text-base font-medium text-gray-900">System Health</p>
+            <p className="text-base text-green-600">Operational</p>
           </div>
         </div>
 
         {/* Alert Status */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-yellow-100 rounded-full">
-            <AlertTriangle className="w-5 h-5 text-yellow-600" />
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-yellow-100 rounded-full">
+            <AlertTriangle className="w-7 h-7 text-yellow-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Alerts</p>
-            <p className="text-sm text-yellow-600">0 Active</p>
+            <p className="text-base font-medium text-gray-900">Alerts</p>
+            <p className="text-base text-yellow-600">0 Active</p>
           </div>
         </div>
       </div>
 
       {/* Detailed Status */}
-      <div className="mt-6 border-t pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <div className="mt-8 border-t pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-base">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Fan Status</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Fan Status</h4>
             <p className="text-gray-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
@@ -151,7 +151,7 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Pumps Active</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Pumps Active</h4>
             <p className="text-gray-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
@@ -177,7 +177,7 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Valves Open</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Valves Open</h4>
             <p className="text-gray-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
@@ -202,10 +202,10 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
         </div>
         
         {/* Total Power Consumption */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="text-center">
-            <h4 className="font-medium text-gray-900 mb-2">Total Power Consumption</h4>
-            <p className="text-2xl font-bold text-brewery-600">
+            <h4 className="text-xl font-medium text-gray-900 mb-4">Total Power Consumption</h4>
+            <p className="text-4xl font-bold text-brewery-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
                 if (sensorError) return 'Error'

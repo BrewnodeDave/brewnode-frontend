@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+public/logo512.svgimport React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { 
   Activity, 
@@ -47,17 +47,17 @@ const Layout = ({ children }) => {
         fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between h-16 px-4 bg-brewery-600">
+        <div className="flex items-center justify-between h-20 px-6 bg-brewery-600">
           <div className="flex items-center">
-            <Activity className="w-8 h-8 text-white mr-2" />
-            <h1 className="text-xl font-bold text-white">Brewnode</h1>
+            <Activity className="w-10 h-10 text-white mr-3" />
+            <h1 className="text-2xl font-bold text-white">Brewnode</h1>
           </div>
           {/* Mobile close button */}
           <button
             onClick={closeSidebar}
             className="lg:hidden text-white hover:text-gray-200"
           >
-            <X className="w-6 h-6" />
+            <X className="w-8 h-8" />
           </button>
         </div>
         
@@ -72,14 +72,14 @@ const Layout = ({ children }) => {
                 to={item.href}
                 onClick={closeSidebar}
                 className={`
-                  flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors
+                  flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors
                   ${isActive
                     ? 'bg-brewery-100 text-brewery-900'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }
                 `}
               >
-                <Icon className="w-5 h-5 mr-3 flex-shrink-0" />
+                <Icon className="w-6 h-6 mr-4 flex-shrink-0" />
                 {item.name}
               </Link>
             )
@@ -89,9 +89,9 @@ const Layout = ({ children }) => {
         <div className="px-2 py-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            className="flex items-center w-full px-4 py-3 text-base font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors"
           >
-            <LogOut className="w-5 h-5 mr-3 flex-shrink-0" />
+            <LogOut className="w-6 h-6 mr-4 flex-shrink-0" />
             Logout
           </button>
         </div>
@@ -101,23 +101,23 @@ const Layout = ({ children }) => {
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         {/* Mobile header */}
         <header className="lg:hidden bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center justify-between px-6 py-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="text-gray-600 hover:text-gray-900"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-8 h-8" />
             </button>
             <div className="flex items-center">
-              <Activity className="w-6 h-6 mr-2 text-brewery-600" />
-              <h1 className="text-lg font-semibold text-gray-900">Brewnode</h1>
+              <Activity className="w-8 h-8 mr-3 text-brewery-600" />
+              <h1 className="text-xl font-semibold text-gray-900">Brewnode</h1>
             </div>
-            <div className="w-6" /> {/* Spacer for centering */}
+            <div className="w-8" /> {/* Spacer for centering */
           </div>
         </header>
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-          <div className="container mx-auto px-4 lg:px-6 py-4 lg:py-8">
+          <div className="container mx-auto px-6 lg:px-8 py-6 lg:py-10">
             {children}
           </div>
         </main>
