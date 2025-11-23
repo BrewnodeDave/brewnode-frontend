@@ -144,20 +144,18 @@ const SystemStatus = () => {
                 if (!sensorData?.data) return 'No Sensor Data'
                 
                 console.log('Processing pumps, sensorData.data:', sensorData.data)
-                console.log('Is array?', Array.isArray(sensorData.data))
                 
-                let pumps = []
-                if (Array.isArray(sensorData.data)) {
-                  pumps = sensorData.data.filter(item => {
-                    console.log('Checking item:', item, 'type:', typeof item)
-                    return item && typeof item === 'object' && item.name && 
-                           typeof item.name === 'string' && item.name.includes('Pump')
-                  })
+                // Handle parsed object format (camelCase keys)
+                if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  const pumpKeys = Object.keys(sensorData.data).filter(key => 
+                    key.toLowerCase().includes('pump')
+                  )
+                  console.log('Found pump keys:', pumpKeys)
+                  const active = pumpKeys.filter(key => (sensorData.data[key] || 0) > 0).length
+                  return pumpKeys.length > 0 ? `${active} of ${pumpKeys.length}` : 'No Pumps Found'
                 }
                 
-                console.log('Found pumps:', pumps)
-                const active = pumps.filter(pump => (pump.value || 0) > 0).length
-                return pumps.length > 0 ? `${active} of ${pumps.length}` : 'No Pumps Found'
+                return 'Invalid Data Format'
               })()}
             </p>
           </div>
@@ -170,17 +168,17 @@ const SystemStatus = () => {
                 if (sensorError) return 'Error'
                 if (!sensorData?.data) return 'No Sensor Data'
                 
-                let valves = []
-                if (Array.isArray(sensorData.data)) {
-                  valves = sensorData.data.filter(item => 
-                    item && typeof item === 'object' && item.name && 
-                    typeof item.name === 'string' && item.name.includes('Valve')
+                // Handle parsed object format (camelCase keys)
+                if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  const valveKeys = Object.keys(sensorData.data).filter(key => 
+                    key.toLowerCase().includes('valve')
                   )
+                  console.log('Found valve keys:', valveKeys)
+                  const open = valveKeys.filter(key => (sensorData.data[key] || 0) > 0).length
+                  return valveKeys.length > 0 ? `${open} of ${valveKeys.length}` : 'No Valves Found'
                 }
                 
-                console.log('Found valves:', valves)
-                const open = valves.filter(valve => (valve.value || 0) > 0).length
-                return valves.length > 0 ? `${open} of ${valves.length}` : 'No Valves Found'
+                return 'Invalid Data Format'
               })()}
             </p>
           </div>
