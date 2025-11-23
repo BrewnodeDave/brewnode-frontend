@@ -9,6 +9,11 @@ const SystemStatus = () => {
 
   // Debug logging
   console.log('SystemStatus sensorData:', sensorData, 'loading:', sensorLoading, 'error:', sensorError)
+  if (sensorData?.data) {
+    console.log('Sensor data array:', sensorData.data)
+    console.log('Array.isArray check:', Array.isArray(sensorData.data))
+    console.log('Data type:', typeof sensorData.data)
+  }
 
   const handleRestart = async () => {
     if (window.confirm('Are you sure you want to restart the server?')) {
@@ -136,15 +141,23 @@ const SystemStatus = () => {
               {(() => {
                 if (sensorLoading) return 'Loading...'
                 if (sensorError) return 'Error'
-                if (!Array.isArray(sensorData?.data)) return 'No Data'
+                if (!sensorData?.data) return 'No Sensor Data'
                 
-                const pumps = sensorData.data.filter(item => 
-                  item && typeof item === 'object' && item.name && 
-                  typeof item.name === 'string' && item.name.includes('Pump')
-                )
+                console.log('Processing pumps, sensorData.data:', sensorData.data)
+                console.log('Is array?', Array.isArray(sensorData.data))
+                
+                let pumps = []
+                if (Array.isArray(sensorData.data)) {
+                  pumps = sensorData.data.filter(item => {
+                    console.log('Checking item:', item, 'type:', typeof item)
+                    return item && typeof item === 'object' && item.name && 
+                           typeof item.name === 'string' && item.name.includes('Pump')
+                  })
+                }
+                
                 console.log('Found pumps:', pumps)
                 const active = pumps.filter(pump => (pump.value || 0) > 0).length
-                return `${active} of ${pumps.length}`
+                return pumps.length > 0 ? `${active} of ${pumps.length}` : 'No Pumps Found'
               })()}
             </p>
           </div>
@@ -155,15 +168,19 @@ const SystemStatus = () => {
               {(() => {
                 if (sensorLoading) return 'Loading...'
                 if (sensorError) return 'Error'
-                if (!Array.isArray(sensorData?.data)) return 'No Data'
+                if (!sensorData?.data) return 'No Sensor Data'
                 
-                const valves = sensorData.data.filter(item => 
-                  item && typeof item === 'object' && item.name && 
-                  typeof item.name === 'string' && item.name.includes('Valve')
-                )
+                let valves = []
+                if (Array.isArray(sensorData.data)) {
+                  valves = sensorData.data.filter(item => 
+                    item && typeof item === 'object' && item.name && 
+                    typeof item.name === 'string' && item.name.includes('Valve')
+                  )
+                }
+                
                 console.log('Found valves:', valves)
                 const open = valves.filter(valve => (valve.value || 0) > 0).length
-                return `${open} of ${valves.length}`
+                return valves.length > 0 ? `${open} of ${valves.length}` : 'No Valves Found'
               })()}
             </p>
           </div>
