@@ -351,33 +351,16 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Kettle Heater"
               status={(() => {
-                // Use local state from API response (power consumption number)
-                if (heaterStates.kettle !== null) {
-                  const power = heaterStates.kettle || 0
+                // Primary source: sensor data array index 12 (most current)
+                if (Array.isArray(sensorData?.data) && sensorData.data[12] !== undefined) {
+                  const power = sensorData.data[12] || 0
                   return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
-                // Fallback to sensor data if local state not available
-                // Try to find kettle heater power in sensor data
-                if (sensorData?.data) {
-                  // Check if sensor data has raw array format
-                  if (Array.isArray(sensorData.data) && sensorData.data[12] !== undefined) {
-                    const power = sensorData.data[12] || 0
-                    return power > 0 ? `On (${power}W)` : "Off"
-                  }
-                  
-                  // Check parsed sensor data for any heat/power related to kettle
-                  if (typeof sensorData.data === 'object') {
-                    const kettleKeys = Object.keys(sensorData.data).filter(k => 
-                      k.toLowerCase().includes('kettle') && 
-                      (k.toLowerCase().includes('heat') || k.toLowerCase().includes('power'))
-                    )
-                    
-                    for (const key of kettleKeys) {
-                      const power = sensorData.data[key] || 0
-                      return power > 0 ? `On (${power}W)` : "Off"
-                    }
-                  }
+                // Fallback: local state from recent API response
+                if (heaterStates.kettle !== null) {
+                  const power = heaterStates.kettle || 0
+                  return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
                 return "Off"
