@@ -133,7 +133,10 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
 
   const heaterMutations = {
     kettle: useMutation(
-      (state) => brewnodeAPI.setHeat(state),
+      (state) => {
+        console.log('Kettle heater mutation - sending state:', state)
+        return brewnodeAPI.setHeat(state)
+      },
       { 
         onSuccess: () => {
           queryClient.invalidateQueries(['sensorStatus'])
@@ -145,7 +148,10 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       }
     ),
     glycolHeat: useMutation(
-      (state) => brewnodeAPI.setGlycolHeat(state),
+      (state) => {
+        console.log('Glycol heater mutation - sending state:', state)
+        return brewnodeAPI.setGlycolHeat(state)
+      },
       { 
         onSuccess: () => {
           queryClient.invalidateQueries(['sensorStatus'])
@@ -157,7 +163,10 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       }
     ),
     glycolChill: useMutation(
-      (state) => brewnodeAPI.setGlycolChill(state),
+      (state) => {
+        console.log('Glycol chiller mutation - sending state:', state)
+        return brewnodeAPI.setGlycolChill(state)
+      },
       { 
         onSuccess: () => {
           queryClient.invalidateQueries(['sensorStatus'])
@@ -300,21 +309,21 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ControlCard
               name="Kettle Heater"
-              status={(sensorData?.data?.kettleHeater || 0) > 0 ? "On" : "Off"}
+              status={(Array.isArray(sensorData?.data) && sensorData.data[12] || 0) > 0 ? "On" : "Off"}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
               icon={Flame}
             />
             <ControlCard
               name="Glycol Heater"
-              status={(sensorData?.data?.glycolHeater || 0) > 0 ? "On" : "Off"}
+              status={(Array.isArray(sensorData?.data) && sensorData.data[10] || 0) > 0 ? "On" : "Off"}
               onToggle={(state) => heaterMutations.glycolHeat.mutate(state)}
               isLoading={heaterMutations.glycolHeat.isLoading}
               icon={Flame}
             />
             <ControlCard
               name="Glycol Chiller"
-              status={(sensorData?.data?.glycolChiller || 0) > 0 ? "On" : "Off"}
+              status={(Array.isArray(sensorData?.data) && sensorData.data[11] || 0) > 0 ? "On" : "Off"}
               onToggle={(state) => heaterMutations.glycolChill.mutate(state)}
               isLoading={heaterMutations.glycolChill.isLoading}
               icon={Snowflake}
