@@ -166,10 +166,13 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       },
       { 
         onSuccess: (response) => {
-          console.log('Kettle heater response - power consumption:', response.data)
-          // Store the power consumption value (0 = off, >0 = on)
-          const powerValue = typeof response.data === 'number' ? response.data : (response.data?.power || response.data?.value || 0)
+          console.log('Kettle heater power consumption:', response.data)
+          
+          // Response.data is a number representing power consumption (0 = off, >0 = on)
+          const powerValue = Number(response.data) || 0
           setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
+          
+          // Invalidate queries to refresh sensor data
           queryClient.invalidateQueries(['sensorStatus'])
         },
         onError: (error) => {
@@ -358,32 +361,33 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Kettle Heater"
               status={(() => {
-                // Check local state first (power consumption from API response)
+                // Use local state from API response (power consumption number)
                 if (heaterStates.kettle !== null) {
                   const power = heaterStates.kettle || 0
                   return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
-                // Try various possible kettle heater keys in parsed sensor data
-                if (sensorData?.data && typeof sensorData.data === 'object') {
-                  const possibleKeys = [
-                    'heatKettle', 'heatkettle', 'kettleHeat', 'kettleheat',
-                    'powerKettle', 'powerkettle', 'kettlePower', 'kettlepower',
-                    'tempKettleHeat', 'tempkettleheat'
-                  ]
+                // Fallback to sensor data if local state not available
+                // Try to find kettle heater power in sensor data
+                if (sensorData?.data) {
+                  // Check if sensor data has raw array format
+                  if (Array.isArray(sensorData.data) && sensorData.data[12] !== undefined) {
+                    const power = sensorData.data[12] || 0
+                    return power > 0 ? `On (${power}W)` : "Off"
+                  }
                   
-                  for (const key of possibleKeys) {
-                    if (sensorData.data[key] !== undefined) {
+                  // Check parsed sensor data for any heat/power related to kettle
+                  if (typeof sensorData.data === 'object') {
+                    const kettleKeys = Object.keys(sensorData.data).filter(k => 
+                      k.toLowerCase().includes('kettle') && 
+                      (k.toLowerCase().includes('heat') || k.toLowerCase().includes('power'))
+                    )
+                    
+                    for (const key of kettleKeys) {
                       const power = sensorData.data[key] || 0
                       return power > 0 ? `On (${power}W)` : "Off"
                     }
                   }
-                }
-                
-                // If it's still an array, try index 12
-                if (Array.isArray(sensorData?.data)) {
-                  const power = sensorData.data[12] || 0
-                  return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
                 return "Off"
