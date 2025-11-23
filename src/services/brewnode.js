@@ -3,8 +3,13 @@ import api from './api'
 // Brewnode API endpoints
 export const brewnodeAPI = {
   // Core Brewnode endpoints
-  getBrewData: (brewname, since) => 
-    api.get('/api/brewdata', { params: { brewname, since } }),
+  getBrewData: (brewname, since) => {
+    const params = { brewname }
+    if (since && since.trim() !== '') {
+      params.since = since
+    }
+    return api.get('/api/brewdata', { params })
+  },
   
   getCurrentBrew: () => 
     api.get('/api/currentbrew'),
