@@ -90,17 +90,35 @@ const SensorControl = () => {
         />
         <StatusCard
           title="Active Pumps"
-          value={pumpsStatus?.data ? Object.values(pumpsStatus.data).filter(v => v === 'On').length : 0}
+          value={(() => {
+            if (!sensorData?.data) return 0
+            if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+              const pumpKeys = Object.keys(sensorData.data).filter(key => 
+                key.toLowerCase().includes('pump')
+              )
+              return pumpKeys.filter(key => (sensorData.data[key] || 0) > 0).length
+            }
+            return 0
+          })()}
           icon={Droplets}
           color="blue"
-          loading={!pumpsStatus}
+          loading={isLoading}
         />
         <StatusCard
           title="Open Valves"
-          value={valvesStatus?.data ? Object.values(valvesStatus.data).filter(v => v === 'Open').length : 0}
+          value={(() => {
+            if (!sensorData?.data) return 0
+            if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+              const valveKeys = Object.keys(sensorData.data).filter(key => 
+                key.toLowerCase().includes('valve')
+              )
+              return valveKeys.filter(key => (sensorData.data[key] || 0) > 0).length
+            }
+            return 0
+          })()}
           icon={Power}
           color="green"
-          loading={!valvesStatus}
+          loading={isLoading}
         />
         <StatusCard
           title="Fan Status"
