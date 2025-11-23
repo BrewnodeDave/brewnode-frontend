@@ -10,11 +10,9 @@ const LoadingSpinner = ({ size = 'medium', text = 'Loading...' }) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
       <div className="relative">
-        <img 
-          src="/logo192.svg" 
-          alt="Brewnode" 
-          className={`${sizeClasses[size]} animate-pulse`}
-        />
+        <div className={`${sizeClasses[size]} bg-brewery-100 rounded-full flex items-center justify-center animate-pulse`}>
+          <Activity className={`${size === 'small' ? 'w-3 h-3' : size === 'medium' ? 'w-5 h-5' : 'w-8 h-8'} text-brewery-600`} />
+        </div>
         <div className={`absolute inset-0 ${sizeClasses[size]} border-2 border-brewery-600 border-t-transparent rounded-full animate-spin`}></div>
       </div>
       {text && (

@@ -43,11 +43,9 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         <div className="flex items-center space-x-3">
-          <img 
-            src="/logo192.svg" 
-            alt="Brewnode" 
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg shadow-sm"
-          />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brewery-100 rounded-lg shadow-sm flex items-center justify-center">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-brewery-600" />
+          </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Brewnode Dashboard</h1>
         </div>
         <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
