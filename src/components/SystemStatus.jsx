@@ -229,12 +229,24 @@ const SystemStatus = () => {
                     totalPower += sensorData.data[key] || 0
                   })
                   
-                  // Add heater power (from array indices 10, 11, 12)
-                } else if (Array.isArray(sensorData.data)) {
-                  // Fan at index 9
-                  totalPower += sensorData.data[9] || 0
+                  // Add heater power using parsed sensor data or fallback to array indices
+                } else if (sensorData.data && typeof sensorData.data === 'object') {
+                  // Use parsed power values if available
+                  totalPower += sensorData.data.fanPower || 0
+                  totalPower += sensorData.data.glycolHeaterPower || 0
+                  totalPower += sensorData.data.glycolChillerPower || 0
+                  totalPower += sensorData.data.kettleHeaterPower || 0
                   
-                  // Heaters at indices 10, 11, 12
+                  // Fallback to raw array if parsed values not available
+                  if (sensorData.data._rawArray && Array.isArray(sensorData.data._rawArray)) {
+                    if (!sensorData.data.fanPower) totalPower += sensorData.data._rawArray[9] || 0
+                    if (!sensorData.data.glycolHeaterPower) totalPower += sensorData.data._rawArray[10] || 0
+                    if (!sensorData.data.glycolChillerPower) totalPower += sensorData.data._rawArray[11] || 0
+                    if (!sensorData.data.kettleHeaterPower) totalPower += sensorData.data._rawArray[12] || 0
+                  }
+                } else if (Array.isArray(sensorData.data)) {
+                  // Legacy: direct array access
+                  totalPower += sensorData.data[9] || 0   // Fan
                   totalPower += sensorData.data[10] || 0  // Glycol heater
                   totalPower += sensorData.data[11] || 0  // Glycol chiller  
                   totalPower += sensorData.data[12] || 0  // Kettle heater
