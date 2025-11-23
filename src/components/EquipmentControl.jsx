@@ -16,21 +16,28 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState('all')
   
-  // Local heater states updated from API responses
+  // Local states updated from API responses
   const [heaterStates, setHeaterStates] = useState({
     kettle: null,
     glycolHeat: null,
     glycolChill: null
   })
+  
+  const [fanState, setFanState] = useState(null)
 
   // Debug logging
   console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
 
   // Mutation handlers
   const fanMutation = useMutation(
-    (state) => brewnodeAPI.setFan(state),
+    (state) => {
+      console.log('Fan mutation - sending state:', state)
+      return brewnodeAPI.setFan(state)
+    },
     { 
-      onSuccess: () => {
+      onSuccess: (response) => {
+        console.log('Fan response:', response.data)
+        setFanState(response.data)
         queryClient.invalidateQueries(['fanStatus'])
         queryClient.invalidateQueries(['sensorStatus'])
       },
@@ -236,7 +243,20 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
         <EquipmentSection title="Fan Control" icon={Fan} color="purple">
           <ControlCard
             name="Extractor Fan"
-            status={fanStatus?.data?.status}
+            status={(() => {
+              // Use local state first, fall back to sensor data
+              let fanPower = fanState !== null ? fanState : null
+              
+              if (fanPower === null && sensorData?.data) {
+                if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  fanPower = sensorData.data.fan || 0
+                } else if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
+                  fanPower = sensorData.data[9] || 0
+                }
+              }
+              
+              return (fanPower || 0) > 0 ? "On" : "Off"
+            })()}
             onToggle={(state) => fanMutation.mutate(state)}
             isLoading={fanMutation.isLoading}
             icon={Fan}
