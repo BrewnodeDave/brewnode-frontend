@@ -4,11 +4,11 @@ import { Server, Wifi, AlertTriangle, CheckCircle, RefreshCw, Trash2 } from 'luc
 import { brewnodeAPI } from '../services/brewnode'
 
 const SystemStatus = () => {
-  const { data: sensorData } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
+  const { data: sensorData, isLoading: sensorLoading, error: sensorError } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
   const { data: systemStatus } = useQuery('systemStatus', () => brewnodeAPI.getSystemStatus(), { refetchInterval: 30000 })
 
   // Debug logging
-  console.log('SystemStatus sensorData:', sensorData)
+  console.log('SystemStatus sensorData:', sensorData, 'loading:', sensorLoading, 'error:', sensorError)
 
   const handleRestart = async () => {
     if (window.confirm('Are you sure you want to restart the server?')) {
@@ -123,13 +123,10 @@ const SystemStatus = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Fan Status</h4>
             <p className="text-gray-600">
-              {(() => {
-                if (Array.isArray(sensorData?.data)) {
-                  const fanValue = sensorData.data[9] // Fan is at index 9
-                  return fanValue > 0 ? 'On' : 'Off'
-                }
-                return 'Unknown'
-              })()}
+              {sensorLoading ? 'Loading...' : 
+               sensorError ? 'Error' :
+               Array.isArray(sensorData?.data) && sensorData.data.length > 9 ? 
+                 ((sensorData.data[9] || 0) > 0 ? 'On' : 'Off') : 'Unknown'}
             </p>
           </div>
           
@@ -137,16 +134,17 @@ const SystemStatus = () => {
             <h4 className="font-medium text-gray-900 mb-2">Pumps Active</h4>
             <p className="text-gray-600">
               {(() => {
-                if (Array.isArray(sensorData?.data)) {
-                  // Extract pump objects from sensor data
-                  const pumps = sensorData.data.filter(item => 
-                    item && typeof item === 'object' && item.name && item.name.includes('Pump')
-                  )
-                  const active = pumps.filter(pump => pump.value > 0).length
-                  const total = pumps.length
-                  return `${active} of ${total}`
-                }
-                return 'Loading...'
+                if (sensorLoading) return 'Loading...'
+                if (sensorError) return 'Error'
+                if (!Array.isArray(sensorData?.data)) return 'No Data'
+                
+                const pumps = sensorData.data.filter(item => 
+                  item && typeof item === 'object' && item.name && 
+                  typeof item.name === 'string' && item.name.includes('Pump')
+                )
+                console.log('Found pumps:', pumps)
+                const active = pumps.filter(pump => (pump.value || 0) > 0).length
+                return `${active} of ${pumps.length}`
               })()}
             </p>
           </div>
@@ -155,16 +153,17 @@ const SystemStatus = () => {
             <h4 className="font-medium text-gray-900 mb-2">Valves Open</h4>
             <p className="text-gray-600">
               {(() => {
-                if (Array.isArray(sensorData?.data)) {
-                  // Extract valve objects from sensor data
-                  const valves = sensorData.data.filter(item => 
-                    item && typeof item === 'object' && item.name && item.name.includes('Valve')
-                  )
-                  const open = valves.filter(valve => valve.value > 0).length
-                  const total = valves.length
-                  return `${open} of ${total}`
-                }
-                return 'Loading...'
+                if (sensorLoading) return 'Loading...'
+                if (sensorError) return 'Error'
+                if (!Array.isArray(sensorData?.data)) return 'No Data'
+                
+                const valves = sensorData.data.filter(item => 
+                  item && typeof item === 'object' && item.name && 
+                  typeof item.name === 'string' && item.name.includes('Valve')
+                )
+                console.log('Found valves:', valves)
+                const open = valves.filter(valve => (valve.value || 0) > 0).length
+                return `${open} of ${valves.length}`
               })()}
             </p>
           </div>
