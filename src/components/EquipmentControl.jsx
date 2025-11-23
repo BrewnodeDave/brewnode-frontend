@@ -228,23 +228,23 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ControlCard
               name="Kettle Pump"
-              status={pumpsStatus?.data?.kettlePump}
+              status={pumpsStatus?.data?.find(p => p.name === "Pump Kettle")?.value > 0 ? "On" : "Off"}
               onToggle={(state) => pumpMutations.kettle.mutate(state)}
               isLoading={pumpMutations.kettle.isLoading}
               icon={Droplets}
             />
             <ControlCard
               name="Mash Pump"
-              status={pumpsStatus?.data?.mashPump}
+              status={pumpsStatus?.data?.find(p => p.name === "Pump Mash")?.value > 0 ? "On" : "Off"}
               onToggle={(state) => pumpMutations.mash.mutate(state)}
               isLoading={pumpMutations.mash.isLoading}
               icon={Droplets}
             />
             <ControlCard
               name="Glycol Pump"
-              status={pumpsStatus?.data?.glycolPump}
+              status={pumpsStatus?.data?.find(p => p.name === "Pump Glycol")?.value > 0 ? "On" : "Off"}
               onToggle={(state) => {
-                console.log('Glycol pump toggle - current status:', pumpsStatus?.data?.glycolPump, 'new state:', state)
+                console.log('Glycol pump toggle - current status:', pumpsStatus?.data?.find(p => p.name === "Pump Glycol")?.value, 'new state:', state)
                 pumpMutations.glycol.mutate(state)
               }}
               isLoading={pumpMutations.glycol.isLoading}
@@ -260,7 +260,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <ControlCard
               name="Kettle In"
-              status={valvesStatus?.data?.kettleInValve}
+              status={valvesStatus?.data?.find(v => v.name === "Valve Kettle-in")?.value > 0 ? "Open" : "Close"}
               onToggle={(state) => valveMutations.kettlein.mutate(state)}
               isLoading={valveMutations.kettlein.isLoading}
               icon={Power}
@@ -268,7 +268,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
             />
             <ControlCard
               name="Mash In"
-              status={valvesStatus?.data?.mashInValve}
+              status={valvesStatus?.data?.find(v => v.name === "Valve Mash-in")?.value > 0 ? "Open" : "Close"}
               onToggle={(state) => valveMutations.mashin.mutate(state)}
               isLoading={valveMutations.mashin.isLoading}
               icon={Power}
@@ -276,7 +276,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
             />
             <ControlCard
               name="Chill Wort In"
-              status={valvesStatus?.data?.chillWortInValve}
+              status={valvesStatus?.data?.find(v => v.name === "Valve Chiller wort-in")?.value > 0 ? "Open" : "Close"}
               onToggle={(state) => valveMutations.chillwortin.mutate(state)}
               isLoading={valveMutations.chillwortin.isLoading}
               icon={Power}
@@ -284,7 +284,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
             />
             <ControlCard
               name="Chill Wort Out"
-              status={valvesStatus?.data?.chillWortOutValve}
+              status={valvesStatus?.data?.find(v => v.name === "Valve Chiller wort-out")?.value > 0 ? "Open" : "Close"}
               onToggle={(state) => valveMutations.chillwortout.mutate(state)}
               isLoading={valveMutations.chillwortout.isLoading}
               icon={Power}
