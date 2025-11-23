@@ -64,7 +64,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           queryClient.invalidateQueries(['pumpsStatus'])
           queryClient.invalidateQueries(['sensorStatus'])
         },
-        onError: (error) => {
+        onError: (error) = > {
           console.error('Kettle pump control failed:', error)
           alert(`Kettle pump control failed: ${error.message || 'Unknown error'}`)
         }
@@ -359,21 +359,28 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
                 // Primary source: parsed sensor data kettleHeaterPower
                 if (sensorData?.data?.kettleHeaterPower !== undefined) {
                   const power = sensorData.data.kettleHeaterPower || 0
-                  return power > 0 ? `On (${power}W)` : "Off"
+                  const status = power > 0 ? 'On (' + power + 'W)' : "Off"
+                  console.log('Kettle heater status computed from kettleHeaterPower:', power, '→', status)
+                  return status
                 }
                 
                 // Alternative: raw array access (fallback)
                 if (sensorData?.data?._rawArray?.[12] !== undefined) {
                   const power = sensorData.data._rawArray[12] || 0
-                  return power > 0 ? `On (${power}W)` : "Off"
+                  const status = power > 0 ? 'On (' + power + 'W)' : "Off"
+                  console.log('Kettle heater status computed from _rawArray[12]:', power, '→', status)
+                  return status
                 }
                 
                 // Last fallback: local state from recent API response
                 if (heaterStates.kettle !== null) {
                   const power = heaterStates.kettle || 0
-                  return power > 0 ? `On (${power}W)` : "Off"
+                  const status = power > 0 ? 'On (' + power + 'W)' : "Off"
+                  console.log('Kettle heater status computed from heaterStates.kettle:', power, '→', status)
+                  return status
                 }
                 
+                console.log('Kettle heater status: no data sources available, returning Off')
                 return "Off"
               })()}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
