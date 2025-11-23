@@ -4,10 +4,11 @@ import { Server, Wifi, AlertTriangle, CheckCircle, RefreshCw, Trash2 } from 'luc
 import { brewnodeAPI } from '../services/brewnode'
 
 const SystemStatus = () => {
-  const { data: fanStatus } = useQuery('fanStatus', () => brewnodeAPI.getFanStatus(), { refetchInterval: 5000 })
-  const { data: pumpsStatus } = useQuery('pumpsStatus', () => brewnodeAPI.getPumpsStatus(), { refetchInterval: 5000 })
-  const { data: valvesStatus } = useQuery('valvesStatus', () => brewnodeAPI.getValvesStatus(), { refetchInterval: 5000 })
+  const { data: sensorData } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
   const { data: systemStatus } = useQuery('systemStatus', () => brewnodeAPI.getSystemStatus(), { refetchInterval: 30000 })
+
+  // Debug logging
+  console.log('SystemStatus sensorData:', sensorData)
 
   const handleRestart = async () => {
     if (window.confirm('Are you sure you want to restart the server?')) {
@@ -122,27 +123,49 @@ const SystemStatus = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Fan Status</h4>
             <p className="text-gray-600">
-              {fanStatus?.data !== undefined 
-                ? (fanStatus.data > 0 ? 'On' : 'Off')
-                : 'Unknown'}
+              {(() => {
+                if (Array.isArray(sensorData?.data)) {
+                  const fanValue = sensorData.data[9] // Fan is at index 9
+                  return fanValue > 0 ? 'On' : 'Off'
+                }
+                return 'Unknown'
+              })()}
             </p>
           </div>
           
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Pumps Active</h4>
             <p className="text-gray-600">
-              {Array.isArray(pumpsStatus?.data) ? 
-                pumpsStatus.data.filter(pump => pump.value > 0).length : 0
-              } of {Array.isArray(pumpsStatus?.data) ? pumpsStatus.data.length : 0}
+              {(() => {
+                if (Array.isArray(sensorData?.data)) {
+                  // Extract pump objects from sensor data
+                  const pumps = sensorData.data.filter(item => 
+                    item && typeof item === 'object' && item.name && item.name.includes('Pump')
+                  )
+                  const active = pumps.filter(pump => pump.value > 0).length
+                  const total = pumps.length
+                  return `${active} of ${total}`
+                }
+                return 'Loading...'
+              })()}
             </p>
           </div>
           
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Valves Open</h4>
             <p className="text-gray-600">
-              {Array.isArray(valvesStatus?.data) ? 
-                valvesStatus.data.filter(valve => valve.value > 0).length : 0
-              } of {Array.isArray(valvesStatus?.data) ? valvesStatus.data.length : 0}
+              {(() => {
+                if (Array.isArray(sensorData?.data)) {
+                  // Extract valve objects from sensor data
+                  const valves = sensorData.data.filter(item => 
+                    item && typeof item === 'object' && item.name && item.name.includes('Valve')
+                  )
+                  const open = valves.filter(valve => valve.value > 0).length
+                  const total = valves.length
+                  return `${open} of ${total}`
+                }
+                return 'Loading...'
+              })()}
             </p>
           </div>
         </div>
