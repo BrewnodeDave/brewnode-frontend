@@ -25,23 +25,7 @@ const SensorControl = () => {
     { refetchInterval: 2000 }
   )
 
-  const { data: fanStatus } = useQuery(
-    'fanStatus',
-    () => brewnodeAPI.getFanStatus(),
-    { refetchInterval: 5000 }
-  )
 
-  const { data: pumpsStatus } = useQuery(
-    'pumpsStatus',
-    () => brewnodeAPI.getPumpsStatus(),
-    { refetchInterval: 5000 }
-  )
-
-  const { data: valvesStatus } = useQuery(
-    'valvesStatus',
-    () => brewnodeAPI.getValvesStatus(),
-    { refetchInterval: 5000 }
-  )
 
   const tabs = [
     { id: 'sensors', name: 'Sensors', icon: Thermometer },
@@ -56,9 +40,6 @@ const SensorControl = () => {
       case 'equipment':
         return (
           <EquipmentControl 
-            fanStatus={fanStatus}
-            pumpsStatus={pumpsStatus}
-            valvesStatus={valvesStatus}
             sensorData={sensorData}
           />
         )
@@ -140,7 +121,7 @@ const SensorControl = () => {
           })()}
           icon={Fan}
           color="purple"
-          loading={!fanStatus && isLoading}
+          loading={isLoading}
           isText={true}
         />
       </div>

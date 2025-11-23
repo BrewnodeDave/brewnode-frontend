@@ -12,21 +12,14 @@ import {
 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 
-const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) => {
+const EquipmentControl = ({ sensorData }) => {
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState('all')
   
-  // Local states updated from API responses
-  const [heaterStates, setHeaterStates] = useState({
-    kettle: null,
-    glycolHeat: null,
-    glycolChill: null
-  })
-  
-  const [fanState, setFanState] = useState(null)
+  // All status information comes from sensorData - no local state needed
 
   // Debug logging
-  console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
+  console.log('EquipmentControl props:', { sensorData })
   
   // Debug logging
   console.log('EquipmentControl - Kettle heater power:', sensorData?.data?.kettleHeaterPower)
@@ -40,7 +33,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
     { 
       onSuccess: (response) => {
         console.log('Fan response:', response.data)
-        setFanState(response.data)
+        // Invalidate queries to refresh all status from central sensorStatus
         queryClient.invalidateQueries('fanStatus')
         queryClient.invalidateQueries('sensorStatus')
       },
@@ -160,10 +153,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           const powerValue = Number(response.data) || 0
           console.log('Kettle heater updated to:', powerValue + 'W')
           
-          // Update local state immediately for instant UI feedback
-          setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
-          
-          // Invalidate queries to refresh sensor data
+          // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
@@ -180,7 +170,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       { 
         onSuccess: (response) => {
           console.log('Glycol heater response:', response.data)
-          setHeaterStates(prev => ({ ...prev, glycolHeat: response.data }))
+          // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
@@ -197,7 +187,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       { 
         onSuccess: (response) => {
           console.log('Glycol chiller response:', response.data)
-          setHeaterStates(prev => ({ ...prev, glycolChill: response.data }))
+          // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
@@ -253,12 +243,12 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           <ControlCard
             name="Extractor Fan"
             status={(() => {
-              // Use local state first, fall back to sensor data
-              let fanPower = fanState !== null ? fanState : null
+              // Get fan status from central sensor data only
+              let fanPower = 0
               
-              if (fanPower === null && sensorData?.data) {
+              if (sensorData?.data) {
                 if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
-                  fanPower = sensorData.data.fan || 0
+                  fanPower = sensorData.data.fanPower || sensorData.data.fan || 0
                 } else if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
                   fanPower = sensorData.data[9] || 0
                 }
@@ -279,23 +269,44 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <ControlCard
               name="Kettle Pump"
-              status={(pumpsStatus?.data?.find(p => p.name === "Pump Kettle")?.value || 0) > 0 ? "On" : "Off"}
+              status={(() => {
+                // Get kettle pump status from sensor data
+                let pumpPower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  pumpPower = sensorData.data.pumpKettle || sensorData.data.kettlePump || 0
+                }
+                return pumpPower > 0 ? "On" : "Off"
+              })()} 
               onToggle={(state) => pumpMutations.kettle.mutate(state)}
               isLoading={pumpMutations.kettle.isLoading}
               icon={Droplets}
             />
             <ControlCard
               name="Mash Pump"
-              status={(pumpsStatus?.data?.find(p => p.name === "Pump Mash")?.value || 0) > 0 ? "On" : "Off"}
+              status={(() => {
+                // Get mash pump status from sensor data
+                let pumpPower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  pumpPower = sensorData.data.pumpMash || sensorData.data.mashPump || 0
+                }
+                return pumpPower > 0 ? "On" : "Off"
+              })()}
               onToggle={(state) => pumpMutations.mash.mutate(state)}
               isLoading={pumpMutations.mash.isLoading}
               icon={Droplets}
             />
             <ControlCard
               name="Glycol Pump"
-              status={(pumpsStatus?.data?.find(p => p.name === "Pump Glycol")?.value || 0) > 0 ? "On" : "Off"}
+              status={(() => {
+                // Get glycol pump status from sensor data
+                let pumpPower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  pumpPower = sensorData.data.pumpGlycol || sensorData.data.glycolPump || 0
+                }
+                return pumpPower > 0 ? "On" : "Off"
+              })()}
               onToggle={(state) => {
-                console.log('Glycol pump toggle - current status:', pumpsStatus?.data?.find(p => p.name === "Pump Glycol")?.value, 'new state:', state)
+                console.log('Glycol pump toggle - new state:', state)
                 pumpMutations.glycol.mutate(state)
               }}
               isLoading={pumpMutations.glycol.isLoading}
@@ -311,7 +322,14 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <ControlCard
               name="Kettle In"
-              status={(valvesStatus?.data?.find(v => v.name === "Valve Kettle-in")?.value || 0) > 0 ? "Open" : "Close"}
+              status={(() => {
+                // Get kettle in valve status from sensor data
+                let valvePower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  valvePower = sensorData.data.valveKettleIn || sensorData.data.kettleIn || 0
+                }
+                return valvePower > 0 ? "Open" : "Close"
+              })()}
               onToggle={(state) => valveMutations.kettlein.mutate(state)}
               isLoading={valveMutations.kettlein.isLoading}
               icon={Power}
@@ -319,7 +337,14 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             />
             <ControlCard
               name="Mash In"
-              status={(valvesStatus?.data?.find(v => v.name === "Valve Mash-in")?.value || 0) > 0 ? "Open" : "Close"}
+              status={(() => {
+                // Get mash in valve status from sensor data
+                let valvePower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  valvePower = sensorData.data.valveMashIn || sensorData.data.mashIn || 0
+                }
+                return valvePower > 0 ? "Open" : "Close"
+              })()}
               onToggle={(state) => valveMutations.mashin.mutate(state)}
               isLoading={valveMutations.mashin.isLoading}
               icon={Power}
@@ -327,7 +352,14 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             />
             <ControlCard
               name="Chill Wort In"
-              status={(valvesStatus?.data?.find(v => v.name === "Valve Chiller wort-in")?.value || 0) > 0 ? "Open" : "Close"}
+              status={(() => {
+                // Get chill wort in valve status from sensor data
+                let valvePower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  valvePower = sensorData.data.valveChillerWortIn || sensorData.data.chillWortIn || 0
+                }
+                return valvePower > 0 ? "Open" : "Close"
+              })()}
               onToggle={(state) => valveMutations.chillwortin.mutate(state)}
               isLoading={valveMutations.chillwortin.isLoading}
               icon={Power}
@@ -335,7 +367,14 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             />
             <ControlCard
               name="Chill Wort Out"
-              status={(valvesStatus?.data?.find(v => v.name === "Valve Chiller wort-out")?.value || 0) > 0 ? "Open" : "Close"}
+              status={(() => {
+                // Get chill wort out valve status from sensor data
+                let valvePower = 0
+                if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  valvePower = sensorData.data.valveChillerWortOut || sensorData.data.chillWortOut || 0
+                }
+                return valvePower > 0 ? "Open" : "Close"
+              })()}
               onToggle={(state) => valveMutations.chillwortout.mutate(state)}
               isLoading={valveMutations.chillwortout.isLoading}
               icon={Power}
@@ -352,32 +391,22 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Kettle Heater"
               status={(() => {
-                // Primary source: local state from API response (immediate feedback)
-                if (heaterStates.kettle !== null) {
-                  const power = heaterStates.kettle || 0
-                  return power > 0 ? "On" : "Off"
-                }
+                // Get kettle heater status from central sensor data only
+                let power = 0
                 
-                // Fallback: parsed sensor data kettleHeaterPower
                 if (sensorData?.data?.kettleHeaterPower !== undefined) {
-                  const power = sensorData.data.kettleHeaterPower || 0
-                  return power > 0 ? "On" : "Off"
+                  power = sensorData.data.kettleHeaterPower || 0
+                } else if (sensorData?.data?._rawArray?.[12] !== undefined) {
+                  power = sensorData.data._rawArray[12] || 0
                 }
                 
-                // Last fallback: raw array access
-                if (sensorData?.data?._rawArray?.[12] !== undefined) {
-                  const power = sensorData.data._rawArray[12] || 0
-                  return power > 0 ? "On" : "Off"
-                }
-                
-                return "Off"
+                return power > 0 ? "On" : "Off"
               })()}
               stateLabels={(() => {
-                // Get current power for display labels - prioritize API response
+                // Get current power for display labels from sensor data
                 let power = 0
-                if (heaterStates.kettle !== null) {
-                  power = heaterStates.kettle || 0
-                } else if (sensorData?.data?.kettleHeaterPower !== undefined) {
+                
+                if (sensorData?.data?.kettleHeaterPower !== undefined) {
                   power = sensorData.data.kettleHeaterPower || 0
                 } else if (sensorData?.data?._rawArray?.[12] !== undefined) {
                   power = sensorData.data._rawArray[12] || 0
@@ -395,8 +424,14 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Glycol Heater"
               status={(() => {
-                const power = heaterStates.glycolHeat !== null ? heaterStates.glycolHeat : (Array.isArray(sensorData?.data) ? sensorData.data[10] : 0)
-                return (power || 0) > 0 ? "On" : "Off"
+                // Get glycol heater status from central sensor data only
+                let power = 0
+                if (sensorData?.data?.glycolHeaterPower !== undefined) {
+                  power = sensorData.data.glycolHeaterPower || 0
+                } else if (sensorData?.data?._rawArray?.[10] !== undefined) {
+                  power = sensorData.data._rawArray[10] || 0
+                }
+                return power > 0 ? "On" : "Off"
               })()}
               onToggle={(state) => heaterMutations.glycolHeat.mutate(state)}
               isLoading={heaterMutations.glycolHeat.isLoading}
@@ -405,8 +440,14 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Glycol Chiller"
               status={(() => {
-                const power = heaterStates.glycolChill !== null ? heaterStates.glycolChill : (Array.isArray(sensorData?.data) ? sensorData.data[11] : 0)
-                return (power || 0) > 0 ? "On" : "Off"
+                // Get glycol chiller status from central sensor data only
+                let power = 0
+                if (sensorData?.data?.glycolChillerPower !== undefined) {
+                  power = sensorData.data.glycolChillerPower || 0
+                } else if (sensorData?.data?._rawArray?.[11] !== undefined) {
+                  power = sensorData.data._rawArray[11] || 0
+                }
+                return power > 0 ? "On" : "Off"
               })()}
               onToggle={(state) => heaterMutations.glycolChill.mutate(state)}
               isLoading={heaterMutations.glycolChill.isLoading}
