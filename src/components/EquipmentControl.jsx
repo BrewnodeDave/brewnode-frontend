@@ -12,12 +12,12 @@ import {
 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 
-const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
+const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) => {
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState('all')
 
   // Debug logging
-  console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus })
+  console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
 
   // Mutation handlers
   const fanMutation = useMutation(
@@ -300,21 +300,21 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ControlCard
               name="Kettle Heater"
-              status="Off" // Would come from sensor data
+              status={(sensorData?.data?.kettleHeater || 0) > 0 ? "On" : "Off"}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
               icon={Flame}
             />
             <ControlCard
               name="Glycol Heater"
-              status="Off" // Would come from sensor data
+              status={(sensorData?.data?.glycolHeater || 0) > 0 ? "On" : "Off"}
               onToggle={(state) => heaterMutations.glycolHeat.mutate(state)}
               isLoading={heaterMutations.glycolHeat.isLoading}
               icon={Flame}
             />
             <ControlCard
               name="Glycol Chiller"
-              status="Off" // Would come from sensor data
+              status={(sensorData?.data?.glycolChiller || 0) > 0 ? "On" : "Off"}
               onToggle={(state) => heaterMutations.glycolChill.mutate(state)}
               isLoading={heaterMutations.glycolChill.isLoading}
               icon={Snowflake}
