@@ -49,28 +49,31 @@ const Dashboard = () => {
       </div>
 
       {/* Current Brew Status */}
-      {currentBrew && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <Activity className="w-5 h-5 mr-2 text-brewery-600" />
-            Current Brew
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <p className="text-sm text-gray-600">Recipe</p>
-              <p className="text-lg font-semibold">{currentBrew.data?.recipeName || 'No active brew'}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600">Status</p>
-              <p className="text-lg font-semibold">{currentBrew.data?.status || 'Idle'}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600">Progress</p>
-              <p className="text-lg font-semibold">{currentBrew.data?.progress || '0%'}</p>
-            </div>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4 flex items-center">
+          <Activity className="w-5 h-5 mr-2 text-brewery-600" />
+          Current Brew
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center">
+            <p className="text-sm text-gray-600">Recipe</p>
+            <p className="text-lg font-semibold">{currentBrew?.data?.recipeName || 'No active brew'}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">Status</p>
+            <p className="text-lg font-semibold">{currentBrew?.data?.status || 'System Ready'}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">Latest Brew</p>
+            <p className="text-lg font-semibold">
+              {brewnames?.data && brewnames.data.length > 0 
+                ? brewnames.data[0] 
+                : 'No brews found'
+              }
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
       {/* System Status Overview */}
       <SystemStatus />
