@@ -64,7 +64,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           queryClient.invalidateQueries(['pumpsStatus'])
           queryClient.invalidateQueries(['sensorStatus'])
         },
-        onError: (error) = > {
+        onError: (error) => {
           console.error('Kettle pump control failed:', error)
           alert(`Kettle pump control failed: ${error.message || 'Unknown error'}`)
         }
