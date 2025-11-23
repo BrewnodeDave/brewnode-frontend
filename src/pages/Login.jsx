@@ -46,7 +46,7 @@ const Login = () => {
         <div>
           <div className="mx-auto h-20 w-20 flex items-center justify-center">
             <img 
-              src="/brewnode-logo.png" 
+              src="/logo192.svg" 
               alt="Brewnode Logo" 
               className="h-16 w-16 rounded-lg shadow-lg"
             />

@@ -6,7 +6,8 @@ import {
   Activity, 
   AlertCircle,
   Clock,
-  Server 
+  Server,
+  Beaker 
 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 import SensorStatusCard from '../components/SensorStatusCard'
@@ -43,7 +44,7 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         <div className="flex items-center space-x-3">
           <img 
-            src="/brewnode-logo.png" 
+            src="/logo192.svg" 
             alt="Brewnode" 
             className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg shadow-sm"
           />
