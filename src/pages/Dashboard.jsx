@@ -40,11 +40,12 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Brewnode Dashboard</h1>
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Brewnode Dashboard</h1>
+        <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
           <Clock className="w-4 h-4" />
-          <span>{new Date().toLocaleString()}</span>
+          <span className="hidden sm:inline">{new Date().toLocaleString()}</span>
+          <span className="sm:hidden">{new Date().toLocaleTimeString()}</span>
         </div>
       </div>
 

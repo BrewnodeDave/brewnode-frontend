@@ -145,27 +145,27 @@ const BrewDataChart = () => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
         <h3 className="text-lg font-semibold flex items-center">
           <BarChart3 className="w-5 h-5 mr-2 text-gray-600" />
           Brew Data Chart
         </h3>
         
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4 text-gray-500" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
             <input
               type="datetime-local"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="text-sm border border-gray-300 rounded px-2 py-1"
+              className="text-sm border border-gray-300 rounded px-2 py-1 flex-1 sm:flex-initial"
             />
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 justify-center sm:justify-start">
             <button
               onClick={() => setEnableZoom(!enableZoom)}
-              className={`flex items-center space-x-1 px-2 py-1 text-xs rounded ${
+              className={`flex items-center space-x-1 px-3 py-2 text-xs rounded transition-colors ${
                 enableZoom 
                   ? 'bg-blue-100 text-blue-700 border border-blue-300' 
                   : 'bg-gray-100 text-gray-600 border border-gray-300'
@@ -173,16 +173,16 @@ const BrewDataChart = () => {
               title={enableZoom ? 'Disable zoom' : 'Enable zoom'}
             >
               <ZoomIn className="w-3 h-3" />
-              <span>Zoom</span>
+              <span className="hidden sm:inline">Zoom</span>
             </button>
             {zoomDomain && (
               <button
                 onClick={resetZoom}
-                className="flex items-center space-x-1 px-2 py-1 text-xs rounded bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200"
+                className="flex items-center space-x-1 px-3 py-2 text-xs rounded bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200 transition-colors"
                 title="Reset zoom"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>Reset</span>
+                <span className="hidden sm:inline">Reset</span>
               </button>
             )}
           </div>
@@ -190,7 +190,7 @@ const BrewDataChart = () => {
           <select
             value={selectedBrew}
             onChange={(e) => setSelectedBrew(e.target.value)}
-            className="text-sm border border-gray-300 rounded px-2 py-1"
+            className="text-sm border border-gray-300 rounded px-2 py-1 w-full sm:w-auto min-w-0 sm:min-w-[150px]"
           >
             <option value="">Select a brew...</option>
             {brewnames?.data?.map((name, index) => (
@@ -213,7 +213,7 @@ const BrewDataChart = () => {
           <p>No data available for selected brew</p>
         </div>
       ) : (
-        <div className="h-64">
+        <div className="h-64 sm:h-80 lg:h-96">
           <p className="text-sm text-gray-600 mb-2">
             Showing {chartData.length} data points for {selectedBrew}
           </p>
