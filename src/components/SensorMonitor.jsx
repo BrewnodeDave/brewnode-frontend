@@ -87,20 +87,7 @@ const SensorMonitor = ({ data, isLoading }) => {
         </div>
       )}
 
-      {/* Other Sensors */}
-      {Object.keys(other).length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Gauge className="w-5 h-5 mr-2 text-blue-600" />
-            Other Sensors
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(other).map(([key, value]) => (
-              <GenericSensorCard key={key} name={key} value={value} />
-            ))}
-          </div>
-        </div>
-      )}
+
 
       {/* Debug Section - Raw Sensor Array */}
       {data.data._rawArray && process.env.NODE_ENV === 'development' && (
