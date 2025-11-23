@@ -8,9 +8,9 @@ const BrewDataChart = () => {
   const [selectedBrew, setSelectedBrew] = useState('')
   const [dateRange, setDateRange] = useState('')
 
-  const { data: brewnames } = useQuery('brewnames', () => brewnodeAPI.getBrewnames())
+  const { data: brewnames, error: brewnamesError } = useQuery('brewnames', () => brewnodeAPI.getBrewnames())
   
-  const { data: brewData, isLoading } = useQuery(
+  const { data: brewData, isLoading, error: brewDataError } = useQuery(
     ['brewData', selectedBrew, dateRange],
     () => brewnodeAPI.getBrewData(selectedBrew, dateRange),
     { 
@@ -19,9 +19,25 @@ const BrewDataChart = () => {
     }
   )
 
+  // Debug logging
+  console.log('BrewDataChart debug:', { 
+    brewnames: brewnames?.data, 
+    brewnamesError, 
+    selectedBrew, 
+    brewData: brewData?.data, 
+    brewDataError,
+    isLoading 
+  })
+
   // Format data for chart
   const chartData = React.useMemo(() => {
     if (!brewData?.data) return []
+    
+    // Validate that brewData.data is an array
+    if (!Array.isArray(brewData.data)) {
+      console.error('BrewData is not an array:', brewData.data)
+      return []
+    }
     
     return brewData.data.map(point => ({
       time: new Date(point.timestamp).toLocaleTimeString(),
