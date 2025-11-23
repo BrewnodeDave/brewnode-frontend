@@ -29,23 +29,105 @@ const BrewDataChart = () => {
     isLoading 
   })
 
+  // Additional debug logging for brew data structure
+  if (brewData?.data) {
+    console.log('BrewData structure:', {
+      isArray: Array.isArray(brewData.data),
+      length: brewData.data.length,
+      firstItem: brewData.data[0],
+      keys: brewData.data[0] ? Object.keys(brewData.data[0]) : []
+    })
+  }
+
   // Format data for chart
   const chartData = React.useMemo(() => {
-    if (!brewData?.data) return []
+    if (!brewData?.data) {
+      console.log('No brewData.data available')
+      return []
+    }
     
-    // Validate that brewData.data is an array
+    // Check if data is in Highcharts format
+    if (brewData.data.highcharts && Array.isArray(brewData.data.highcharts)) {
+      console.log('Processing Highcharts format data')
+      const series = brewData.data.highcharts
+      
+      // Create a map to organize data by timestamp
+      const timePointsMap = new Map()
+      
+      series.forEach(seriesItem => {
+        const seriesName = seriesItem.name
+        console.log(`Processing series: ${seriesName}`)
+        
+        if (Array.isArray(seriesItem.data)) {
+          seriesItem.data.forEach(([timestamp, value]) => {
+            const timeKey = new Date(timestamp).getTime()
+            const timeStr = new Date(timestamp).toLocaleTimeString()
+            
+            if (!timePointsMap.has(timeKey)) {
+              timePointsMap.set(timeKey, { time: timeStr })
+            }
+            
+            const point = timePointsMap.get(timeKey)
+            
+            // Map series names to our expected field names
+            switch (seriesName.toLowerCase()) {
+              case 'temp kettle':
+                point.kettleTemp = value
+                break
+              case 'temp mash':
+                point.mashTemp = value
+                break
+              case 'temp fermenter':
+                point.fermenterTemp = value
+                break
+              case 'temp glycol':
+                point.glycolTemp = value
+                break
+              default:
+                // Handle other temperature sensors dynamically
+                const fieldName = seriesName.toLowerCase().replace(/[^a-z]/g, '') + 'Temp'
+                point[fieldName] = value
+            }
+          })
+        }
+      })
+      
+      // Convert map to array and sort by timestamp
+      const result = Array.from(timePointsMap.values()).sort((a, b) => 
+        new Date('1970-01-01 ' + a.time).getTime() - new Date('1970-01-01 ' + b.time).getTime()
+      )
+      
+      console.log('Processed chart data:', { 
+        seriesCount: series.length, 
+        dataPointsCount: result.length,
+        samplePoint: result[0]
+      })
+      
+      return result
+    }
+    
+    // Fallback: handle legacy format if not Highcharts
     if (!Array.isArray(brewData.data)) {
       console.error('BrewData is not an array:', brewData.data)
       return []
     }
     
-    return brewData.data.map(point => ({
-      time: new Date(point.timestamp).toLocaleTimeString(),
-      kettleTemp: point.kettleTemp,
-      mashTemp: point.mashTemp,
-      fermenterTemp: point.fermenterTemp,
-      glycolTemp: point.glycolTemp,
-    }))
+    console.log('Processing legacy format data, array length:', brewData.data.length)
+    
+    return brewData.data.map((point, index) => {
+      // Handle different possible timestamp field names
+      const timestamp = point.timestamp || point.time || point.date || point.created_at
+      const timeStr = timestamp ? new Date(timestamp).toLocaleTimeString() : `Point ${index}`
+      
+      // Handle different possible temperature field names
+      return {
+        time: timeStr,
+        kettleTemp: point.kettleTemp || point.kettle_temp || point.KettleTemp || point['Kettle Temp'],
+        mashTemp: point.mashTemp || point.mash_temp || point.MashTemp || point['Mash Temp'],
+        fermenterTemp: point.fermenterTemp || point.fermenter_temp || point.FermenterTemp || point['Fermenter Temp'],
+        glycolTemp: point.glycolTemp || point.glycol_temp || point.GlycolTemp || point['Glycol Temp'],
+      }
+    })
   }, [brewData])
 
   return (
@@ -94,6 +176,9 @@ const BrewDataChart = () => {
         </div>
       ) : (
         <div className="h-64">
+          <p className="text-sm text-gray-600 mb-2">
+            Showing {chartData.length} data points for {selectedBrew}
+          </p>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
