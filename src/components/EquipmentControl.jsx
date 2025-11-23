@@ -34,6 +34,9 @@ const EquipmentControl = ({ sensorData }) => {
   // Track expected states after button presses
   const [expectedStates, setExpectedStates] = useState({})
   
+  // Track when transitions started to enforce minimum duration
+  const [transitionStartTimes, setTransitionStartTimes] = useState({})
+  
   // All status information comes from sensorData - no local state needed
 
   // Clear transition states when sensor data matches expected states
@@ -95,9 +98,20 @@ const EquipmentControl = ({ sensorData }) => {
             break
         }
         
-        // If sensor data matches expected state, clear transition
+        // If sensor data matches expected state, check if minimum duration has passed
         if (currentState === expectedStates[key]) {
-          updates[key] = false
+          const transitionStartTime = transitionStartTimes[key]
+          const minDuration = 2000 // Minimum 2 seconds transition display
+          const elapsed = transitionStartTime ? Date.now() - transitionStartTime : minDuration
+          
+          console.log(`${key}: currentState=${currentState}, expectedState=${expectedStates[key]}, elapsed=${elapsed}ms`)
+          
+          if (elapsed >= minDuration) {
+            updates[key] = false
+            console.log(`Clearing transition for ${key} after ${elapsed}ms`)
+          } else {
+            console.log(`${key} transition too short (${elapsed}ms), keeping active`)
+          }
         }
       }
     })
@@ -105,13 +119,20 @@ const EquipmentControl = ({ sensorData }) => {
     // Update transition states
     if (Object.keys(updates).length > 0) {
       setTransitionStates(prev => ({ ...prev, ...updates }))
-      // Clear corresponding expected states
+      // Clear corresponding expected states and timestamps
       setExpectedStates(prev => {
         const newExpected = { ...prev }
         Object.keys(updates).forEach(key => {
           delete newExpected[key]
         })
         return newExpected
+      })
+      setTransitionStartTimes(prev => {
+        const newTimes = { ...prev }
+        Object.keys(updates).forEach(key => {
+          delete newTimes[key]
+        })
+        return newTimes
       })
     }
   }, [sensorData, transitionStates, expectedStates])
@@ -121,11 +142,17 @@ const EquipmentControl = ({ sensorData }) => {
     const timeouts = Object.keys(transitionStates).map(key => {
       if (transitionStates[key]) {
         return setTimeout(() => {
+          console.log(`Fallback timeout clearing transition for ${key}`)
           setTransitionStates(prev => ({ ...prev, [key]: false }))
           setExpectedStates(prev => {
             const newExpected = { ...prev }
             delete newExpected[key]
             return newExpected
+          })
+          setTransitionStartTimes(prev => {
+            const newTimes = { ...prev }
+            delete newTimes[key]
+            return newTimes
           })
         }, 10000) // 10 second fallback
       }
@@ -139,6 +166,7 @@ const EquipmentControl = ({ sensorData }) => {
   console.log('EquipmentControl props:', { sensorData })
   console.log('Transition states:', transitionStates)
   console.log('Expected states:', expectedStates)
+  console.log('Transition start times:', transitionStartTimes)
   
   // Debug logging
   console.log('EquipmentControl - Kettle heater power:', sensorData?.data?.kettleHeaterPower)
@@ -154,8 +182,10 @@ const EquipmentControl = ({ sensorData }) => {
         console.log('Fan response:', response.data)
         // Set transition state and expected state
         const expectedOn = variables === 'On'
+        console.log(`Fan transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
         setTransitionStates(prev => ({ ...prev, fan: true }))
         setExpectedStates(prev => ({ ...prev, fan: expectedOn }))
+        setTransitionStartTimes(prev => ({ ...prev, fan: Date.now() }))
         // Invalidate queries to refresh all status from central sensorStatus
         queryClient.invalidateQueries('fanStatus')
         queryClient.invalidateQueries('sensorStatus')
@@ -173,8 +203,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Kettle pump transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, kettlePump: true }))
           setExpectedStates(prev => ({ ...prev, kettlePump: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, kettlePump: Date.now() }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -189,8 +221,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Mash pump transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, mashPump: true }))
           setExpectedStates(prev => ({ ...prev, mashPump: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, mashPump: Date.now() }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -205,8 +239,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Glycol pump transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, glycolPump: true }))
           setExpectedStates(prev => ({ ...prev, glycolPump: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, glycolPump: Date.now() }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -224,8 +260,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Kettle In valve transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, kettleInValve: true }))
           setExpectedStates(prev => ({ ...prev, kettleInValve: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, kettleInValve: Date.now() }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -240,8 +278,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Mash In valve transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, mashInValve: true }))
           setExpectedStates(prev => ({ ...prev, mashInValve: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, mashInValve: Date.now() }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -256,8 +296,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Chill Wort In valve transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, chillWortInValve: true }))
           setExpectedStates(prev => ({ ...prev, chillWortInValve: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, chillWortInValve: Date.now() }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -272,8 +314,10 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response, variables) => {
           const expectedOn = variables === 'On'
+          console.log(`Chill Wort Out valve transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, chillWortOutValve: true }))
           setExpectedStates(prev => ({ ...prev, chillWortOutValve: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, chillWortOutValve: Date.now() }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -298,8 +342,10 @@ const EquipmentControl = ({ sensorData }) => {
           console.log('Kettle heater updated to:', powerValue + 'W')
           
           const expectedOn = variables === 'On'
+          console.log(`Kettle heater transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, kettleHeater: true }))
           setExpectedStates(prev => ({ ...prev, kettleHeater: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, kettleHeater: Date.now() }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -318,8 +364,10 @@ const EquipmentControl = ({ sensorData }) => {
         onSuccess: (response, variables) => {
           console.log('Glycol heater response:', response.data)
           const expectedOn = variables === 'On'
+          console.log(`Glycol heater transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, glycolHeater: true }))
           setExpectedStates(prev => ({ ...prev, glycolHeater: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, glycolHeater: Date.now() }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -338,8 +386,10 @@ const EquipmentControl = ({ sensorData }) => {
         onSuccess: (response, variables) => {
           console.log('Glycol chiller response:', response.data)
           const expectedOn = variables === 'On'
+          console.log(`Glycol chiller transition started: expecting ${expectedOn ? 'ON' : 'OFF'}`)
           setTransitionStates(prev => ({ ...prev, glycolChiller: true }))
           setExpectedStates(prev => ({ ...prev, glycolChiller: expectedOn }))
+          setTransitionStartTimes(prev => ({ ...prev, glycolChiller: Date.now() }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
