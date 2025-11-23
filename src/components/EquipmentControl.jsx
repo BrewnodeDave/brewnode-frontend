@@ -31,11 +31,13 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   // Debug heater status specifically
   if (sensorData?.data) {
     console.log('Heater debug - Kettle heater power consumption:', {
-      'sensorData.data[12] (watts)': Array.isArray(sensorData.data) ? sensorData.data[12] : 'not array',
-      'sensorData.data.heatkettle (watts)': sensorData.data?.heatkettle,
+      'sensorData.data type': Array.isArray(sensorData.data) ? 'array' : typeof sensorData.data,
+      'sensorData.data keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data) : 'no keys',
+      'all heat-related keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('heat')) : [],
+      'all power-related keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('power')) : [],
+      'all kettle-related keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('kettle')) : [],
       'heaterStates.kettle (watts)': heaterStates.kettle,
-      'status': heaterStates.kettle !== null ? (heaterStates.kettle > 0 ? 'ON' : 'OFF') : 'unknown',
-      'available heat keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('heat')) : 'no object'
+      'status': heaterStates.kettle !== null ? (heaterStates.kettle > 0 ? 'ON' : 'OFF') : 'unknown'
     })
   }
 
@@ -362,15 +364,29 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
                   return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
-                // Try parsed sensor data
-                if (sensorData?.data?.heatkettle !== undefined) {
-                  const power = sensorData.data.heatkettle || 0
+                // Try various possible kettle heater keys in parsed sensor data
+                if (sensorData?.data && typeof sensorData.data === 'object') {
+                  const possibleKeys = [
+                    'heatKettle', 'heatkettle', 'kettleHeat', 'kettleheat',
+                    'powerKettle', 'powerkettle', 'kettlePower', 'kettlepower',
+                    'tempKettleHeat', 'tempkettleheat'
+                  ]
+                  
+                  for (const key of possibleKeys) {
+                    if (sensorData.data[key] !== undefined) {
+                      const power = sensorData.data[key] || 0
+                      return power > 0 ? `On (${power}W)` : "Off"
+                    }
+                  }
+                }
+                
+                // If it's still an array, try index 12
+                if (Array.isArray(sensorData?.data)) {
+                  const power = sensorData.data[12] || 0
                   return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
-                // Fallback to array index (sensor data[12] = kettle heater power)
-                const power = Array.isArray(sensorData?.data) ? (sensorData.data[12] || 0) : 0
-                return power > 0 ? `On (${power}W)` : "Off"
+                return "Off"
               })()}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
