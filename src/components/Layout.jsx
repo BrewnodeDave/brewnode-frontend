@@ -49,7 +49,11 @@ const Layout = ({ children }) => {
       `}>
         <div className="flex items-center justify-between h-16 px-4 bg-brewery-600">
           <div className="flex items-center">
-            <Activity className="w-8 h-8 text-white mr-2" />
+            <img 
+              src="/logo192.svg" 
+              alt="Brewnode Logo" 
+              className="w-8 h-8 mr-2 filter brightness-0 invert"
+            />
             <h1 className="text-xl font-bold text-white">Brewnode</h1>
           </div>
           {/* Mobile close button */}
@@ -108,7 +112,14 @@ const Layout = ({ children }) => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">Brewnode</h1>
+            <div className="flex items-center">
+              <img 
+                src="/logo192.svg" 
+                alt="Brewnode Logo" 
+                className="w-6 h-6 mr-2"
+              />
+              <h1 className="text-lg font-semibold text-gray-900">Brewnode</h1>
+            </div>
             <div className="w-6" /> {/* Spacer for centering */}
           </div>
         </header>

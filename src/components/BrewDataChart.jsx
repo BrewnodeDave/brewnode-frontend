@@ -3,6 +3,7 @@ import { useQuery } from 'react-query'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Brush } from 'recharts'
 import { Calendar, BarChart3, ZoomIn, RotateCcw } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
+import LoadingSpinner from './LoadingSpinner'
 
 const BrewDataChart = () => {
   const [selectedBrew, setSelectedBrew] = useState('')
@@ -206,7 +207,7 @@ const BrewDataChart = () => {
         </div>
       ) : isLoading ? (
         <div className="h-64 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brewery-600"></div>
+          <LoadingSpinner text="Loading brew data..." />
         </div>
       ) : chartData.length === 0 ? (
         <div className="h-64 flex items-center justify-center text-gray-500">
