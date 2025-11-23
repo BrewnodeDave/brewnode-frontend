@@ -40,39 +40,39 @@ const Dashboard = () => {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brewery-100 rounded-lg shadow-sm flex items-center justify-center">
-            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-brewery-600" />
+        <div className="flex items-center space-x-4">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-brewery-100 rounded-lg shadow-sm flex items-center justify-center">
+            <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-brewery-600" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Brewnode Dashboard</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Brewnode Dashboard</h1>
         </div>
-        <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
-          <Clock className="w-4 h-4" />
+        <div className="flex items-center space-x-3 text-sm sm:text-base text-gray-500">
+          <Clock className="w-5 h-5" />
           <span className="hidden sm:inline">{new Date().toLocaleString()}</span>
           <span className="sm:hidden">{new Date().toLocaleTimeString()}</span>
         </div>
       </div>
 
       {/* Current Brew Status */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center">
-          <Beaker className="w-5 h-5 mr-2 text-brewery-600" />
+      <div className="bg-white rounded-lg shadow p-8">
+        <h2 className="text-2xl font-semibold mb-6 flex items-center">
+          <Beaker className="w-7 h-7 mr-3 text-brewery-600" />
           Current Brew
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <p className="text-sm text-gray-600">Recipe</p>
-            <p className="text-lg font-semibold">{currentBrew?.data?.recipeName || 'No active brew'}</p>
+            <p className="text-base text-gray-600">Recipe</p>
+            <p className="text-xl font-semibold">{currentBrew?.data?.recipeName || 'No active brew'}</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-600">Status</p>
-            <p className="text-lg font-semibold">{currentBrew?.data?.status || 'System Ready'}</p>
+            <p className="text-base text-gray-600">Status</p>
+            <p className="text-xl font-semibold">{currentBrew?.data?.status || 'System Ready'}</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-gray-600">Latest Brew</p>
-            <p className="text-lg font-semibold">
+            <p className="text-base text-gray-600">Latest Brew</p>
+            <p className="text-xl font-semibold">
               {brewnames?.data && brewnames.data.length > 0 
                 ? brewnames.data[0] 
                 : 'No brews found'
@@ -86,7 +86,7 @@ const Dashboard = () => {
       <SystemStatus sensorData={sensorData} />
 
       {/* Sensor Status Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <SensorStatusCard
           title="Kettle Temperature"
           icon={Thermometer}
