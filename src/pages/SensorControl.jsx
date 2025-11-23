@@ -129,10 +129,13 @@ const SensorControl = () => {
             let fanPower = 0
             if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
               fanPower = sensorData.data.fan || 0
+              console.log('Fan power from parsed object:', fanPower, 'fan key:', sensorData.data.fan)
             } else if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
               fanPower = sensorData.data[9] || 0
+              console.log('Fan power from array index 9:', fanPower, 'value:', sensorData.data[9])
             }
             
+            console.log('Final fan power:', fanPower)
             return fanPower > 0 ? `On (${fanPower}W)` : 'Off (0W)'
           })()}
           icon={Fan}
