@@ -390,8 +390,8 @@ const ControlCard = ({
           isLoading
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
             : isOn
-            ? 'bg-red-600 text-white hover:bg-red-700'
-            : 'bg-green-600 text-white hover:bg-green-700'
+            ? 'bg-green-600 text-white hover:bg-green-700'
+            : 'bg-red-600 text-white hover:bg-red-700'
         }`}
       >
         {isLoading ? (
@@ -407,7 +407,7 @@ const ControlCard = ({
               <ToggleLeft className="w-4 h-4" />
             )}
             <span>
-              Turn {isOn ? stateLabels.off || 'Off' : stateLabels.on || 'On'}
+              {isOn ? stateLabels.off || 'Off' : stateLabels.on || 'On'}
             </span>
           </>
         )}
