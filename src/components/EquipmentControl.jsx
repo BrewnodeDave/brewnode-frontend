@@ -41,8 +41,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       onSuccess: (response) => {
         console.log('Fan response:', response.data)
         setFanState(response.data)
-        queryClient.invalidateQueries(['fanStatus'])
-        queryClient.invalidateQueries(['sensorStatus'])
+        queryClient.invalidateQueries('fanStatus')
+        queryClient.invalidateQueries('sensorStatus')
       },
       onError: (error) => {
         console.error('Fan control failed:', error)
@@ -56,8 +56,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setKettlePump(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['pumpsStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Kettle pump control failed:', error)
@@ -69,8 +69,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setMashPump(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['pumpsStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Mash pump control failed:', error)
@@ -82,8 +82,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setGlycolPump(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['pumpsStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Glycol pump control failed:', error)
@@ -98,8 +98,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setKettleInValve(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['valvesStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('valvesStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Kettle In valve control failed:', error)
@@ -111,8 +111,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setMashInValve(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['valvesStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('valvesStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Mash In valve control failed:', error)
@@ -124,8 +124,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setChillWortInValve(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['valvesStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('valvesStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Chill Wort In valve control failed:', error)
@@ -137,8 +137,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       (state) => brewnodeAPI.setChillWortOutValve(state),
       { 
         onSuccess: () => {
-          queryClient.invalidateQueries(['valvesStatus'])
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('valvesStatus')
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Chill Wort Out valve control failed:', error)
@@ -164,7 +164,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
           
           // Invalidate queries to refresh sensor data
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Kettle heater control failed:', error)
@@ -181,7 +181,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
         onSuccess: (response) => {
           console.log('Glycol heater response:', response.data)
           setHeaterStates(prev => ({ ...prev, glycolHeat: response.data }))
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Glycol heater control failed:', error)
@@ -198,7 +198,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
         onSuccess: (response) => {
           console.log('Glycol chiller response:', response.data)
           setHeaterStates(prev => ({ ...prev, glycolChill: response.data }))
-          queryClient.invalidateQueries(['sensorStatus'])
+          queryClient.invalidateQueries('sensorStatus')
         },
         onError: (error) => {
           console.error('Glycol chiller control failed:', error)

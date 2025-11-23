@@ -3,8 +3,11 @@ import { useQuery } from 'react-query'
 import { Server, Wifi, AlertTriangle, CheckCircle, RefreshCw, Trash2 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 
-const SystemStatus = () => {
-  const { data: sensorData, isLoading: sensorLoading, error: sensorError } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
+const SystemStatus = ({ sensorData: propSensorData }) => {
+  const { data: querySensorData, isLoading: sensorLoading, error: sensorError } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
+  
+  // Use prop data if available, otherwise use query data
+  const sensorData = propSensorData || querySensorData
   const { data: systemStatus } = useQuery('systemStatus', () => brewnodeAPI.getSystemStatus(), { refetchInterval: 30000 })
 
   // Debug logging
@@ -13,6 +16,7 @@ const SystemStatus = () => {
     console.log('Sensor data array:', sensorData.data)
     console.log('Array.isArray check:', Array.isArray(sensorData.data))
     console.log('Data type:', typeof sensorData.data)
+    console.log('Kettle heater power:', sensorData.data.kettleHeaterPower, 'from array[12]:', sensorData.data._rawArray?.[12])
   }
 
   const handleRestart = async () => {

@@ -18,7 +18,7 @@ const Dashboard = () => {
   const { data: sensorData, isLoading: sensorsLoading } = useQuery(
     'sensorStatus',
     () => brewnodeAPI.getSensorStatus(),
-    { refetchInterval: 5000 }
+    { refetchInterval: 2000 }
   )
 
   const { data: currentBrew } = useQuery(
@@ -83,7 +83,7 @@ const Dashboard = () => {
       </div>
 
       {/* System Status Overview */}
-      <SystemStatus />
+      <SystemStatus sensorData={sensorData} />
 
       {/* Sensor Status Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
