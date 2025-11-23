@@ -29,7 +29,12 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
   
   // Debug logging
-  console.log('EquipmentControl - Kettle heater power:', heaterStates.kettle)
+  console.log('EquipmentControl sensor data debug:', {
+    'sensorData': sensorData,
+    'sensorData?.data type': sensorData?.data ? (Array.isArray(sensorData.data) ? 'array' : typeof sensorData.data) : 'no data',
+    'sensorData.data[12]': Array.isArray(sensorData?.data) ? sensorData.data[12] : 'not array or no data',
+    'heaterStates.kettle': heaterStates.kettle
+  })
 
   // Mutation handlers
   const fanMutation = useMutation(
