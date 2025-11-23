@@ -59,6 +59,7 @@ const SensorControl = () => {
             fanStatus={fanStatus}
             pumpsStatus={pumpsStatus}
             valvesStatus={valvesStatus}
+            sensorData={sensorData}
           />
         )
       case 'i2c':
@@ -104,6 +105,12 @@ const SensorControl = () => {
         <StatusCard
           title="Fan Status"
           value={(() => {
+            // Debug: Check all possible fan-related keys
+            const sensorKeys = sensorData?.data ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('fan')) : []
+            console.log('Fan-related sensor keys:', sensorKeys)
+            console.log('Fan value from sensorData:', sensorData?.data?.fan)
+            console.log('FanStatus API response:', fanStatus)
+            
             const fanValue = sensorData?.data?.fan
             if (fanValue !== null && fanValue !== undefined) {
               const numValue = parseFloat(fanValue)
