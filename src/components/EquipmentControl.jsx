@@ -27,6 +27,17 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
 
   // Debug logging
   console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
+  
+  // Debug heater status specifically
+  if (sensorData?.data) {
+    console.log('Heater debug - Kettle heater power consumption:', {
+      'sensorData.data[12] (watts)': Array.isArray(sensorData.data) ? sensorData.data[12] : 'not array',
+      'sensorData.data.heatkettle (watts)': sensorData.data?.heatkettle,
+      'heaterStates.kettle (watts)': heaterStates.kettle,
+      'status': heaterStates.kettle !== null ? (heaterStates.kettle > 0 ? 'ON' : 'OFF') : 'unknown',
+      'available heat keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('heat')) : 'no object'
+    })
+  }
 
   // Mutation handlers
   const fanMutation = useMutation(
@@ -153,8 +164,10 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       },
       { 
         onSuccess: (response) => {
-          console.log('Kettle heater response:', response.data)
-          setHeaterStates(prev => ({ ...prev, kettle: response.data }))
+          console.log('Kettle heater response - power consumption:', response.data)
+          // Store the power consumption value (0 = off, >0 = on)
+          const powerValue = typeof response.data === 'number' ? response.data : (response.data?.power || response.data?.value || 0)
+          setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
           queryClient.invalidateQueries(['sensorStatus'])
         },
         onError: (error) => {
@@ -343,8 +356,21 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Kettle Heater"
               status={(() => {
-                const power = heaterStates.kettle !== null ? heaterStates.kettle : (Array.isArray(sensorData?.data) ? sensorData.data[12] : 0)
-                return (power || 0) > 0 ? "On" : "Off"
+                // Check local state first (power consumption from API response)
+                if (heaterStates.kettle !== null) {
+                  const power = heaterStates.kettle || 0
+                  return power > 0 ? `On (${power}W)` : "Off"
+                }
+                
+                // Try parsed sensor data
+                if (sensorData?.data?.heatkettle !== undefined) {
+                  const power = sensorData.data.heatkettle || 0
+                  return power > 0 ? `On (${power}W)` : "Off"
+                }
+                
+                // Fallback to array index (sensor data[12] = kettle heater power)
+                const power = Array.isArray(sensorData?.data) ? (sensorData.data[12] || 0) : 0
+                return power > 0 ? `On (${power}W)` : "Off"
               })()}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
