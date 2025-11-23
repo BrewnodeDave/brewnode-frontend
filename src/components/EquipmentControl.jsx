@@ -28,18 +28,15 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   // Debug logging
   console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
   
-  // Debug heater status specifically
-  if (sensorData?.data) {
-    console.log('Heater debug - Kettle heater power consumption:', {
-      'sensorData.data type': Array.isArray(sensorData.data) ? 'array' : typeof sensorData.data,
-      'sensorData.data keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data) : 'no keys',
-      'all heat-related keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('heat')) : [],
-      'all power-related keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('power')) : [],
-      'all kettle-related keys': typeof sensorData.data === 'object' ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('kettle')) : [],
-      'heaterStates.kettle (watts)': heaterStates.kettle,
-      'status': heaterStates.kettle !== null ? (heaterStates.kettle > 0 ? 'ON' : 'OFF') : 'unknown'
-    })
-  }
+  // Debug heater status specifically  
+  console.log('Kettle heater state debug:', {
+    'heaterStates.kettle': heaterStates.kettle,
+    'heaterStates.kettle type': typeof heaterStates.kettle,
+    'heaterStates.kettle !== null': heaterStates.kettle !== null,
+    'computed status': heaterStates.kettle !== null ? 
+      (heaterStates.kettle > 0 ? `On (${heaterStates.kettle}W)` : "Off") : 
+      'using sensor data fallback'
+  })
 
   // Mutation handlers
   const fanMutation = useMutation(
@@ -166,11 +163,17 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       },
       { 
         onSuccess: (response) => {
-          console.log('Kettle heater power consumption:', response.data)
+          console.log('Kettle heater API response.data:', response.data)
           
           // Response.data is a number representing power consumption (0 = off, >0 = on)
           const powerValue = Number(response.data) || 0
-          setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
+          console.log('Setting kettle heater state to:', powerValue)
+          
+          setHeaterStates(prev => {
+            const newState = { ...prev, kettle: powerValue }
+            console.log('New heater states:', newState)
+            return newState
+          })
           
           // Invalidate queries to refresh sensor data
           queryClient.invalidateQueries(['sensorStatus'])
