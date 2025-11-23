@@ -160,6 +160,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
           const powerValue = Number(response.data) || 0
           console.log('Kettle heater updated to:', powerValue + 'W')
           
+          // Update local state immediately for instant UI feedback
           setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
           
           // Invalidate queries to refresh sensor data
@@ -351,35 +352,35 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Kettle Heater"
               status={(() => {
-                // Primary source: parsed sensor data kettleHeaterPower
+                // Primary source: local state from API response (immediate feedback)
+                if (heaterStates.kettle !== null) {
+                  const power = heaterStates.kettle || 0
+                  return power > 0 ? "On" : "Off"
+                }
+                
+                // Fallback: parsed sensor data kettleHeaterPower
                 if (sensorData?.data?.kettleHeaterPower !== undefined) {
                   const power = sensorData.data.kettleHeaterPower || 0
                   return power > 0 ? "On" : "Off"
                 }
                 
-                // Alternative: raw array access (fallback)
+                // Last fallback: raw array access
                 if (sensorData?.data?._rawArray?.[12] !== undefined) {
                   const power = sensorData.data._rawArray[12] || 0
-                  return power > 0 ? "On" : "Off"
-                }
-                
-                // Last fallback: local state from recent API response
-                if (heaterStates.kettle !== null) {
-                  const power = heaterStates.kettle || 0
                   return power > 0 ? "On" : "Off"
                 }
                 
                 return "Off"
               })()}
               stateLabels={(() => {
-                // Get current power for display labels
+                // Get current power for display labels - prioritize API response
                 let power = 0
-                if (sensorData?.data?.kettleHeaterPower !== undefined) {
+                if (heaterStates.kettle !== null) {
+                  power = heaterStates.kettle || 0
+                } else if (sensorData?.data?.kettleHeaterPower !== undefined) {
                   power = sensorData.data.kettleHeaterPower || 0
                 } else if (sensorData?.data?._rawArray?.[12] !== undefined) {
                   power = sensorData.data._rawArray[12] || 0
-                } else if (heaterStates.kettle !== null) {
-                  power = heaterStates.kettle || 0
                 }
                 
                 return {
