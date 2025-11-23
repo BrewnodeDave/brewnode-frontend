@@ -28,15 +28,8 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   // Debug logging
   console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
   
-  // Debug heater status specifically  
-  console.log('Kettle heater state debug:', {
-    'heaterStates.kettle': heaterStates.kettle,
-    'heaterStates.kettle type': typeof heaterStates.kettle,
-    'heaterStates.kettle !== null': heaterStates.kettle !== null,
-    'computed status': heaterStates.kettle !== null ? 
-      (heaterStates.kettle > 0 ? `On (${heaterStates.kettle}W)` : "Off") : 
-      'using sensor data fallback'
-  })
+  // Debug logging
+  console.log('EquipmentControl - Kettle heater power:', heaterStates.kettle)
 
   // Mutation handlers
   const fanMutation = useMutation(
@@ -163,17 +156,11 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
       },
       { 
         onSuccess: (response) => {
-          console.log('Kettle heater API response.data:', response.data)
-          
           // Response.data is a number representing power consumption (0 = off, >0 = on)
           const powerValue = Number(response.data) || 0
-          console.log('Setting kettle heater state to:', powerValue)
+          console.log('Kettle heater updated to:', powerValue + 'W')
           
-          setHeaterStates(prev => {
-            const newState = { ...prev, kettle: powerValue }
-            console.log('New heater states:', newState)
-            return newState
-          })
+          setHeaterStates(prev => ({ ...prev, kettle: powerValue }))
           
           // Invalidate queries to refresh sensor data
           queryClient.invalidateQueries(['sensorStatus'])
