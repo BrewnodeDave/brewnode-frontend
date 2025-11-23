@@ -462,6 +462,7 @@ const EquipmentControl = ({ sensorData }) => {
             onToggle={(state) => fanMutation.mutate(state)}
             isLoading={fanMutation.isLoading}
             isTransitioning={transitionStates.fan}
+            expectedState={expectedStates.fan}
             icon={Fan}
           />
         </EquipmentSection>
@@ -484,6 +485,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => pumpMutations.kettle.mutate(state)}
               isLoading={pumpMutations.kettle.isLoading}
               isTransitioning={transitionStates.kettlePump}
+              expectedState={expectedStates.kettlePump}
               icon={Droplets}
             />
             <ControlCard
@@ -499,23 +501,23 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => pumpMutations.mash.mutate(state)}
               isLoading={pumpMutations.mash.isLoading}
               isTransitioning={transitionStates.mashPump}
+              expectedState={expectedStates.mashPump}
               icon={Droplets}
             />
             <ControlCard
               name="Glycol Pump"
               status={(() => {
-                // Get glycol pump status from sensor data
+                // Get glycol pump status from sensor data  
                 let pumpPower = 0
                 if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
                   pumpPower = sensorData.data.pumpGlycol || sensorData.data.glycolPump || 0
                 }
                 return pumpPower > 0 ? "On" : "Off"
               })()}
-              onToggle={(state) => {
-                console.log('Glycol pump toggle - new state:', state)
-                pumpMutations.glycol.mutate(state)
-              }}
+              onToggle={(state) => pumpMutations.glycol.mutate(state)}
               isLoading={pumpMutations.glycol.isLoading}
+              isTransitioning={transitionStates.glycolPump}
+              expectedState={expectedStates.glycolPump}
               icon={Droplets}
             />
           </div>
@@ -539,6 +541,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => valveMutations.kettlein.mutate(state)}
               isLoading={valveMutations.kettlein.isLoading}
               isTransitioning={transitionStates.kettleInValve}
+              expectedState={expectedStates.kettleInValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -555,6 +558,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => valveMutations.mashin.mutate(state)}
               isLoading={valveMutations.mashin.isLoading}
               isTransitioning={transitionStates.mashInValve}
+              expectedState={expectedStates.mashInValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -571,6 +575,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => valveMutations.chillwortin.mutate(state)}
               isLoading={valveMutations.chillwortin.isLoading}
               isTransitioning={transitionStates.chillWortInValve}
+              expectedState={expectedStates.chillWortInValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -587,6 +592,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => valveMutations.chillwortout.mutate(state)}
               isLoading={valveMutations.chillwortout.isLoading}
               isTransitioning={transitionStates.chillWortOutValve}
+              expectedState={expectedStates.chillWortOutValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -630,6 +636,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
               isTransitioning={transitionStates.kettleHeater}
+              expectedState={expectedStates.kettleHeater}
               icon={Flame}
             />
             <ControlCard
@@ -647,6 +654,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => heaterMutations.glycolHeat.mutate(state)}
               isLoading={heaterMutations.glycolHeat.isLoading}
               isTransitioning={transitionStates.glycolHeater}
+              expectedState={expectedStates.glycolHeater}
               icon={Flame}
             />
             <ControlCard
@@ -664,6 +672,7 @@ const EquipmentControl = ({ sensorData }) => {
               onToggle={(state) => heaterMutations.glycolChill.mutate(state)}
               isLoading={heaterMutations.glycolChill.isLoading}
               isTransitioning={transitionStates.glycolChiller}
+              expectedState={expectedStates.glycolChiller}
               icon={Snowflake}
             />
           </div>
@@ -704,12 +713,20 @@ const ControlCard = ({
   isLoading, 
   isTransitioning = false,
   icon: Icon,
-  stateLabels = { on: 'On', off: 'Off' }
+  stateLabels = { on: 'On', off: 'Off' },
+  expectedState = null
 }) => {
-  const isOn = status === 'On' || status === 'Open' || status === 'Active'
+  // During transition, use expected state; otherwise use current sensor status
+  const isOn = isTransitioning && expectedState !== null 
+    ? expectedState 
+    : (status === 'On' || status === 'Open' || status === 'Active')
+    
   const displayStatus = isTransitioning ? 'Updating...' : (isOn ? (stateLabels.on || 'On') : (stateLabels.off || 'Off'))
 
   const handleToggle = () => {
+    // Don't allow toggle during transition
+    if (isTransitioning) return
+    
     // Always send 'On'/'Off' to the API regardless of display labels
     const newState = isOn ? 'Off' : 'On'
     onToggle(newState)
