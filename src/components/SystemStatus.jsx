@@ -128,10 +128,21 @@ const SystemStatus = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Fan Status</h4>
             <p className="text-gray-600">
-              {sensorLoading ? 'Loading...' : 
-               sensorError ? 'Error' :
-               Array.isArray(sensorData?.data) && sensorData.data.length > 9 ? 
-                 ((sensorData.data[9] || 0) > 0 ? 'On' : 'Off') : 'Unknown'}
+              {(() => {
+                if (sensorLoading) return 'Loading...'
+                if (sensorError) return 'Error'
+                if (!sensorData?.data) return 'No Sensor Data'
+                
+                // Fan is at index 9 in raw array or 'fan' key in parsed data
+                let fanPower = 0
+                if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
+                  fanPower = sensorData.data[9] || 0
+                } else if (typeof sensorData.data === 'object' && sensorData.data.fan !== undefined) {
+                  fanPower = sensorData.data.fan || 0
+                }
+                
+                return fanPower > 0 ? `On (${fanPower}W)` : 'Off (0W)'
+              })()}
             </p>
           </div>
           
@@ -151,8 +162,9 @@ const SystemStatus = () => {
                     key.toLowerCase().includes('pump')
                   )
                   console.log('Found pump keys:', pumpKeys)
-                  const active = pumpKeys.filter(key => (sensorData.data[key] || 0) > 0).length
-                  return pumpKeys.length > 0 ? `${active} of ${pumpKeys.length}` : 'No Pumps Found'
+                  const activePumps = pumpKeys.filter(key => (sensorData.data[key] || 0) > 0)
+                  const totalPumpPower = pumpKeys.reduce((sum, key) => sum + (sensorData.data[key] || 0), 0)
+                  return pumpKeys.length > 0 ? `${activePumps.length} of ${pumpKeys.length} (${totalPumpPower}W)` : 'No Pumps Found'
                 }
                 
                 return 'Invalid Data Format'
@@ -174,11 +186,69 @@ const SystemStatus = () => {
                     key.toLowerCase().includes('valve')
                   )
                   console.log('Found valve keys:', valveKeys)
-                  const open = valveKeys.filter(key => (sensorData.data[key] || 0) > 0).length
-                  return valveKeys.length > 0 ? `${open} of ${valveKeys.length}` : 'No Valves Found'
+                  const openValves = valveKeys.filter(key => (sensorData.data[key] || 0) > 0)
+                  const totalValvePower = valveKeys.reduce((sum, key) => sum + (sensorData.data[key] || 0), 0)
+                  return valveKeys.length > 0 ? `${openValves.length} of ${valveKeys.length} (${totalValvePower}W)` : 'No Valves Found'
                 }
                 
                 return 'Invalid Data Format'
+              })()}
+            </p>
+          </div>
+        </div>
+        
+        {/* Total Power Consumption */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="text-center">
+            <h4 className="font-medium text-gray-900 mb-2">Total Power Consumption</h4>
+            <p className="text-2xl font-bold text-brewery-600">
+              {(() => {
+                if (sensorLoading) return 'Loading...'
+                if (sensorError) return 'Error'
+                if (!sensorData?.data) return 'No Data'
+                
+                let totalPower = 0
+                
+                if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+                  // Add fan power
+                  totalPower += sensorData.data.fan || 0
+                  
+                  // Add pump power
+                  const pumpKeys = Object.keys(sensorData.data).filter(key => 
+                    key.toLowerCase().includes('pump')
+                  )
+                  pumpKeys.forEach(key => {
+                    totalPower += sensorData.data[key] || 0
+                  })
+                  
+                  // Add valve power  
+                  const valveKeys = Object.keys(sensorData.data).filter(key => 
+                    key.toLowerCase().includes('valve')
+                  )
+                  valveKeys.forEach(key => {
+                    totalPower += sensorData.data[key] || 0
+                  })
+                  
+                  // Add heater power (from array indices 10, 11, 12)
+                } else if (Array.isArray(sensorData.data)) {
+                  // Fan at index 9
+                  totalPower += sensorData.data[9] || 0
+                  
+                  // Heaters at indices 10, 11, 12
+                  totalPower += sensorData.data[10] || 0  // Glycol heater
+                  totalPower += sensorData.data[11] || 0  // Glycol chiller  
+                  totalPower += sensorData.data[12] || 0  // Kettle heater
+                  
+                  // Pumps and valves from objects in array
+                  sensorData.data.forEach(item => {
+                    if (item && typeof item === 'object' && item.name && 
+                        (item.name.includes('Pump') || item.name.includes('Valve'))) {
+                      totalPower += item.value || 0
+                    }
+                  })
+                }
+                
+                return `${totalPower}W`
               })()}
             </p>
           </div>
