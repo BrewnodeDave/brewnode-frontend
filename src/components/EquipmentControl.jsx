@@ -29,12 +29,7 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   console.log('EquipmentControl props:', { fanStatus, pumpsStatus, valvesStatus, sensorData })
   
   // Debug logging
-  console.log('EquipmentControl sensor data debug:', {
-    'sensorData?.data type': sensorData?.data ? (Array.isArray(sensorData.data) ? 'array' : typeof sensorData.data) : 'no data',
-    'sensorData.data.kettleHeaterPower': sensorData?.data?.kettleHeaterPower,
-    'sensorData.data._rawArray[12]': sensorData?.data?._rawArray?.[12],
-    'heaterStates.kettle': heaterStates.kettle
-  })
+  console.log('EquipmentControl - Kettle heater power:', sensorData?.data?.kettleHeaterPower)
 
   // Mutation handlers
   const fanMutation = useMutation(
@@ -359,29 +354,38 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
                 // Primary source: parsed sensor data kettleHeaterPower
                 if (sensorData?.data?.kettleHeaterPower !== undefined) {
                   const power = sensorData.data.kettleHeaterPower || 0
-                  const status = power > 0 ? 'On (' + power + 'W)' : "Off"
-                  console.log('Kettle heater status computed from kettleHeaterPower:', power, '→', status)
-                  return status
+                  return power > 0 ? "On" : "Off"
                 }
                 
                 // Alternative: raw array access (fallback)
                 if (sensorData?.data?._rawArray?.[12] !== undefined) {
                   const power = sensorData.data._rawArray[12] || 0
-                  const status = power > 0 ? 'On (' + power + 'W)' : "Off"
-                  console.log('Kettle heater status computed from _rawArray[12]:', power, '→', status)
-                  return status
+                  return power > 0 ? "On" : "Off"
                 }
                 
                 // Last fallback: local state from recent API response
                 if (heaterStates.kettle !== null) {
                   const power = heaterStates.kettle || 0
-                  const status = power > 0 ? 'On (' + power + 'W)' : "Off"
-                  console.log('Kettle heater status computed from heaterStates.kettle:', power, '→', status)
-                  return status
+                  return power > 0 ? "On" : "Off"
                 }
                 
-                console.log('Kettle heater status: no data sources available, returning Off')
                 return "Off"
+              })()}
+              stateLabels={(() => {
+                // Get current power for display labels
+                let power = 0
+                if (sensorData?.data?.kettleHeaterPower !== undefined) {
+                  power = sensorData.data.kettleHeaterPower || 0
+                } else if (sensorData?.data?._rawArray?.[12] !== undefined) {
+                  power = sensorData.data._rawArray[12] || 0
+                } else if (heaterStates.kettle !== null) {
+                  power = heaterStates.kettle || 0
+                }
+                
+                return {
+                  on: power > 0 ? 'On (' + power + 'W)' : 'On',
+                  off: 'Off'
+                }
               })()}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
