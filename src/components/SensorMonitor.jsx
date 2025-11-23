@@ -89,24 +89,7 @@ const SensorMonitor = ({ data, isLoading }) => {
 
 
 
-      {/* Debug Section - Raw Sensor Array */}
-      {data.data._rawArray && process.env.NODE_ENV === 'development' && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Debug: Raw Sensor Array</h4>
-          <div className="text-xs text-gray-600 space-y-1">
-            {data.data._rawArray.map((item, index) => (
-              <div key={index} className="flex">
-                <span className="w-8 text-gray-500">[{index}]:</span>
-                <span className="flex-1 font-mono">{
-                  typeof item === 'object' && item !== null 
-                    ? JSON.stringify(item, null, 2)
-                    : String(item || 'null')
-                }</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }
