@@ -47,8 +47,10 @@ const SensorMonitor = ({ data, isLoading }) => {
               'kettleIn', 'mashIn', 'kettleHeater', 'glycolHeater', 'glycolChiller'].includes(key)) {
       equipment[key] = value
     } 
-    // Other sensors
-    else if (value !== undefined && value !== null && value !== '') {
+    // Other sensors (exclude internal fields)
+    else if (value !== undefined && value !== null && value !== '' && 
+             !key.startsWith('_') && !key.includes('Raw') && 
+             typeof value !== 'object') {
       other[key] = value
     }
   })
@@ -95,6 +97,25 @@ const SensorMonitor = ({ data, isLoading }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(other).map(([key, value]) => (
               <GenericSensorCard key={key} name={key} value={value} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Debug Section - Raw Sensor Array */}
+      {data.data._rawArray && process.env.NODE_ENV === 'development' && (
+        <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Debug: Raw Sensor Array</h4>
+          <div className="text-xs text-gray-600 space-y-1">
+            {data.data._rawArray.map((item, index) => (
+              <div key={index} className="flex">
+                <span className="w-8 text-gray-500">[{index}]:</span>
+                <span className="flex-1 font-mono">{
+                  typeof item === 'object' && item !== null 
+                    ? JSON.stringify(item, null, 2)
+                    : String(item || 'null')
+                }</span>
+              </div>
             ))}
           </div>
         </div>
@@ -262,6 +283,16 @@ const StatusCard = ({ name, value }) => {
 
 const GenericSensorCard = ({ name, value }) => {
   const formatName = (name) => {
+    // Special name mappings
+    const nameMap = {
+      fanPower: 'Fan Power',
+      kettleHeaterPower: 'Kettle Heater Power',
+      glycolHeaterPower: 'Glycol Heater Power',
+      glycolChillerPower: 'Glycol Chiller Power'
+    };
+    
+    if (nameMap[name]) return nameMap[name];
+    
     return name
       .replace(/([A-Z])/g, ' $1')
       .trim()
@@ -270,11 +301,25 @@ const GenericSensorCard = ({ name, value }) => {
       .join(' ')
   }
 
+  const formatValue = (name, value) => {
+    // Power values should show watts
+    if (name.toLowerCase().includes('power') && typeof value === 'number') {
+      return value > 0 ? `${value}W` : '0W';
+    }
+    
+    // Arrays should not be displayed here
+    if (Array.isArray(value)) {
+      return 'Array Data';
+    }
+    
+    return value !== null && value !== undefined ? value.toString() : '--';
+  }
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h4 className="text-sm font-medium text-gray-600 mb-2">{formatName(name)}</h4>
       <div className="text-xl font-bold text-gray-900">
-        {value !== null && value !== undefined ? value.toString() : '--'}
+        {formatValue(name, value)}
       </div>
     </div>
   )

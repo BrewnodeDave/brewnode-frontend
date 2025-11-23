@@ -17,6 +17,7 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
     console.log('Array.isArray check:', Array.isArray(sensorData.data))
     console.log('Data type:', typeof sensorData.data)
     console.log('Kettle heater power:', sensorData.data.kettleHeaterPower, 'from array[12]:', sensorData.data._rawArray?.[12])
+    console.log('Parsed sensor keys:', Object.keys(sensorData.data).filter(k => !k.startsWith('_')))
   }
 
   const handleRestart = async () => {

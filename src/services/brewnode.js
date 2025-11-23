@@ -73,7 +73,14 @@ export const brewnodeAPI = {
       });
       
       // Also preserve the raw array for components that need it
-      parsedData._rawArray = response.data;
+      // Convert objects to strings to avoid [object Object] display
+      const cleanRawArray = response.data.map(item => {
+        if (item && typeof item === 'object' && item.name && item.value !== undefined) {
+          return `${item.name}: ${item.value}`;
+        }
+        return item;
+      });
+      parsedData._rawArray = cleanRawArray;
     }
     
     return {
