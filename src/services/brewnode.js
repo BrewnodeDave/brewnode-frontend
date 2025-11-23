@@ -44,7 +44,7 @@ export const brewnodeAPI = {
     const parsedData = {};
     
     if (Array.isArray(response.data)) {
-      response.data.forEach(item => {
+      response.data.forEach((item, index) => {
         if (item && typeof item === 'object' && item.name && item.value !== undefined) {
           // Convert sensor names to camelCase keys while preserving uniqueness
           const key = item.name
@@ -62,8 +62,18 @@ export const brewnodeAPI = {
           }
           
           parsedData[key] = value;
+        } else if (typeof item === 'number') {
+          // Handle raw numeric values (like heater power consumption)
+          // Map known indices to meaningful names
+          if (index === 9) parsedData['fanPower'] = item;
+          if (index === 10) parsedData['glycolHeaterPower'] = item;
+          if (index === 11) parsedData['glycolChillerPower'] = item;
+          if (index === 12) parsedData['kettleHeaterPower'] = item;
         }
       });
+      
+      // Also preserve the raw array for components that need it
+      parsedData._rawArray = response.data;
     }
     
     return {

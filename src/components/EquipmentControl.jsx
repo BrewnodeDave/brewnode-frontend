@@ -30,9 +30,9 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
   
   // Debug logging
   console.log('EquipmentControl sensor data debug:', {
-    'sensorData': sensorData,
     'sensorData?.data type': sensorData?.data ? (Array.isArray(sensorData.data) ? 'array' : typeof sensorData.data) : 'no data',
-    'sensorData.data[12]': Array.isArray(sensorData?.data) ? sensorData.data[12] : 'not array or no data',
+    'sensorData.data.kettleHeaterPower': sensorData?.data?.kettleHeaterPower,
+    'sensorData.data._rawArray[12]': sensorData?.data?._rawArray?.[12],
     'heaterStates.kettle': heaterStates.kettle
   })
 
@@ -356,13 +356,19 @@ const EquipmentControl = ({ fanStatus, pumpsStatus, valvesStatus, sensorData }) 
             <ControlCard
               name="Kettle Heater"
               status={(() => {
-                // Primary source: sensor data array index 12 (most current)
-                if (Array.isArray(sensorData?.data) && sensorData.data[12] !== undefined) {
-                  const power = sensorData.data[12] || 0
+                // Primary source: parsed sensor data kettleHeaterPower
+                if (sensorData?.data?.kettleHeaterPower !== undefined) {
+                  const power = sensorData.data.kettleHeaterPower || 0
                   return power > 0 ? `On (${power}W)` : "Off"
                 }
                 
-                // Fallback: local state from recent API response
+                // Alternative: raw array access (fallback)
+                if (sensorData?.data?._rawArray?.[12] !== undefined) {
+                  const power = sensorData.data._rawArray[12] || 0
+                  return power > 0 ? `On (${power}W)` : "Off"
+                }
+                
+                // Last fallback: local state from recent API response
                 if (heaterStates.kettle !== null) {
                   const power = heaterStates.kettle || 0
                   return power > 0 ? `On (${power}W)` : "Off"
