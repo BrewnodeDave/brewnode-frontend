@@ -103,7 +103,7 @@ const Layout = ({ children }) => {
               <Activity className="w-8 h-8 mr-3 text-brewery-600" />
               <h1 className="text-xl font-semibold text-gray-900">Brewnode</h1>
             </div>
-            <div className="w-8" /> {/* Spacer for centering */
+            <div className="w-8" /> {/* Spacer for centering */}
           </div>
         </header>
 
