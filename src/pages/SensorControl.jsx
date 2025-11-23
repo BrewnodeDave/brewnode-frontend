@@ -123,20 +123,17 @@ const SensorControl = () => {
         <StatusCard
           title="Fan Status"
           value={(() => {
-            // Debug: Check all possible fan-related keys
-            const sensorKeys = sensorData?.data ? Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('fan')) : []
-            console.log('Fan-related sensor keys:', sensorKeys)
-            console.log('Fan value from sensorData:', sensorData?.data?.fan)
-            console.log('FanStatus API response:', fanStatus)
+            if (!sensorData?.data) return 'Loading...'
             
-            const fanValue = sensorData?.data?.fan
-            if (fanValue !== null && fanValue !== undefined) {
-              const numValue = parseFloat(fanValue)
-              if (!isNaN(numValue)) {
-                return numValue > 0 ? `On (${numValue}W)` : 'Off'
-              }
+            // Use same logic as Dashboard - fan power from sensor data
+            let fanPower = 0
+            if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
+              fanPower = sensorData.data.fan || 0
+            } else if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
+              fanPower = sensorData.data[9] || 0
             }
-            return fanStatus?.data?.status || 'Unknown'
+            
+            return fanPower > 0 ? `On (${fanPower}W)` : 'Off (0W)'
           })()}
           icon={Fan}
           color="purple"
