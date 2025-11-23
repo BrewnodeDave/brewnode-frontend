@@ -31,22 +31,114 @@ const EquipmentControl = ({ sensorData }) => {
     glycolChiller: false
   })
   
+  // Track expected states after button presses
+  const [expectedStates, setExpectedStates] = useState({})
+  
   // All status information comes from sensorData - no local state needed
 
-  // Clear transition states when sensor data updates
+  // Clear transition states when sensor data matches expected states
   useEffect(() => {
-    // Clear all transition states after a delay to allow sensor data to update
-    const timeouts = Object.keys(transitionStates).map(key => 
-      setTimeout(() => {
-        setTransitionStates(prev => ({ ...prev, [key]: false }))
-      }, 3000) // Clear after 3 seconds max
-    )
+    if (!sensorData?.data) return
+    
+    const updates = {}
+    
+    // Check each transitioning equipment against sensor data
+    Object.keys(transitionStates).forEach(key => {
+      if (transitionStates[key] && expectedStates[key] !== undefined) {
+        let currentState = false
+        
+        // Get current state from sensor data
+        switch(key) {
+          case 'fan':
+            const fanPower = sensorData.data.fanPower || sensorData.data.fan || (Array.isArray(sensorData.data) ? sensorData.data[9] : 0) || 0
+            currentState = fanPower > 0
+            break
+          case 'kettlePump':
+            const kettlePump = sensorData.data.pumpKettle || sensorData.data.kettlePump || 0
+            currentState = kettlePump > 0
+            break
+          case 'mashPump':
+            const mashPump = sensorData.data.pumpMash || sensorData.data.mashPump || 0
+            currentState = mashPump > 0
+            break
+          case 'glycolPump':
+            const glycolPump = sensorData.data.pumpGlycol || sensorData.data.glycolPump || 0
+            currentState = glycolPump > 0
+            break
+          case 'kettleInValve':
+            const kettleInValve = sensorData.data.valveKettleIn || sensorData.data.kettleIn || 0
+            currentState = kettleInValve > 0
+            break
+          case 'mashInValve':
+            const mashInValve = sensorData.data.valveMashIn || sensorData.data.mashIn || 0
+            currentState = mashInValve > 0
+            break
+          case 'chillWortInValve':
+            const chillWortIn = sensorData.data.valveChillerWortIn || sensorData.data.chillWortIn || 0
+            currentState = chillWortIn > 0
+            break
+          case 'chillWortOutValve':
+            const chillWortOut = sensorData.data.valveChillerWortOut || sensorData.data.chillWortOut || 0
+            currentState = chillWortOut > 0
+            break
+          case 'kettleHeater':
+            const kettleHeater = sensorData.data.kettleHeaterPower || (sensorData.data._rawArray ? sensorData.data._rawArray[12] : 0) || 0
+            currentState = kettleHeater > 0
+            break
+          case 'glycolHeater':
+            const glycolHeater = sensorData.data.glycolHeaterPower || (sensorData.data._rawArray ? sensorData.data._rawArray[10] : 0) || 0
+            currentState = glycolHeater > 0
+            break
+          case 'glycolChiller':
+            const glycolChiller = sensorData.data.glycolChillerPower || (sensorData.data._rawArray ? sensorData.data._rawArray[11] : 0) || 0
+            currentState = glycolChiller > 0
+            break
+        }
+        
+        // If sensor data matches expected state, clear transition
+        if (currentState === expectedStates[key]) {
+          updates[key] = false
+        }
+      }
+    })
+    
+    // Update transition states
+    if (Object.keys(updates).length > 0) {
+      setTransitionStates(prev => ({ ...prev, ...updates }))
+      // Clear corresponding expected states
+      setExpectedStates(prev => {
+        const newExpected = { ...prev }
+        Object.keys(updates).forEach(key => {
+          delete newExpected[key]
+        })
+        return newExpected
+      })
+    }
+  }, [sensorData, transitionStates, expectedStates])
+  
+  // Fallback timeout to clear stuck transitions after 10 seconds
+  useEffect(() => {
+    const timeouts = Object.keys(transitionStates).map(key => {
+      if (transitionStates[key]) {
+        return setTimeout(() => {
+          setTransitionStates(prev => ({ ...prev, [key]: false }))
+          setExpectedStates(prev => {
+            const newExpected = { ...prev }
+            delete newExpected[key]
+            return newExpected
+          })
+        }, 10000) // 10 second fallback
+      }
+      return null
+    }).filter(Boolean)
     
     return () => timeouts.forEach(clearTimeout)
-  }, [sensorData])
+  }, [transitionStates])
   
   // Debug logging
   console.log('EquipmentControl props:', { sensorData })
+  console.log('Transition states:', transitionStates)
+  console.log('Expected states:', expectedStates)
   
   // Debug logging
   console.log('EquipmentControl - Kettle heater power:', sensorData?.data?.kettleHeaterPower)
@@ -58,10 +150,12 @@ const EquipmentControl = ({ sensorData }) => {
       return brewnodeAPI.setFan(state)
     },
     { 
-      onSuccess: (response) => {
+      onSuccess: (response, variables) => {
         console.log('Fan response:', response.data)
-        // Set transition state
+        // Set transition state and expected state
+        const expectedOn = variables === 'On'
         setTransitionStates(prev => ({ ...prev, fan: true }))
+        setExpectedStates(prev => ({ ...prev, fan: expectedOn }))
         // Invalidate queries to refresh all status from central sensorStatus
         queryClient.invalidateQueries('fanStatus')
         queryClient.invalidateQueries('sensorStatus')
@@ -77,8 +171,10 @@ const EquipmentControl = ({ sensorData }) => {
     kettle: useMutation(
       (state) => brewnodeAPI.setKettlePump(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, kettlePump: true }))
+          setExpectedStates(prev => ({ ...prev, kettlePump: expectedOn }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -91,8 +187,10 @@ const EquipmentControl = ({ sensorData }) => {
     mash: useMutation(
       (state) => brewnodeAPI.setMashPump(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, mashPump: true }))
+          setExpectedStates(prev => ({ ...prev, mashPump: expectedOn }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -105,8 +203,10 @@ const EquipmentControl = ({ sensorData }) => {
     glycol: useMutation(
       (state) => brewnodeAPI.setGlycolPump(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, glycolPump: true }))
+          setExpectedStates(prev => ({ ...prev, glycolPump: expectedOn }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -122,8 +222,10 @@ const EquipmentControl = ({ sensorData }) => {
     kettlein: useMutation(
       (state) => brewnodeAPI.setKettleInValve(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, kettleInValve: true }))
+          setExpectedStates(prev => ({ ...prev, kettleInValve: expectedOn }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -136,8 +238,10 @@ const EquipmentControl = ({ sensorData }) => {
     mashin: useMutation(
       (state) => brewnodeAPI.setMashInValve(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, mashInValve: true }))
+          setExpectedStates(prev => ({ ...prev, mashInValve: expectedOn }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -150,8 +254,10 @@ const EquipmentControl = ({ sensorData }) => {
     chillwortin: useMutation(
       (state) => brewnodeAPI.setChillWortInValve(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, chillWortInValve: true }))
+          setExpectedStates(prev => ({ ...prev, chillWortInValve: expectedOn }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -164,8 +270,10 @@ const EquipmentControl = ({ sensorData }) => {
     chillwortout: useMutation(
       (state) => brewnodeAPI.setChillWortOutValve(state),
       { 
-        onSuccess: () => {
+        onSuccess: (response, variables) => {
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, chillWortOutValve: true }))
+          setExpectedStates(prev => ({ ...prev, chillWortOutValve: expectedOn }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -184,12 +292,14 @@ const EquipmentControl = ({ sensorData }) => {
         return brewnodeAPI.setHeat(state)
       },
       { 
-        onSuccess: (response) => {
+        onSuccess: (response, variables) => {
           // Response.data is a number representing power consumption (0 = off, >0 = on)
           const powerValue = Number(response.data) || 0
           console.log('Kettle heater updated to:', powerValue + 'W')
           
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, kettleHeater: true }))
+          setExpectedStates(prev => ({ ...prev, kettleHeater: expectedOn }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -205,9 +315,11 @@ const EquipmentControl = ({ sensorData }) => {
         return brewnodeAPI.setGlycolHeat(state)
       },
       { 
-        onSuccess: (response) => {
+        onSuccess: (response, variables) => {
           console.log('Glycol heater response:', response.data)
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, glycolHeater: true }))
+          setExpectedStates(prev => ({ ...prev, glycolHeater: expectedOn }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -223,9 +335,11 @@ const EquipmentControl = ({ sensorData }) => {
         return brewnodeAPI.setGlycolChill(state)
       },
       { 
-        onSuccess: (response) => {
+        onSuccess: (response, variables) => {
           console.log('Glycol chiller response:', response.data)
+          const expectedOn = variables === 'On'
           setTransitionStates(prev => ({ ...prev, glycolChiller: true }))
+          setExpectedStates(prev => ({ ...prev, glycolChiller: expectedOn }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
