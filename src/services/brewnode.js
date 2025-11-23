@@ -111,7 +111,7 @@ export const brewnodeAPI = {
     api.put('/api/pump/kettle', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setKettleInValve: (onOff) => 
-    api.put('/api/valve/kettlein', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/kettlein', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Glycol controls
   setGlycolChill: (onOff) => 
@@ -128,14 +128,14 @@ export const brewnodeAPI = {
     api.put('/api/pump/mash', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setMashInValve: (onOff) => 
-    api.put('/api/valve/mashin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/mashin', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Chiller valve controls
   setChillWortInValve: (onOff) => 
-    api.put('/api/valve/chillwortin', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/chillwortin', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setChillWortOutValve: (onOff) => 
-    api.put('/api/valve/chillwortout', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put('/api/valve/chillwortout', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
   // Simulator controls
   setKettleVolume: (litres) => 
