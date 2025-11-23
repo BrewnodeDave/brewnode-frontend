@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useQuery } from 'react-query'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { Calendar, BarChart3 } from 'lucide-react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Brush } from 'recharts'
+import { Calendar, BarChart3, ZoomIn, RotateCcw } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 
 const BrewDataChart = () => {
   const [selectedBrew, setSelectedBrew] = useState('')
   const [dateRange, setDateRange] = useState('')
+  const [zoomDomain, setZoomDomain] = useState(null)
+  const [enableZoom, setEnableZoom] = useState(true)
 
   const { data: brewnames, error: brewnamesError } = useQuery('brewnames', () => brewnodeAPI.getBrewnames())
   
@@ -130,6 +132,17 @@ const BrewDataChart = () => {
     })
   }, [brewData])
 
+  // Zoom functions
+  const handleZoom = useCallback((domain) => {
+    if (domain && domain.startIndex !== undefined && domain.endIndex !== undefined) {
+      setZoomDomain(domain)
+    }
+  }, [])
+
+  const resetZoom = useCallback(() => {
+    setZoomDomain(null)
+  }, [])
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-6">
@@ -147,6 +160,31 @@ const BrewDataChart = () => {
               onChange={(e) => setDateRange(e.target.value)}
               className="text-sm border border-gray-300 rounded px-2 py-1"
             />
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setEnableZoom(!enableZoom)}
+              className={`flex items-center space-x-1 px-2 py-1 text-xs rounded ${
+                enableZoom 
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300' 
+                  : 'bg-gray-100 text-gray-600 border border-gray-300'
+              }`}
+              title={enableZoom ? 'Disable zoom' : 'Enable zoom'}
+            >
+              <ZoomIn className="w-3 h-3" />
+              <span>Zoom</span>
+            </button>
+            {zoomDomain && (
+              <button
+                onClick={resetZoom}
+                className="flex items-center space-x-1 px-2 py-1 text-xs rounded bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200"
+                title="Reset zoom"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            )}
           </div>
           
           <select
@@ -180,9 +218,16 @@ const BrewDataChart = () => {
             Showing {chartData.length} data points for {selectedBrew}
           </p>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <LineChart 
+              data={chartData}
+              onMouseDown={(e) => enableZoom && e && setZoomDomain(null)}
+            >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
+              <XAxis 
+                dataKey="time" 
+                domain={zoomDomain ? [zoomDomain.startIndex, zoomDomain.endIndex] : ['dataMin', 'dataMax']}
+                type="category"
+              />
               <YAxis label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
               <Legend />
@@ -218,6 +263,15 @@ const BrewDataChart = () => {
                 strokeWidth={2}
                 dot={false}
               />
+              {enableZoom && chartData.length > 10 && (
+                <Brush 
+                  dataKey="time" 
+                  height={30} 
+                  stroke="#3b82f6"
+                  fill="#dbeafe"
+                  onChange={handleZoom}
+                />
+              )}
             </LineChart>
           </ResponsiveContainer>
         </div>
