@@ -43,10 +43,7 @@ const Layout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-20 px-6 bg-brewery-600">
           <div className="flex items-center">
             <Activity className="w-10 h-10 text-white mr-3" />
@@ -71,13 +68,7 @@ const Layout = ({ children }) => {
                 key={item.name}
                 to={item.href}
                 onClick={closeSidebar}
-                className={`
-                  flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors
-                  ${isActive
-                    ? 'bg-brewery-100 text-brewery-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }
-                `}
+                className={`flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors ${isActive ? 'bg-brewery-100 text-brewery-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
               >
                 <Icon className="w-6 h-6 mr-4 flex-shrink-0" />
                 {item.name}
