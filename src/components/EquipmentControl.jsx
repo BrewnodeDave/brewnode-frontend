@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { 
   Power, 
@@ -16,8 +16,35 @@ const EquipmentControl = ({ sensorData }) => {
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState('all')
   
+  // Transition states to show between button press and sensor data update
+  const [transitionStates, setTransitionStates] = useState({
+    fan: false,
+    kettlePump: false,
+    mashPump: false,
+    glycolPump: false,
+    kettleInValve: false,
+    mashInValve: false,
+    chillWortInValve: false,
+    chillWortOutValve: false,
+    kettleHeater: false,
+    glycolHeater: false,
+    glycolChiller: false
+  })
+  
   // All status information comes from sensorData - no local state needed
 
+  // Clear transition states when sensor data updates
+  useEffect(() => {
+    // Clear all transition states after a delay to allow sensor data to update
+    const timeouts = Object.keys(transitionStates).map(key => 
+      setTimeout(() => {
+        setTransitionStates(prev => ({ ...prev, [key]: false }))
+      }, 3000) // Clear after 3 seconds max
+    )
+    
+    return () => timeouts.forEach(clearTimeout)
+  }, [sensorData])
+  
   // Debug logging
   console.log('EquipmentControl props:', { sensorData })
   
@@ -33,6 +60,8 @@ const EquipmentControl = ({ sensorData }) => {
     { 
       onSuccess: (response) => {
         console.log('Fan response:', response.data)
+        // Set transition state
+        setTransitionStates(prev => ({ ...prev, fan: true }))
         // Invalidate queries to refresh all status from central sensorStatus
         queryClient.invalidateQueries('fanStatus')
         queryClient.invalidateQueries('sensorStatus')
@@ -49,6 +78,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setKettlePump(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, kettlePump: true }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -62,6 +92,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setMashPump(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, mashPump: true }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -75,6 +106,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setGlycolPump(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, glycolPump: true }))
           queryClient.invalidateQueries('pumpsStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -91,6 +123,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setKettleInValve(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, kettleInValve: true }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -104,6 +137,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setMashInValve(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, mashInValve: true }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -117,6 +151,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setChillWortInValve(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, chillWortInValve: true }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -130,6 +165,7 @@ const EquipmentControl = ({ sensorData }) => {
       (state) => brewnodeAPI.setChillWortOutValve(state),
       { 
         onSuccess: () => {
+          setTransitionStates(prev => ({ ...prev, chillWortOutValve: true }))
           queryClient.invalidateQueries('valvesStatus')
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -153,6 +189,7 @@ const EquipmentControl = ({ sensorData }) => {
           const powerValue = Number(response.data) || 0
           console.log('Kettle heater updated to:', powerValue + 'W')
           
+          setTransitionStates(prev => ({ ...prev, kettleHeater: true }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -170,6 +207,7 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response) => {
           console.log('Glycol heater response:', response.data)
+          setTransitionStates(prev => ({ ...prev, glycolHeater: true }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -187,6 +225,7 @@ const EquipmentControl = ({ sensorData }) => {
       { 
         onSuccess: (response) => {
           console.log('Glycol chiller response:', response.data)
+          setTransitionStates(prev => ({ ...prev, glycolChiller: true }))
           // Invalidate queries to refresh all status from central sensorStatus
           queryClient.invalidateQueries('sensorStatus')
         },
@@ -258,6 +297,7 @@ const EquipmentControl = ({ sensorData }) => {
             })()}
             onToggle={(state) => fanMutation.mutate(state)}
             isLoading={fanMutation.isLoading}
+            isTransitioning={transitionStates.fan}
             icon={Fan}
           />
         </EquipmentSection>
@@ -279,6 +319,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()} 
               onToggle={(state) => pumpMutations.kettle.mutate(state)}
               isLoading={pumpMutations.kettle.isLoading}
+              isTransitioning={transitionStates.kettlePump}
               icon={Droplets}
             />
             <ControlCard
@@ -293,6 +334,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => pumpMutations.mash.mutate(state)}
               isLoading={pumpMutations.mash.isLoading}
+              isTransitioning={transitionStates.mashPump}
               icon={Droplets}
             />
             <ControlCard
@@ -332,6 +374,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => valveMutations.kettlein.mutate(state)}
               isLoading={valveMutations.kettlein.isLoading}
+              isTransitioning={transitionStates.kettleInValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -347,6 +390,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => valveMutations.mashin.mutate(state)}
               isLoading={valveMutations.mashin.isLoading}
+              isTransitioning={transitionStates.mashInValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -362,6 +406,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => valveMutations.chillwortin.mutate(state)}
               isLoading={valveMutations.chillwortin.isLoading}
+              isTransitioning={transitionStates.chillWortInValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -377,6 +422,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => valveMutations.chillwortout.mutate(state)}
               isLoading={valveMutations.chillwortout.isLoading}
+              isTransitioning={transitionStates.chillWortOutValve}
               icon={Power}
               stateLabels={{ on: 'Open', off: 'Close' }}
             />
@@ -419,6 +465,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => heaterMutations.kettle.mutate(state)}
               isLoading={heaterMutations.kettle.isLoading}
+              isTransitioning={transitionStates.kettleHeater}
               icon={Flame}
             />
             <ControlCard
@@ -435,6 +482,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => heaterMutations.glycolHeat.mutate(state)}
               isLoading={heaterMutations.glycolHeat.isLoading}
+              isTransitioning={transitionStates.glycolHeater}
               icon={Flame}
             />
             <ControlCard
@@ -451,6 +499,7 @@ const EquipmentControl = ({ sensorData }) => {
               })()}
               onToggle={(state) => heaterMutations.glycolChill.mutate(state)}
               isLoading={heaterMutations.glycolChill.isLoading}
+              isTransitioning={transitionStates.glycolChiller}
               icon={Snowflake}
             />
           </div>
@@ -489,11 +538,12 @@ const ControlCard = ({
   status, 
   onToggle, 
   isLoading, 
+  isTransitioning = false,
   icon: Icon,
   stateLabels = { on: 'On', off: 'Off' }
 }) => {
   const isOn = status === 'On' || status === 'Open' || status === 'Active'
-  const displayStatus = isOn ? (stateLabels.on || 'On') : (stateLabels.off || 'Off')
+  const displayStatus = isTransitioning ? 'Updating...' : (isOn ? (stateLabels.on || 'On') : (stateLabels.off || 'Off'))
 
   const handleToggle = () => {
     // Always send 'On'/'Off' to the API regardless of display labels
@@ -509,7 +559,9 @@ const ControlCard = ({
           <span className="text-lg font-medium text-gray-900">{name}</span>
         </div>
         <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-          isOn 
+          isTransitioning
+            ? 'bg-yellow-100 text-yellow-800'
+            : isOn 
             ? 'bg-green-100 text-green-800' 
             : 'bg-gray-100 text-gray-800'
         }`}>
@@ -519,10 +571,12 @@ const ControlCard = ({
 
       <button
         onClick={handleToggle}
-        disabled={isLoading}
+        disabled={isLoading || isTransitioning}
         className={`w-full flex items-center justify-center space-x-3 py-3 px-6 rounded-md text-lg font-medium transition-colors ${
           isLoading
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : isTransitioning
+            ? 'bg-yellow-500 text-white cursor-not-allowed'
             : isOn
             ? 'bg-green-600 text-white hover:bg-green-700'
             : 'bg-red-600 text-white hover:bg-red-700'
@@ -532,6 +586,13 @@ const ControlCard = ({
           <>
             <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
             <span>Processing...</span>
+          </>
+        ) : isTransitioning ? (
+          <>
+            <div className="w-6 h-6 animate-pulse">
+              <div className="w-full h-full bg-white rounded-full opacity-60"></div>
+            </div>
+            <span>Updating...</span>
           </>
         ) : (
           <>
