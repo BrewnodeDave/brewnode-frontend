@@ -153,43 +153,67 @@ const Dashboard = () => {
             Equipment Status
           </h3>
           <div className="space-y-4">
-            {sensorData?.data && Object.entries(sensorData.data).map(([key, value]) => {
-              if (key.includes('pump') || key.includes('heater') || key.includes('valve')) {
-                // Determine if equipment is active/on/open
-                let isActive = false;
-                let displayValue = 'Off';
-                
-                if (typeof value === 'number') {
-                  isActive = value > 0;
+            {sensorData?.data && (() => {
+              const equipmentEntries = Object.entries(sensorData.data);
+              const seenEquipment = new Set();
+              
+              return equipmentEntries.map(([key, value]) => {
+                if (key.includes('pump') || key.includes('heater') || key.includes('valve')) {
+                  // For valves, use only the camelCase compatibility keys to avoid duplicates
                   if (key.includes('valve')) {
-                    displayValue = isActive ? `Open (${value}W)` : 'Closed';
-                  } else if (key.includes('pump')) {
-                    displayValue = isActive ? `On (${value}W)` : 'Off';
-                  } else if (key.includes('heater')) {
-                    displayValue = isActive ? `On (${value}W)` : 'Off';
+                    // Skip if this is the prefixed valve key (e.g., "valveMashIn") 
+                    // and we have the camelCase version (e.g., "mashIn")
+                    if (key.startsWith('valve')) {
+                      const camelCaseKey = key.replace('valve', '').charAt(0).toLowerCase() + key.replace('valve', '').slice(1);
+                      if (sensorData.data[camelCaseKey] !== undefined) {
+                        return null; // Skip the prefixed version
+                      }
+                    }
+                    
+                    // Also prevent duplicate equipment names
+                    const equipmentName = key.replace(/([A-Z])/g, ' $1').trim().toLowerCase();
+                    if (seenEquipment.has(equipmentName)) {
+                      return null;
+                    }
+                    seenEquipment.add(equipmentName);
                   }
-                } else if (typeof value === 'string') {
-                  isActive = value === 'On' || value === 'Open';
-                  displayValue = value || 'Off';
+                  
+                  // Determine if equipment is active/on/open
+                  let isActive = false;
+                  let displayValue = 'Off';
+                  
+                  if (typeof value === 'number') {
+                    isActive = value > 0;
+                    if (key.includes('valve') || key.includes('In') || key.includes('Out')) {
+                      displayValue = isActive ? `Open (${value}W)` : 'Closed';
+                    } else if (key.includes('pump')) {
+                      displayValue = isActive ? `On (${value}W)` : 'Off';
+                    } else if (key.includes('heater')) {
+                      displayValue = isActive ? `On (${value}W)` : 'Off';
+                    }
+                  } else if (typeof value === 'string') {
+                    isActive = value === 'On' || value === 'Open';
+                    displayValue = value || 'Off';
+                  }
+                  
+                  return (
+                    <div key={key} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
+                      <span className="text-base font-medium text-gray-700 capitalize">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </span>
+                      <span className={`px-4 py-2 text-sm font-semibold rounded-full ${
+                        isActive
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {displayValue}
+                      </span>
+                    </div>
+                  )
                 }
-                
-                return (
-                  <div key={key} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                    <span className="text-base font-medium text-gray-700 capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </span>
-                    <span className={`px-4 py-2 text-sm font-semibold rounded-full ${
-                      isActive
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {displayValue}
-                    </span>
-                  </div>
-                )
-              }
-              return null
-            })}
+                return null
+              }).filter(Boolean);
+            })()}
           </div>
         </div>
 
