@@ -59,7 +59,7 @@ const EquipmentControl = ({ sensorData }) => {
         }
         
         if (expectedStates[key] !== undefined) {
-        let currentState = false
+          let currentState = false
         
         // Get current state from sensor data
         switch(key) {
@@ -134,6 +134,7 @@ const EquipmentControl = ({ sensorData }) => {
             updates[key] = false
             console.log(`Force clearing stuck transition for ${key} after ${elapsed}ms (currentState=${currentState}, expectedState=${expectedStates[key]})`)
           }
+        }
         }
       }
     })
