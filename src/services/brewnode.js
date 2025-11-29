@@ -44,7 +44,21 @@ export const brewnodeAPI = {
     const parsedData = {};
     
     if (Array.isArray(response.data)) {
-      // First, deduplicate items based on normalized valve names
+      // First, extract power values from known indices in the original array
+      if (response.data.length > 9) {
+        if (typeof response.data[9] === 'number') parsedData['fanPower'] = response.data[9];
+        if (typeof response.data[10] === 'number') parsedData['glycolHeaterPower'] = response.data[10];
+        if (typeof response.data[11] === 'number') parsedData['glycolChillerPower'] = response.data[11];
+        if (typeof response.data[12] === 'number') parsedData['kettleHeaterPower'] = response.data[12];
+        console.log('Extracted power values:', {
+          fanPower: parsedData['fanPower'],
+          glycolHeaterPower: parsedData['glycolHeaterPower'],
+          glycolChillerPower: parsedData['glycolChillerPower'],
+          kettleHeaterPower: parsedData['kettleHeaterPower']
+        });
+      }
+      
+      // Then, deduplicate valve items based on normalized valve names
       const seenValves = new Set();
       const filteredData = response.data.filter((item) => {
         if (item === "" || item === null || item === undefined) {
@@ -144,12 +158,8 @@ export const brewnodeAPI = {
           }
           
         } else if (typeof item === 'number') {
-          // Handle raw numeric values (like heater power consumption)
-          // Map known indices to meaningful names - include 0 values as they're valid power readings
-          if (index === 9) parsedData['fanPower'] = item;
-          if (index === 10) parsedData['glycolHeaterPower'] = item;
-          if (index === 11) parsedData['glycolChillerPower'] = item;
-          if (index === 12) parsedData['kettleHeaterPower'] = item;
+          // Skip numeric values as they're processed upfront by index
+          // This prevents overwriting the correct power mappings
         }
       });
       
