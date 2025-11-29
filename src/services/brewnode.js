@@ -106,7 +106,11 @@ export const brewnodeAPI = {
             value = null; // Mark as unavailable rather than showing error values
           }
           
-          parsedData[key] = value;
+          // For valves, we'll handle key creation in the valve-specific section below
+          // For other items, create the standard camelCase key
+          if (!item.name.toLowerCase().includes('valve')) {
+            parsedData[key] = value;
+          }
           
           // Also create more specific keys for equipment status checks
           if (item.name.toLowerCase().includes('pump')) {
@@ -135,22 +139,17 @@ export const brewnodeAPI = {
                 .replace(/^(.)/, (match) => match.toUpperCase());
             }
             
-            // Create standardized valve key (avoid duplicates by checking if key exists)
+            // Use a single consistent key format to prevent duplicates
             const valveKey = `valve${normalizedName}`;
-            if (!parsedData[valveKey]) {
-              parsedData[valveKey] = value;
-              console.log(`Created valve key: ${valveKey} = ${value}`);
-            } else {
-              console.log(`Skipped duplicate valve key: ${valveKey}`);
-            }
-            
-            // Create compatibility keys (avoid duplicates)
             const compatKey = normalizedName.charAt(0).toLowerCase() + normalizedName.slice(1);
-            if (!parsedData[compatKey]) {
+            
+            // Only create keys if they don't already exist (first occurrence wins)
+            if (!parsedData[valveKey] && !parsedData[compatKey]) {
+              parsedData[valveKey] = value;
               parsedData[compatKey] = value;
-              console.log(`Created compat key: ${compatKey} = ${value}`);
+              console.log(`Created valve keys: ${valveKey} and ${compatKey} = ${value}`);
             } else {
-              console.log(`Skipped duplicate compat key: ${compatKey}`);
+              console.log(`Skipped duplicate valve: ${item.name} (keys ${valveKey}, ${compatKey} already exist)`);
             }
           }
           
