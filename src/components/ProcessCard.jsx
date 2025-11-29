@@ -18,27 +18,27 @@ const ProcessCard = ({ process, onClick, isLoading }) => {
       onClick={onClick}
       disabled={isLoading}
       className={`
-        w-full p-6 border-2 rounded-lg transition-all duration-200
+        w-full p-6 sm:p-8 border-2 rounded-xl transition-all duration-200 min-h-[140px] sm:min-h-[160px]
         ${colorClasses[process.color] || colorClasses.blue}
-        ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer transform hover:scale-105'}
+        ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer transform hover:scale-105 active:scale-95'}
       `}
     >
-      <div className="flex flex-col items-center space-y-3">
-        <div className="p-3 rounded-full bg-white bg-opacity-50">
+      <div className="flex flex-col items-center justify-center space-y-4 h-full">
+        <div className="p-4 rounded-full bg-white bg-opacity-60">
           {isLoading ? (
-            <div className="w-8 h-8 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            <div className="w-10 h-10 animate-spin rounded-full border-3 border-current border-t-transparent" />
           ) : (
-            <Icon className="w-8 h-8" />
+            <Icon className="w-10 h-10" />
           )}
         </div>
         
         <div className="text-center">
-          <h3 className="font-semibold text-lg">{process.name}</h3>
-          <p className="text-sm opacity-75 mt-1">{process.description}</p>
+          <h3 className="font-bold text-xl mb-2">{process.name}</h3>
+          <p className="text-base opacity-80">{process.description}</p>
         </div>
         
         {isLoading && (
-          <div className="text-sm font-medium">
+          <div className="text-base font-semibold">
             Processing...
           </div>
         )}

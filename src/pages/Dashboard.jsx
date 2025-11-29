@@ -40,39 +40,39 @@ const Dashboard = () => {
   )
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
         <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-brewery-100 rounded-lg shadow-sm flex items-center justify-center">
-            <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-brewery-600" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-brewery-100 rounded-xl shadow-sm flex items-center justify-center">
+            <Activity className="w-8 h-8 sm:w-10 sm:h-10 text-brewery-600" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Brewnode Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Brewnode Dashboard</h1>
         </div>
-        <div className="flex items-center space-x-3 text-sm sm:text-base text-gray-500">
-          <Clock className="w-5 h-5" />
+        <div className="flex items-center space-x-3 text-base sm:text-lg text-gray-500">
+          <Clock className="w-6 h-6" />
           <span className="hidden sm:inline">{new Date().toLocaleString()}</span>
           <span className="sm:hidden">{new Date().toLocaleTimeString()}</span>
         </div>
       </div>
 
       {/* Current Brew Status */}
-      <div className="bg-white rounded-lg shadow p-8">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center">
-          <Beaker className="w-7 h-7 mr-3 text-brewery-600" />
+      <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
+        <h2 className="text-xl sm:text-2xl font-semibold mb-6 flex items-center">
+          <Beaker className="w-8 h-8 mr-3 text-brewery-600" />
           Current Brew
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <p className="text-base text-gray-600">Recipe</p>
-            <p className="text-xl font-semibold">{currentBrew?.data?.recipeName || 'No active brew'}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <p className="text-lg font-medium text-gray-600 mb-2">Recipe</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{currentBrew?.data?.recipeName || 'No active brew'}</p>
           </div>
-          <div className="text-center">
-            <p className="text-base text-gray-600">Status</p>
-            <p className="text-xl font-semibold">{currentBrew?.data?.status || 'System Ready'}</p>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <p className="text-lg font-medium text-gray-600 mb-2">Status</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{currentBrew?.data?.status || 'System Ready'}</p>
           </div>
-          <div className="text-center">
-            <p className="text-base text-gray-600">Latest Brew</p>
-            <p className="text-xl font-semibold">
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <p className="text-lg font-medium text-gray-600 mb-2">Latest Brew</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">
               {brewnames?.data && brewnames.data.length > 0 
                 ? brewnames.data[0] 
                 : 'No brews found'
@@ -86,7 +86,7 @@ const Dashboard = () => {
       <SystemStatus sensorData={sensorData} />
 
       {/* Sensor Status Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
         <SensorStatusCard
           title="Kettle Temperature"
           icon={Thermometer}
@@ -146,21 +146,21 @@ const Dashboard = () => {
       </div>
 
       {/* Equipment Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Server className="w-5 h-5 mr-2 text-gray-600" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
+          <h3 className="text-xl font-semibold mb-6 flex items-center">
+            <Server className="w-7 h-7 mr-3 text-gray-600" />
             Equipment Status
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {sensorData?.data && Object.entries(sensorData.data).map(([key, value]) => {
               if (key.includes('pump') || key.includes('heater') || key.includes('valve')) {
                 return (
-                  <div key={key} className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600 capitalize">
+                  <div key={key} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
+                    <span className="text-base font-medium text-gray-700 capitalize">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
+                    <span className={`px-4 py-2 text-sm font-semibold rounded-full ${
                       value === 'On' || value === 'Open' 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-gray-100 text-gray-800'
@@ -175,14 +175,14 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <AlertCircle className="w-5 h-5 mr-2 text-gray-600" />
+        <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
+          <h3 className="text-xl font-semibold mb-6 flex items-center">
+            <AlertCircle className="w-7 h-7 mr-3 text-gray-600" />
             Recent Brews
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {brewnames?.data?.slice(0, 5).map((name, index) => (
-              <div key={index} className="text-sm text-gray-600 py-1 border-b border-gray-100 last:border-b-0">
+              <div key={index} className="text-base font-medium text-gray-700 py-3 px-4 bg-gray-50 rounded-lg">
                 {name}
               </div>
             ))}
