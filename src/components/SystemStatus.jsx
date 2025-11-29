@@ -216,7 +216,7 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
                 
                 if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
                   // Add fan power
-                  totalPower += sensorData.data.fan || 0
+                  totalPower += sensorData.data.fanPower || sensorData.data.fan || 0
                   
                   // Add pump power
                   const pumpKeys = Object.keys(sensorData.data).filter(key => 
@@ -234,7 +234,18 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
                     totalPower += sensorData.data[key] || 0
                   })
                   
-                  // Add heater power using parsed sensor data or fallback to array indices
+                  // Add heater power using parsed sensor data
+                  totalPower += sensorData.data.glycolHeaterPower || 0
+                  totalPower += sensorData.data.glycolChillerPower || 0
+                  totalPower += sensorData.data.kettleHeaterPower || 0
+                  
+                  // Also add any other heater keys that might exist
+                  const heaterKeys = Object.keys(sensorData.data).filter(key => 
+                    key.toLowerCase().includes('heater') && !key.includes('Power')
+                  )
+                  heaterKeys.forEach(key => {
+                    totalPower += sensorData.data[key] || 0
+                  })
                 } else if (sensorData.data && typeof sensorData.data === 'object') {
                   // Use parsed power values if available
                   totalPower += sensorData.data.fanPower || 0

@@ -155,17 +155,35 @@ const Dashboard = () => {
           <div className="space-y-4">
             {sensorData?.data && Object.entries(sensorData.data).map(([key, value]) => {
               if (key.includes('pump') || key.includes('heater') || key.includes('valve')) {
+                // Determine if equipment is active/on/open
+                let isActive = false;
+                let displayValue = 'Off';
+                
+                if (typeof value === 'number') {
+                  isActive = value > 0;
+                  if (key.includes('valve')) {
+                    displayValue = isActive ? `Open (${value}W)` : 'Closed';
+                  } else if (key.includes('pump')) {
+                    displayValue = isActive ? `On (${value}W)` : 'Off';
+                  } else if (key.includes('heater')) {
+                    displayValue = isActive ? `On (${value}W)` : 'Off';
+                  }
+                } else if (typeof value === 'string') {
+                  isActive = value === 'On' || value === 'Open';
+                  displayValue = value || 'Off';
+                }
+                
                 return (
                   <div key={key} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
                     <span className="text-base font-medium text-gray-700 capitalize">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
                     <span className={`px-4 py-2 text-sm font-semibold rounded-full ${
-                      value === 'On' || value === 'Open' 
+                      isActive
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {value || 'Off'}
+                      {displayValue}
                     </span>
                   </div>
                 )

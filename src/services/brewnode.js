@@ -45,9 +45,14 @@ export const brewnodeAPI = {
     
     if (Array.isArray(response.data)) {
       response.data.forEach((item, index) => {
+        // Skip empty strings and null/undefined values
+        if (item === "" || item === null || item === undefined) {
+          return;
+        }
+        
         if (item && typeof item === 'object' && item.name && item.value !== undefined) {
           // Convert sensor names to camelCase keys while preserving uniqueness
-          const key = item.name
+          let key = item.name
             .toLowerCase()
             .replace(/\s+(.)/g, (_, char) => char.toUpperCase()) // Convert spaces to camelCase
             .replace(/[^\w]/g, ''); // Remove special characters
@@ -62,7 +67,41 @@ export const brewnodeAPI = {
           }
           
           parsedData[key] = value;
-        } else if (typeof item === 'number') {
+          
+          // Also create more specific keys for equipment status checks
+          if (item.name.toLowerCase().includes('pump')) {
+            // Create a standardized pump key
+            const pumpName = item.name.toLowerCase().replace('pump ', '').replace(/\s+/g, '');
+            parsedData[`pump${pumpName.charAt(0).toUpperCase() + pumpName.slice(1)}`] = value;
+          } else if (item.name.toLowerCase().includes('valve')) {
+            // Create a standardized valve key  
+            let valveName = item.name.toLowerCase()
+              .replace('valve ', '')
+              .replace(/[-\s]+/g, '')
+              .replace('chillerwortin', 'ChillerWortIn')
+              .replace('chillerwortout', 'ChillerWortOut')  
+              .replace('kettlein', 'KettleIn')
+              .replace('mashin', 'MashIn');
+            
+            // Ensure first letter is uppercase
+            if (valveName.length > 0) {
+              valveName = valveName.charAt(0).toUpperCase() + valveName.slice(1);
+            }
+            parsedData[`valve${valveName}`] = value;
+            
+            // Also create alternative key formats for compatibility
+            if (item.name.toLowerCase().includes('mash-in')) {
+              parsedData['mashIn'] = value;
+            } else if (item.name.toLowerCase().includes('kettle-in')) {
+              parsedData['kettleIn'] = value;  
+            } else if (item.name.toLowerCase().includes('chiller wort-in')) {
+              parsedData['chillWortIn'] = value;
+            } else if (item.name.toLowerCase().includes('chiller wort-out')) {
+              parsedData['chillWortOut'] = value;
+            }
+          }
+          
+        } else if (typeof item === 'number' && item !== 0) {
           // Handle raw numeric values (like heater power consumption)
           // Map known indices to meaningful names
           if (index === 9) parsedData['fanPower'] = item;
