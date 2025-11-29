@@ -138,14 +138,8 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
                 if (sensorError) return 'Error'
                 if (!sensorData?.data) return 'No Sensor Data'
                 
-                // Fan is at index 9 in raw array or 'fan' key in parsed data
-                let fanPower = 0
-                if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
-                  fanPower = sensorData.data[9] || 0
-                } else if (typeof sensorData.data === 'object' && sensorData.data.fan !== undefined) {
-                  fanPower = sensorData.data.fan || 0
-                }
-                
+                // Use the enhanced fanPower from our fixed API parsing
+                const fanPower = sensorData.data.fanPower || 0
                 return fanPower > 0 ? `On (${fanPower}W)` : 'Off (0W)'
               })()}
             </p>

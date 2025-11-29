@@ -6,10 +6,12 @@ import {
   AlertCircle,
   Clock,
   Server,
-  Beaker 
+  Beaker,
+  Fan
 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 import SensorStatusCard from '../components/SensorStatusCard'
+import EquipmentStatusCard from '../components/EquipmentStatusCard'
 import BrewDataChart from '../components/BrewDataChart'
 import SystemStatus from '../components/SystemStatus'
 
@@ -144,6 +146,18 @@ const Dashboard = () => {
         />
       </div>
 
+      {/* Fan Status */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <EquipmentStatusCard
+          name="Fan"
+          isActive={(sensorData?.data?.fanPower || 0) > 0}
+          powerConsumption={sensorData?.data?.fanPower || 0}
+          icon={Fan}
+          color="purple"
+          loading={sensorsLoading}
+        />
+      </div>
+
       {/* Equipment Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
@@ -157,8 +171,8 @@ const Dashboard = () => {
               const shownEquipment = new Set();
               
               return equipmentEntries.filter(([key, value]) => {
-                // Show equipment (pumps, heaters, valves)
-                if (key.includes('pump') || key.includes('heater') || 
+                // Show equipment (pumps, heaters, valves, fan)
+                if (key.includes('pump') || key.includes('heater') || key.includes('fan') ||
                     key.includes('valve') || key.includes('In') || key.includes('Out')) {
                   
                   // For valve duplicates, prefer camelCase version over prefixed version
@@ -196,6 +210,8 @@ const Dashboard = () => {
                   } else if (key.includes('pump')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
                   } else if (key.includes('heater')) {
+                    displayValue = isActive ? `On (${value}W)` : 'Off';
+                  } else if (key.includes('fan')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
                   }
                 } else if (typeof value === 'string') {
