@@ -45,7 +45,7 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-brewery-100">
-            <img src="/logo192.png" alt="Brewnode" className="h-12 w-12" onError={(e) => e.target.src = '/brewnode-logo.png'} />
+            <img src="/logo.png" alt="Brewnode" className="h-12 w-12" onError={(e) => e.target.src = '/brewnode-logo.png'} />
           </div>
           <h2 className="mt-8 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
             Sign in to Brewnode

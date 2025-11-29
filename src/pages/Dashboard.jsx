@@ -43,7 +43,7 @@ const Dashboard = () => {
       <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-brewery-100 rounded-xl shadow-sm flex items-center justify-center">
-            <img src="/logo192.png" alt="Brewnode" className="w-8 h-8 sm:w-10 sm:h-10" onError={(e) => e.target.src = '/brewnode-logo.png'} />
+            <img src="/logo.png" alt="Brewnode" className="w-8 h-8 sm:w-10 sm:h-10" onError={(e) => e.target.src = '/brewnode-logo.png'} />
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Brewnode Dashboard</h1>
         </div>
