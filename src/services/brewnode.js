@@ -153,9 +153,9 @@ export const brewnodeAPI = {
             }
           }
           
-        } else if (typeof item === 'number' && item !== 0) {
+        } else if (typeof item === 'number') {
           // Handle raw numeric values (like heater power consumption)
-          // Map known indices to meaningful names
+          // Map known indices to meaningful names - include 0 values as they're valid power readings
           if (index === 9) parsedData['fanPower'] = item;
           if (index === 10) parsedData['glycolHeaterPower'] = item;
           if (index === 11) parsedData['glycolChillerPower'] = item;
