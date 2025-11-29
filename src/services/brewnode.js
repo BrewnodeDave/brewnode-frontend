@@ -44,9 +44,6 @@ export const brewnodeAPI = {
     const parsedData = {};
     
     if (Array.isArray(response.data)) {
-      // Debug: Log the raw response to see what we're getting
-      console.log('Raw sensor data response:', response.data);
-      
       // First, deduplicate items based on normalized valve names
       const seenValves = new Set();
       const filteredData = response.data.filter((item) => {
@@ -70,10 +67,7 @@ export const brewnodeAPI = {
             normalizedName = originalName.replace('valve ', '').replace(/[-\s]+/g, '');
           }
           
-          console.log(`Processing valve: "${item.name}" -> normalized: "${normalizedName}", already seen: ${seenValves.has(normalizedName)}`);
-          
           if (seenValves.has(normalizedName)) {
-            console.log(`Filtering out duplicate valve: ${item.name}`);
             return false; // Skip duplicate
           }
           seenValves.add(normalizedName);
@@ -81,8 +75,7 @@ export const brewnodeAPI = {
         
         return true;
       });
-      
-      console.log('Filtered data:', filteredData);
+
       
       filteredData.forEach((item, index) => {
         // Skip empty strings and null/undefined values
@@ -147,9 +140,6 @@ export const brewnodeAPI = {
             if (!parsedData[valveKey] && !parsedData[compatKey]) {
               parsedData[valveKey] = value;
               parsedData[compatKey] = value;
-              console.log(`Created valve keys: ${valveKey} and ${compatKey} = ${value}`);
-            } else {
-              console.log(`Skipped duplicate valve: ${item.name} (keys ${valveKey}, ${compatKey} already exist)`);
             }
           }
           
@@ -174,9 +164,6 @@ export const brewnodeAPI = {
       parsedData._rawArray = cleanRawArray;
     }
     
-    console.log('Final parsed data:', parsedData);
-    console.log('Valve-related keys:', Object.keys(parsedData).filter(key => key.toLowerCase().includes('valve') || key.toLowerCase().includes('mash')));
-    
     return {
       ...response,
       data: parsedData
@@ -186,10 +173,8 @@ export const brewnodeAPI = {
   getFanStatus: () =>
     api.get('/api/fan/status'),
 
-  setFan: (onOff) => {
-    console.log('setFan called with:', onOff);
-    return api.put('/api/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } });
-  },
+  setFan: (onOff) => 
+    api.put('/api/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   getPumpsStatus: () =>
     api.get('/api/pumps/status'),

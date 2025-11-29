@@ -55,6 +55,7 @@ const EquipmentControl = ({ sensorData }) => {
           case 'fan':
             const fanPower = sensorData.data.fanPower || sensorData.data.fan || (Array.isArray(sensorData.data) ? sensorData.data[9] : 0) || 0
             currentState = fanPower > 0
+            console.log(`Fan transition check: fanPower=${fanPower}, currentState=${currentState}, expectedState=${expectedStates[key]}`)
             break
           case 'kettlePump':
             const kettlePump = sensorData.data.pumpKettle || sensorData.data.kettlePump || 0
@@ -111,6 +112,16 @@ const EquipmentControl = ({ sensorData }) => {
             console.log(`Clearing transition for ${key} after ${elapsed}ms`)
           } else {
             console.log(`${key} transition too short (${elapsed}ms), keeping active`)
+          }
+        } else {
+          // Clear stuck transitions after 10 seconds
+          const transitionStartTime = transitionStartTimes[key]
+          const maxDuration = 10000 // Maximum 10 seconds transition
+          const elapsed = transitionStartTime ? Date.now() - transitionStartTime : maxDuration
+          
+          if (elapsed >= maxDuration) {
+            updates[key] = false
+            console.log(`Force clearing stuck transition for ${key} after ${elapsed}ms (currentState=${currentState}, expectedState=${expectedStates[key]})`)
           }
         }
       }
