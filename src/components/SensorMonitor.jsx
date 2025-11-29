@@ -31,13 +31,15 @@ const SensorMonitor = ({ data, isLoading }) => {
   const equipment = {}
   const other = {}
 
+  const seenEquipment = new Set();
+  
   Object.entries(data.data).forEach(([key, value]) => {
     // Temperature sensors - check if key contains temperature-related terms
     if (key.toLowerCase().includes('temp') || 
         ['glycol', 'kettle', 'fermenter', 'mash', 'ambient'].includes(key)) {
       temperatures[key] = value
     } 
-    // Equipment (pumps, valves, heaters)
+    // Equipment (pumps, valves, heaters) - avoid duplicates
     else if (key.toLowerCase().includes('pump') || 
              key.toLowerCase().includes('valve') || 
              key.toLowerCase().includes('heater') || 
@@ -45,10 +47,31 @@ const SensorMonitor = ({ data, isLoading }) => {
              key === 'fan' ||
              ['mashPump', 'kettlePump', 'glycolPump', 'chillerWortOut', 'chillerWortIn', 
               'kettleIn', 'mashIn', 'kettleHeater', 'glycolHeater', 'glycolChiller'].includes(key)) {
-      equipment[key] = value
+      
+      // For valve duplicates, prefer camelCase version over prefixed version
+      if (key.startsWith('valve')) {
+        const camelCaseKey = key.replace('valve', '').charAt(0).toLowerCase() + key.replace('valve', '').slice(1);
+        if (data.data[camelCaseKey] !== undefined) {
+          return; // Skip prefixed version if camelCase exists
+        }
+      }
+      
+      // Prevent showing the same equipment name twice
+      const normalizedName = key.toLowerCase()
+        .replace('valve', '')
+        .replace(/^(.)/, match => match.toUpperCase())
+        .replace(/([A-Z])/g, ' $1')
+        .trim();
+      
+      if (!seenEquipment.has(normalizedName)) {
+        seenEquipment.add(normalizedName);
+        equipment[key] = value;
+      }
     } 
-    // Other sensors
-    else if (value !== undefined && value !== null && value !== '') {
+    // Other sensors (exclude internal fields)
+    else if (value !== undefined && value !== null && value !== '' && 
+             !key.startsWith('_') && !key.includes('Raw') && 
+             typeof value !== 'object') {
       other[key] = value
     }
   })
@@ -85,20 +108,9 @@ const SensorMonitor = ({ data, isLoading }) => {
         </div>
       )}
 
-      {/* Other Sensors */}
-      {Object.keys(other).length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Gauge className="w-5 h-5 mr-2 text-blue-600" />
-            Other Sensors
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(other).map(([key, value]) => (
-              <GenericSensorCard key={key} name={key} value={value} />
-            ))}
-          </div>
-        </div>
-      )}
+
+
+
     </div>
   )
 }
@@ -262,6 +274,16 @@ const StatusCard = ({ name, value }) => {
 
 const GenericSensorCard = ({ name, value }) => {
   const formatName = (name) => {
+    // Special name mappings
+    const nameMap = {
+      fanPower: 'Fan Power',
+      kettleHeaterPower: 'Kettle Heater Power',
+      glycolHeaterPower: 'Glycol Heater Power',
+      glycolChillerPower: 'Glycol Chiller Power'
+    };
+    
+    if (nameMap[name]) return nameMap[name];
+    
     return name
       .replace(/([A-Z])/g, ' $1')
       .trim()
@@ -270,11 +292,25 @@ const GenericSensorCard = ({ name, value }) => {
       .join(' ')
   }
 
+  const formatValue = (name, value) => {
+    // Power values should show watts
+    if (name.toLowerCase().includes('power') && typeof value === 'number') {
+      return value > 0 ? `${value}W` : '0W';
+    }
+    
+    // Arrays should not be displayed here
+    if (Array.isArray(value)) {
+      return 'Array Data';
+    }
+    
+    return value !== null && value !== undefined ? value.toString() : '--';
+  }
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h4 className="text-sm font-medium text-gray-600 mb-2">{formatName(name)}</h4>
       <div className="text-xl font-bold text-gray-900">
-        {value !== null && value !== undefined ? value.toString() : '--'}
+        {formatValue(name, value)}
       </div>
     </div>
   )
