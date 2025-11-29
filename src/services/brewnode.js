@@ -115,7 +115,7 @@ export const brewnodeAPI = {
     api.put('/api/ferment', null, { params: { step: JSON.stringify(step) } }),
   
   fill: (litres) => 
-    api.put('/api/fill', null, { params: { litres } }),
+    api.put('/api/fill', null, { params: { litres }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   k2f: (flowTimeoutSecs = 5) => 
     api.put('/api/k2f', null, { params: { flowTimeoutSecs } }),
