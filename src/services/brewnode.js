@@ -44,7 +44,39 @@ export const brewnodeAPI = {
     const parsedData = {};
     
     if (Array.isArray(response.data)) {
-      response.data.forEach((item, index) => {
+      // First, deduplicate items based on normalized valve names
+      const seenValves = new Set();
+      const filteredData = response.data.filter((item) => {
+        if (item === "" || item === null || item === undefined) {
+          return false;
+        }
+        
+        if (item && typeof item === 'object' && item.name && item.value !== undefined && item.name.toLowerCase().includes('valve')) {
+          const originalName = item.name.toLowerCase();
+          let normalizedName = '';
+          
+          if (originalName.includes('mash') && originalName.includes('in')) {
+            normalizedName = 'mashin';
+          } else if (originalName.includes('kettle') && originalName.includes('in')) {
+            normalizedName = 'kettlein';
+          } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('in')) {
+            normalizedName = 'chillerwortin';
+          } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('out')) {
+            normalizedName = 'chillerwortout';
+          } else {
+            normalizedName = originalName.replace('valve ', '').replace(/[-\s]+/g, '');
+          }
+          
+          if (seenValves.has(normalizedName)) {
+            return false; // Skip duplicate
+          }
+          seenValves.add(normalizedName);
+        }
+        
+        return true;
+      });
+      
+      filteredData.forEach((item, index) => {
         // Skip empty strings and null/undefined values
         if (item === "" || item === null || item === undefined) {
           return;
@@ -120,7 +152,7 @@ export const brewnodeAPI = {
       
       // Also preserve the raw array for components that need it
       // Convert objects to strings to avoid [object Object] display
-      const cleanRawArray = response.data.map(item => {
+      const cleanRawArray = filteredData.map(item => {
         if (item && typeof item === 'object' && item.name && item.value !== undefined) {
           return `${item.name}: ${item.value}`;
         }
