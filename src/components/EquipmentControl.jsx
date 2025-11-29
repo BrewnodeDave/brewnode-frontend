@@ -485,12 +485,24 @@ const EquipmentControl = ({ sensorData }) => {
               if (sensorData?.data) {
                 if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
                   fanPower = sensorData.data.fanPower || sensorData.data.fan || 0
+                  console.log('Fan status check (parsed object):', {
+                    fanPower: sensorData.data.fanPower,
+                    fan: sensorData.data.fan,
+                    finalFanPower: fanPower,
+                    dataKeys: Object.keys(sensorData.data).filter(k => k.toLowerCase().includes('fan'))
+                  })
                 } else if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
                   fanPower = sensorData.data[9] || 0
+                  console.log('Fan status check (raw array):', {
+                    index9: sensorData.data[9],
+                    finalFanPower: fanPower
+                  })
                 }
               }
               
-              return (fanPower || 0) > 0 ? "On" : "Off"
+              const status = (fanPower || 0) > 0 ? "On" : "Off"
+              console.log('Final fan status:', status, 'fanPower:', fanPower)
+              return status
             })()}
             onToggle={(state) => fanMutation.mutate(state)}
             isLoading={fanMutation.isLoading}
