@@ -186,8 +186,10 @@ export const brewnodeAPI = {
   getFanStatus: () =>
     api.get('/api/fan/status'),
 
-  setFan: (onOff) => 
-    api.put('/api/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  setFan: (onOff) => {
+    console.log('setFan called with:', onOff);
+    return api.put('/api/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } });
+  },
   
   getPumpsStatus: () =>
     api.get('/api/pumps/status'),
