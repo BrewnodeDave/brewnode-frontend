@@ -74,30 +74,37 @@ export const brewnodeAPI = {
             const pumpName = item.name.toLowerCase().replace('pump ', '').replace(/\s+/g, '');
             parsedData[`pump${pumpName.charAt(0).toUpperCase() + pumpName.slice(1)}`] = value;
           } else if (item.name.toLowerCase().includes('valve')) {
-            // Create a standardized valve key  
-            let valveName = item.name.toLowerCase()
-              .replace('valve ', '')
-              .replace(/[-\s]+/g, '')
-              .replace('chillerwortin', 'ChillerWortIn')
-              .replace('chillerwortout', 'ChillerWortOut')  
-              .replace('kettlein', 'KettleIn')
-              .replace('mashin', 'MashIn');
+            // Normalize valve names to prevent duplicates
+            const originalName = item.name.toLowerCase();
+            let normalizedName = '';
             
-            // Ensure first letter is uppercase
-            if (valveName.length > 0) {
-              valveName = valveName.charAt(0).toUpperCase() + valveName.slice(1);
+            // Standardize common valve names to prevent duplicates
+            if (originalName.includes('mash') && originalName.includes('in')) {
+              normalizedName = 'MashIn';
+            } else if (originalName.includes('kettle') && originalName.includes('in')) {
+              normalizedName = 'KettleIn';
+            } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('in')) {
+              normalizedName = 'ChillerWortIn';
+            } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('out')) {
+              normalizedName = 'ChillerWortOut';
+            } else {
+              // Fallback: clean the name generically
+              normalizedName = originalName
+                .replace('valve ', '')
+                .replace(/[-\s]+/g, '')
+                .replace(/^(.)/, (match) => match.toUpperCase());
             }
-            parsedData[`valve${valveName}`] = value;
             
-            // Also create alternative key formats for compatibility
-            if (item.name.toLowerCase().includes('mash-in')) {
-              parsedData['mashIn'] = value;
-            } else if (item.name.toLowerCase().includes('kettle-in')) {
-              parsedData['kettleIn'] = value;  
-            } else if (item.name.toLowerCase().includes('chiller wort-in')) {
-              parsedData['chillWortIn'] = value;
-            } else if (item.name.toLowerCase().includes('chiller wort-out')) {
-              parsedData['chillWortOut'] = value;
+            // Create standardized valve key (avoid duplicates by checking if key exists)
+            const valveKey = `valve${normalizedName}`;
+            if (!parsedData[valveKey]) {
+              parsedData[valveKey] = value;
+            }
+            
+            // Create compatibility keys (avoid duplicates)
+            const compatKey = normalizedName.charAt(0).toLowerCase() + normalizedName.slice(1);
+            if (!parsedData[compatKey]) {
+              parsedData[compatKey] = value;
             }
           }
           
