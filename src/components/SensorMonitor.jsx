@@ -31,13 +31,15 @@ const SensorMonitor = ({ data, isLoading }) => {
   const equipment = {}
   const other = {}
 
+  const seenEquipment = new Set();
+  
   Object.entries(data.data).forEach(([key, value]) => {
     // Temperature sensors - check if key contains temperature-related terms
     if (key.toLowerCase().includes('temp') || 
         ['glycol', 'kettle', 'fermenter', 'mash', 'ambient'].includes(key)) {
       temperatures[key] = value
     } 
-    // Equipment (pumps, valves, heaters)
+    // Equipment (pumps, valves, heaters) - avoid duplicates
     else if (key.toLowerCase().includes('pump') || 
              key.toLowerCase().includes('valve') || 
              key.toLowerCase().includes('heater') || 
@@ -45,7 +47,26 @@ const SensorMonitor = ({ data, isLoading }) => {
              key === 'fan' ||
              ['mashPump', 'kettlePump', 'glycolPump', 'chillerWortOut', 'chillerWortIn', 
               'kettleIn', 'mashIn', 'kettleHeater', 'glycolHeater', 'glycolChiller'].includes(key)) {
-      equipment[key] = value
+      
+      // For valve duplicates, prefer camelCase version over prefixed version
+      if (key.startsWith('valve')) {
+        const camelCaseKey = key.replace('valve', '').charAt(0).toLowerCase() + key.replace('valve', '').slice(1);
+        if (data.data[camelCaseKey] !== undefined) {
+          return; // Skip prefixed version if camelCase exists
+        }
+      }
+      
+      // Prevent showing the same equipment name twice
+      const normalizedName = key.toLowerCase()
+        .replace('valve', '')
+        .replace(/^(.)/, match => match.toUpperCase())
+        .replace(/([A-Z])/g, ' $1')
+        .trim();
+      
+      if (!seenEquipment.has(normalizedName)) {
+        seenEquipment.add(normalizedName);
+        equipment[key] = value;
+      }
     } 
     // Other sensors (exclude internal fields)
     else if (value !== undefined && value !== null && value !== '' && 
