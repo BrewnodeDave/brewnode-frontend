@@ -45,7 +45,7 @@ const Layout = ({ children }) => {
       <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex items-center justify-between h-24 px-6 bg-brewery-600">
           <div className="flex items-center">
-            <img src="/logo.png" alt="Brewnode" className="w-12 h-12 mr-4" onError={(e) => e.target.src = '/brewnode-logo.png'} />
+            <img src="/logo-40x40.png" alt="Brewnode" className="w-12 h-12 mr-4" />
             <h1 className="text-3xl font-bold text-white">Brewnode</h1>
           </div>
           {/* Mobile close button */}
@@ -99,7 +99,7 @@ const Layout = ({ children }) => {
               <Menu className="w-10 h-10" />
             </button>
             <div className="flex items-center">
-              <img src="/logo.png" alt="Brewnode" className="w-10 h-10 mr-3" onError={(e) => e.target.src = '/brewnode-logo.png'} />
+              <img src="/logo-40x40.png" alt="Brewnode" className="w-10 h-10 mr-3" />
               <h1 className="text-2xl font-semibold text-gray-900">Brewnode</h1>
             </div>
             <div className="w-14" /> {/* Spacer for centering */}
