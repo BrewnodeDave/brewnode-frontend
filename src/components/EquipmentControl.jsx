@@ -47,7 +47,18 @@ const EquipmentControl = ({ sensorData }) => {
     
     // Check each transitioning equipment against sensor data
     Object.keys(transitionStates).forEach(key => {
-      if (transitionStates[key] && expectedStates[key] !== undefined) {
+      if (transitionStates[key]) {
+        // Force clear fan transition if it's been stuck too long
+        if (key === 'fan' && transitionStartTimes[key]) {
+          const elapsed = Date.now() - transitionStartTimes[key];
+          if (elapsed > 5000) { // Clear after 5 seconds for fan
+            updates[key] = false;
+            console.log(`Force clearing stuck fan transition after ${elapsed}ms`);
+            return;
+          }
+        }
+        
+        if (expectedStates[key] !== undefined) {
         let currentState = false
         
         // Get current state from sensor data
@@ -183,6 +194,13 @@ const EquipmentControl = ({ sensorData }) => {
   console.log('EquipmentControl - Kettle heater power:', sensorData?.data?.kettleHeaterPower)
 
   // Mutation handlers
+  // Function to clear fan transition manually
+  const clearFanTransition = () => {
+    setTransitionStates(prev => ({ ...prev, fan: false }))
+    setExpectedStates(prev => ({ ...prev, fan: undefined }))
+    setTransitionStartTimes(prev => ({ ...prev, fan: undefined }))
+  }
+
   const fanMutation = useMutation(
     (state) => {
       console.log('Fan mutation - sending state:', state)
@@ -197,6 +215,7 @@ const EquipmentControl = ({ sensorData }) => {
         setTransitionStates(prev => ({ ...prev, fan: true }))
         setExpectedStates(prev => ({ ...prev, fan: expectedOn }))
         setTransitionStartTimes(prev => ({ ...prev, fan: Date.now() }))
+        window.fanTransitionStart = Date.now() // Track globally for override
         // Invalidate queries to refresh all status from central sensorStatus
         queryClient.invalidateQueries('fanStatus')
         queryClient.invalidateQueries('sensorStatus')
@@ -204,6 +223,8 @@ const EquipmentControl = ({ sensorData }) => {
       onError: (error) => {
         console.error('Fan control failed:', error)
         alert(`Fan control failed: ${error.message || 'Unknown error'}`)
+        // Clear transition on error
+        clearFanTransition()
       }
     }
   )
@@ -735,8 +756,11 @@ const ControlCard = ({
   const displayStatus = isTransitioning ? 'Updating...' : (isOn ? (stateLabels.on || 'On') : (stateLabels.off || 'Off'))
 
   const handleToggle = () => {
-    // Don't allow toggle during transition
-    if (isTransitioning) return
+    // Allow toggle even during transition if it's been stuck for more than 3 seconds
+    if (isTransitioning) {
+      const transitionTime = Date.now() - (window.fanTransitionStart || 0);
+      if (transitionTime < 3000) return; // Still wait 3 seconds before allowing override
+    }
     
     // Always send 'On'/'Off' to the API regardless of display labels
     const newState = isOn ? 'Off' : 'On'
