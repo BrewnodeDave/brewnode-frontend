@@ -113,17 +113,16 @@ const ProcessControl = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Process Control</h1>
-        <div className="flex items-center space-x-3 text-base text-gray-500">
-          <Play className="w-6 h-6" />
-          <span className="hidden sm:inline">Automated Brewing Processes</span>
-          <span className="sm:hidden">Brewing Controls</span>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-900">Process Control</h1>
+        <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <Play className="w-4 h-4" />
+          <span>Automated Brewing Processes</span>
         </div>
       </div>
 
       {/* Process Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {processes.map((process) => (
           <ProcessCard
             key={process.id}
@@ -135,9 +134,9 @@ const ProcessControl = () => {
       </div>
 
       {/* Quick Temperature Control */}
-      <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
-        <h3 className="text-xl font-semibold mb-6 flex items-center">
-          <Thermometer className="w-7 h-7 mr-3 text-red-600" />
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <Thermometer className="w-5 h-5 mr-2 text-red-600" />
           Quick Temperature Control
         </h3>
         <KettleTempControl onSubmit={processHandlers.kettleTemp} />

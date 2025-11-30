@@ -1,16 +1,6 @@
  import React from 'react'
 
-const SensorStatusCard = ({ 
-  title, 
-  icon: Icon, 
-  value, 
-  unit, 
-  color, 
-  loading, 
-  isActive, 
-  statusText, 
-  showStatusIndicator = false 
-}) => {
+const SensorStatusCard = ({ title, icon: Icon, value, unit, color, loading }) => {
   const colorClasses = {
     red: 'text-red-600 bg-red-50',
     orange: 'text-orange-600 bg-orange-50',
@@ -20,31 +10,20 @@ const SensorStatusCard = ({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
+    <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center">
-        <div className={`p-4 rounded-xl ${colorClasses[color] || colorClasses.blue}`}>
-          <Icon className="w-10 h-10" />
+        <div className={`p-2 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
+          <Icon className="w-6 h-6" />
         </div>
-        <div className="ml-6 flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-lg font-medium text-gray-600">{title}</p>
-            {showStatusIndicator && (
-              <div className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                isActive
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {statusText || (isActive ? 'On' : 'Off')}
-              </div>
-            )}
-          </div>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
+        <div className="ml-4">
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-2xl font-bold text-gray-900">
             {loading ? (
               <span className="animate-pulse">--</span>
             ) : (
               <>
                 {value}
-                {unit && <span className="text-lg font-normal text-gray-500 ml-1">{unit}</span>}
+                {unit && <span className="text-sm font-normal text-gray-500 ml-1">{unit}</span>}
               </>
             )}
           </p>
