@@ -29,8 +29,10 @@ const Dashboard = () => {
       refetchInterval: 10000,
       retry: false,
       onError: (error) => {
-        console.error('getCurrentBrew failed:', error)
-        console.log('Error response:', error.response?.data)
+        // Silently handle 400 errors (no active brew) - this is expected
+        if (error.response?.status !== 400) {
+          console.error('getCurrentBrew failed:', error)
+        }
       }
     }
   )
@@ -65,11 +67,13 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-lg font-medium text-gray-600 mb-2">Recipe</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">{currentBrew?.data?.recipeName || 'No active brew'}</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{currentBrew?.data?.name || 'No active brew'}</p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-lg font-medium text-gray-600 mb-2">Status</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">{currentBrew?.data?.status || 'System Ready'}</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              {currentBrew?.data ? 'Brewing/Fermenting' : 'System Ready'}
+            </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <p className="text-lg font-medium text-gray-600 mb-2">Latest Brew</p>
