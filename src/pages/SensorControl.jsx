@@ -25,23 +25,7 @@ const SensorControl = () => {
     { refetchInterval: 2000 }
   )
 
-  const { data: fanStatus } = useQuery(
-    'fanStatus',
-    () => brewnodeAPI.getFanStatus(),
-    { refetchInterval: 5000 }
-  )
 
-  const { data: pumpsStatus } = useQuery(
-    'pumpsStatus',
-    () => brewnodeAPI.getPumpsStatus(),
-    { refetchInterval: 5000 }
-  )
-
-  const { data: valvesStatus } = useQuery(
-    'valvesStatus',
-    () => brewnodeAPI.getValvesStatus(),
-    { refetchInterval: 5000 }
-  )
 
   const tabs = [
     { id: 'sensors', name: 'Sensors', icon: Thermometer },
@@ -56,9 +40,6 @@ const SensorControl = () => {
       case 'equipment':
         return (
           <EquipmentControl 
-            fanStatus={fanStatus}
-            pumpsStatus={pumpsStatus}
-            valvesStatus={valvesStatus}
             sensorData={sensorData}
           />
         )
@@ -125,22 +106,13 @@ const SensorControl = () => {
           value={(() => {
             if (!sensorData?.data) return 'Loading...'
             
-            // Use same logic as Dashboard - fan power from sensor data
-            let fanPower = 0
-            if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
-              fanPower = sensorData.data.fan || 0
-              console.log('Fan power from parsed object:', fanPower, 'fan key:', sensorData.data.fan)
-            } else if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
-              fanPower = sensorData.data[9] || 0
-              console.log('Fan power from array index 9:', fanPower, 'value:', sensorData.data[9])
-            }
-            
-            console.log('Final fan power:', fanPower)
+            // Use the enhanced fanPower from our fixed API parsing
+            const fanPower = sensorData.data.fanPower || 0
             return fanPower > 0 ? `On (${fanPower}W)` : 'Off (0W)'
           })()}
           icon={Fan}
           color="purple"
-          loading={!fanStatus && isLoading}
+          loading={isLoading}
           isText={true}
         />
       </div>

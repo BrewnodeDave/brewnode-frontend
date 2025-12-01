@@ -3,11 +3,23 @@ import api from './api'
 // Brewnode API endpoints
 export const brewnodeAPI = {
   // Core Brewnode endpoints
-  getBrewData: (brewname, since) => 
-    api.get('/api/brewdata', { params: { brewname, since } }),
+  getBrewData: (brewname, since) => {
+    const params = { brewname }
+    if (since && since.trim() !== '') {
+      params.since = since
+    }
+    return api.get('/api/brewdata', { params })
+  },
   
   getCurrentBrew: () => 
-    api.get('/api/currentbrew'),
+    // Temporarily return mock data until backend endpoint is implemented
+    Promise.resolve({ 
+      data: { 
+        recipeName: null, 
+        status: 'No active brew', 
+        progress: '0%' 
+      } 
+    }),
   
   setBrewname: (name) => 
     api.put('/api/brewname', { name }),
@@ -32,10 +44,62 @@ export const brewnodeAPI = {
     const parsedData = {};
     
     if (Array.isArray(response.data)) {
-      response.data.forEach(item => {
+      // First, extract power values from known indices in the original array
+      if (response.data.length > 9) {
+        if (typeof response.data[9] === 'number') parsedData['fanPower'] = response.data[9];
+        if (typeof response.data[10] === 'number') parsedData['glycolHeaterPower'] = response.data[10];
+        if (typeof response.data[11] === 'number') parsedData['glycolChillerPower'] = response.data[11];
+        if (typeof response.data[12] === 'number') parsedData['kettleHeaterPower'] = response.data[12];
+        console.log('Extracted power values:', {
+          fanPower: parsedData['fanPower'],
+          glycolHeaterPower: parsedData['glycolHeaterPower'],
+          glycolChillerPower: parsedData['glycolChillerPower'],
+          kettleHeaterPower: parsedData['kettleHeaterPower']
+        });
+      }
+      
+      // Then, deduplicate valve items based on normalized valve names
+      const seenValves = new Set();
+      const filteredData = response.data.filter((item) => {
+        if (item === "" || item === null || item === undefined) {
+          return false;
+        }
+        
+        if (item && typeof item === 'object' && item.name && item.value !== undefined && item.name.toLowerCase().includes('valve')) {
+          const originalName = item.name.toLowerCase();
+          let normalizedName = '';
+          
+          if (originalName.includes('mash') && originalName.includes('in')) {
+            normalizedName = 'mashin';
+          } else if (originalName.includes('kettle') && originalName.includes('in')) {
+            normalizedName = 'kettlein';
+          } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('in')) {
+            normalizedName = 'chillerwortin';
+          } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('out')) {
+            normalizedName = 'chillerwortout';
+          } else {
+            normalizedName = originalName.replace('valve ', '').replace(/[-\s]+/g, '');
+          }
+          
+          if (seenValves.has(normalizedName)) {
+            return false; // Skip duplicate
+          }
+          seenValves.add(normalizedName);
+        }
+        
+        return true;
+      });
+
+      
+      filteredData.forEach((item, index) => {
+        // Skip empty strings and null/undefined values
+        if (item === "" || item === null || item === undefined) {
+          return;
+        }
+        
         if (item && typeof item === 'object' && item.name && item.value !== undefined) {
           // Convert sensor names to camelCase keys while preserving uniqueness
-          const key = item.name
+          let key = item.name
             .toLowerCase()
             .replace(/\s+(.)/g, (_, char) => char.toUpperCase()) // Convert spaces to camelCase
             .replace(/[^\w]/g, ''); // Remove special characters
@@ -49,9 +113,65 @@ export const brewnodeAPI = {
             value = null; // Mark as unavailable rather than showing error values
           }
           
-          parsedData[key] = value;
+          // For valves, we'll handle key creation in the valve-specific section below
+          // For other items, create the standard camelCase key
+          if (!item.name.toLowerCase().includes('valve')) {
+            parsedData[key] = value;
+          }
+          
+          // Also create more specific keys for equipment status checks
+          if (item.name.toLowerCase().includes('pump')) {
+            // Create a standardized pump key
+            const pumpName = item.name.toLowerCase().replace('pump ', '').replace(/\s+/g, '');
+            parsedData[`pump${pumpName.charAt(0).toUpperCase() + pumpName.slice(1)}`] = value;
+          } else if (item.name.toLowerCase().includes('valve')) {
+            // Normalize valve names to prevent duplicates
+            const originalName = item.name.toLowerCase();
+            let normalizedName = '';
+            
+            // Standardize common valve names to prevent duplicates
+            if (originalName.includes('mash') && originalName.includes('in')) {
+              normalizedName = 'MashIn';
+            } else if (originalName.includes('kettle') && originalName.includes('in')) {
+              normalizedName = 'KettleIn';
+            } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('in')) {
+              normalizedName = 'ChillerWortIn';
+            } else if (originalName.includes('chiller') && originalName.includes('wort') && originalName.includes('out')) {
+              normalizedName = 'ChillerWortOut';
+            } else {
+              // Fallback: clean the name generically
+              normalizedName = originalName
+                .replace('valve ', '')
+                .replace(/[-\s]+/g, '')
+                .replace(/^(.)/, (match) => match.toUpperCase());
+            }
+            
+            // Use a single consistent key format to prevent duplicates
+            const valveKey = `valve${normalizedName}`;
+            const compatKey = normalizedName.charAt(0).toLowerCase() + normalizedName.slice(1);
+            
+            // Only create keys if they don't already exist (first occurrence wins)
+            if (!parsedData[valveKey] && !parsedData[compatKey]) {
+              parsedData[valveKey] = value;
+              parsedData[compatKey] = value;
+            }
+          }
+          
+        } else if (typeof item === 'number') {
+          // Skip numeric values as they're processed upfront by index
+          // This prevents overwriting the correct power mappings
         }
       });
+      
+      // Also preserve the raw array for components that need it
+      // Convert objects to strings to avoid [object Object] display
+      const cleanRawArray = filteredData.map(item => {
+        if (item && typeof item === 'object' && item.name && item.value !== undefined) {
+          return `${item.name}: ${item.value}`;
+        }
+        return item;
+      });
+      parsedData._rawArray = cleanRawArray;
     }
     
     return {
@@ -64,7 +184,7 @@ export const brewnodeAPI = {
     api.get('/api/fan/status'),
 
   setFan: (onOff) => 
-    api.put('/api/fan', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+    api.put(`/api/fan?onOff=${onOff}`, null, { headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   getPumpsStatus: () =>
     api.get('/api/pumps/status'),
@@ -86,7 +206,7 @@ export const brewnodeAPI = {
     api.put('/api/ferment', null, { params: { step: JSON.stringify(step) } }),
   
   fill: (litres) => 
-    api.put('/api/fill', null, { params: { litres } }),
+    api.put('/api/fill', null, { params: { litres }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   k2f: (flowTimeoutSecs = 5) => 
     api.put('/api/k2f', null, { params: { flowTimeoutSecs } }),

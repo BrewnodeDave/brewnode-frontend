@@ -3,8 +3,11 @@ import { useQuery } from 'react-query'
 import { Server, Wifi, AlertTriangle, CheckCircle, RefreshCw, Trash2 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 
-const SystemStatus = () => {
-  const { data: sensorData, isLoading: sensorLoading, error: sensorError } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
+const SystemStatus = ({ sensorData: propSensorData }) => {
+  const { data: querySensorData, isLoading: sensorLoading, error: sensorError } = useQuery('sensorStatus', () => brewnodeAPI.getSensorStatus(), { refetchInterval: 2000 })
+  
+  // Use prop data if available, otherwise use query data
+  const sensorData = propSensorData || querySensorData
   const { data: systemStatus } = useQuery('systemStatus', () => brewnodeAPI.getSystemStatus(), { refetchInterval: 30000 })
 
   // Debug logging
@@ -13,6 +16,8 @@ const SystemStatus = () => {
     console.log('Sensor data array:', sensorData.data)
     console.log('Array.isArray check:', Array.isArray(sensorData.data))
     console.log('Data type:', typeof sensorData.data)
+    console.log('Kettle heater power:', sensorData.data.kettleHeaterPower, 'from array[12]:', sensorData.data._rawArray?.[12])
+    console.log('Parsed sensor keys:', Object.keys(sensorData.data).filter(k => !k.startsWith('_')))
   }
 
   const handleRestart = async () => {
@@ -62,23 +67,23 @@ const SystemStatus = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Hardware Status */}
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-full ${
+        <div className="flex items-center space-x-4">
+          <div className={`p-3 rounded-full ${
             systemStatus?.data?.isHardware 
               ? 'bg-green-100' 
               : 'bg-orange-100'
           }`}>
-            <Server className={`w-5 h-5 ${
+            <Server className={`w-7 h-7 ${
               systemStatus?.data?.isHardware 
                 ? 'text-green-600' 
                 : 'text-orange-600'
             }`} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Hardware</p>
-            <p className={`text-sm ${
+            <p className="text-base font-medium text-gray-900">Hardware</p>
+            <p className={`text-base ${
               systemStatus?.data?.isHardware 
                 ? 'text-green-600' 
                 : 'text-orange-600'
@@ -89,65 +94,59 @@ const SystemStatus = () => {
         </div>
 
         {/* Connection Status */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-100 rounded-full">
-            <Wifi className="w-5 h-5 text-green-600" />
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-green-100 rounded-full">
+            <Wifi className="w-7 h-7 text-green-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Connection</p>
-            <p className="text-sm text-green-600">Connected</p>
+            <p className="text-base font-medium text-gray-900">Connection</p>
+            <p className="text-base text-green-600">Connected</p>
           </div>
         </div>
 
         {/* System Health */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-100 rounded-full">
-            <CheckCircle className="w-5 h-5 text-green-600" />
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-green-100 rounded-full">
+            <CheckCircle className="w-7 h-7 text-green-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">System Health</p>
-            <p className="text-sm text-green-600">Operational</p>
+            <p className="text-base font-medium text-gray-900">System Health</p>
+            <p className="text-base text-green-600">Operational</p>
           </div>
         </div>
 
         {/* Alert Status */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-yellow-100 rounded-full">
-            <AlertTriangle className="w-5 h-5 text-yellow-600" />
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-yellow-100 rounded-full">
+            <AlertTriangle className="w-7 h-7 text-yellow-600" />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Alerts</p>
-            <p className="text-sm text-yellow-600">0 Active</p>
+            <p className="text-base font-medium text-gray-900">Alerts</p>
+            <p className="text-base text-yellow-600">0 Active</p>
           </div>
         </div>
       </div>
 
       {/* Detailed Status */}
-      <div className="mt-6 border-t pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <div className="mt-8 border-t pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-base">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Fan Status</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Fan Status</h4>
             <p className="text-gray-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
                 if (sensorError) return 'Error'
                 if (!sensorData?.data) return 'No Sensor Data'
                 
-                // Fan is at index 9 in raw array or 'fan' key in parsed data
-                let fanPower = 0
-                if (Array.isArray(sensorData.data) && sensorData.data.length > 9) {
-                  fanPower = sensorData.data[9] || 0
-                } else if (typeof sensorData.data === 'object' && sensorData.data.fan !== undefined) {
-                  fanPower = sensorData.data.fan || 0
-                }
-                
+                // Use the enhanced fanPower from our fixed API parsing
+                const fanPower = sensorData.data.fanPower || 0
                 return fanPower > 0 ? `On (${fanPower}W)` : 'Off (0W)'
               })()}
             </p>
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Pumps Active</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Pumps Active</h4>
             <p className="text-gray-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
@@ -173,7 +172,7 @@ const SystemStatus = () => {
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Valves Open</h4>
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Valves Open</h4>
             <p className="text-gray-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
@@ -198,10 +197,10 @@ const SystemStatus = () => {
         </div>
         
         {/* Total Power Consumption */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="text-center">
-            <h4 className="font-medium text-gray-900 mb-2">Total Power Consumption</h4>
-            <p className="text-2xl font-bold text-brewery-600">
+            <h4 className="text-xl font-medium text-gray-900 mb-4">Total Power Consumption</h4>
+            <p className="text-4xl font-bold text-brewery-600">
               {(() => {
                 if (sensorLoading) return 'Loading...'
                 if (sensorError) return 'Error'
@@ -211,7 +210,7 @@ const SystemStatus = () => {
                 
                 if (typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
                   // Add fan power
-                  totalPower += sensorData.data.fan || 0
+                  totalPower += sensorData.data.fanPower || sensorData.data.fan || 0
                   
                   // Add pump power
                   const pumpKeys = Object.keys(sensorData.data).filter(key => 
@@ -229,12 +228,35 @@ const SystemStatus = () => {
                     totalPower += sensorData.data[key] || 0
                   })
                   
-                  // Add heater power (from array indices 10, 11, 12)
-                } else if (Array.isArray(sensorData.data)) {
-                  // Fan at index 9
-                  totalPower += sensorData.data[9] || 0
+                  // Add heater power using parsed sensor data
+                  totalPower += sensorData.data.glycolHeaterPower || 0
+                  totalPower += sensorData.data.glycolChillerPower || 0
+                  totalPower += sensorData.data.kettleHeaterPower || 0
                   
-                  // Heaters at indices 10, 11, 12
+                  // Also add any other heater keys that might exist
+                  const heaterKeys = Object.keys(sensorData.data).filter(key => 
+                    key.toLowerCase().includes('heater') && !key.includes('Power')
+                  )
+                  heaterKeys.forEach(key => {
+                    totalPower += sensorData.data[key] || 0
+                  })
+                } else if (sensorData.data && typeof sensorData.data === 'object') {
+                  // Use parsed power values if available
+                  totalPower += sensorData.data.fanPower || 0
+                  totalPower += sensorData.data.glycolHeaterPower || 0
+                  totalPower += sensorData.data.glycolChillerPower || 0
+                  totalPower += sensorData.data.kettleHeaterPower || 0
+                  
+                  // Fallback to raw array if parsed values not available
+                  if (sensorData.data._rawArray && Array.isArray(sensorData.data._rawArray)) {
+                    if (!sensorData.data.fanPower) totalPower += sensorData.data._rawArray[9] || 0
+                    if (!sensorData.data.glycolHeaterPower) totalPower += sensorData.data._rawArray[10] || 0
+                    if (!sensorData.data.glycolChillerPower) totalPower += sensorData.data._rawArray[11] || 0
+                    if (!sensorData.data.kettleHeaterPower) totalPower += sensorData.data._rawArray[12] || 0
+                  }
+                } else if (Array.isArray(sensorData.data)) {
+                  // Legacy: direct array access
+                  totalPower += sensorData.data[9] || 0   // Fan
                   totalPower += sensorData.data[10] || 0  // Glycol heater
                   totalPower += sensorData.data[11] || 0  // Glycol chiller  
                   totalPower += sensorData.data[12] || 0  // Kettle heater
