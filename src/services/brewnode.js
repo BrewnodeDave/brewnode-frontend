@@ -12,14 +12,7 @@ export const brewnodeAPI = {
   },
   
   getCurrentBrew: () => 
-    // Temporarily return mock data until backend endpoint is implemented
-    Promise.resolve({ 
-      data: { 
-        recipeName: null, 
-        status: 'No active brew', 
-        progress: '0%' 
-      } 
-    }),
+    api.get('/api/brewing'),
   
   setBrewname: (name) => 
     api.put('/api/brewname', { name }),
