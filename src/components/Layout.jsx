@@ -42,18 +42,18 @@ const Layout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between h-24 px-6 bg-brewery-600">
+      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between h-24 px-6 bg-gradient-to-r from-brewery-500 to-brewery-600">
           <div className="flex items-center">
-            <img src="/logo-40x40.png" alt="Brewnode" className="w-12 h-12 mr-4" />
-            <h1 className="text-3xl font-bold text-white">Brewnode</h1>
+            <img src="/logo-40x40.png" alt="Brewnode" className="w-14 h-14 mr-4 drop-shadow-lg" />
+            <h1 className="text-3xl font-black text-white drop-shadow-md">Brewnode</h1>
           </div>
           {/* Mobile close button */}
           <button
             onClick={closeSidebar}
-            className="lg:hidden text-white hover:text-gray-200 p-3 rounded-lg"
+            className="lg:hidden text-white hover:text-gray-100 p-3 rounded-xl hover:bg-white/20 transition-colors"
           >
-            <X className="w-12 h-12" />
+            <X className="w-14 h-14" />
           </button>
         </div>
         
@@ -67,21 +67,21 @@ const Layout = ({ children }) => {
                 key={item.name}
                 to={item.href}
                 onClick={closeSidebar}
-                className={`flex items-center px-6 py-5 text-lg font-medium rounded-lg transition-colors ${isActive ? 'bg-brewery-100 text-brewery-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                className={`flex items-center px-5 py-4 text-lg font-bold rounded-xl transition-all shadow-md ${isActive ? 'bg-brewery-100 text-brewery-900 scale-105' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:scale-105'}`}
               >
-                <Icon className="w-8 h-8 mr-5 flex-shrink-0" />
+                <Icon className="w-8 h-8 mr-4 flex-shrink-0" />
                 {item.name}
               </Link>
             )
           })}
         </nav>
         
-        <div className="px-4 py-6 border-t border-gray-200">
+        <div className="px-5 py-8 border-t-4 border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-6 py-5 text-lg font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            className="flex items-center w-full px-7 py-6 text-xl font-bold text-gray-600 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all shadow-md hover:scale-105"
           >
-            <LogOut className="w-8 h-8 mr-5 flex-shrink-0" />
+            <LogOut className="w-10 h-10 mr-6 flex-shrink-0" />
             Logout
           </button>
         </div>
@@ -90,24 +90,24 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         {/* Mobile header */}
-        <header className="lg:hidden bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-6 py-6">
+        <header className="lg:hidden bg-white shadow-lg border-b-4 border-brewery-200">
+          <div className="flex items-center justify-between px-8 py-8">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="text-gray-600 hover:text-gray-900 p-2"
+              className="text-gray-600 hover:text-gray-900 p-3 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Menu className="w-10 h-10" />
+              <Menu className="w-12 h-12" />
             </button>
             <div className="flex items-center">
-              <img src="/logo-40x40.png" alt="Brewnode" className="w-10 h-10 mr-3" />
-              <h1 className="text-2xl font-semibold text-gray-900">Brewnode</h1>
+              <img src="/logo-40x40.png" alt="Brewnode" className="w-12 h-12 mr-4" />
+              <h1 className="text-3xl font-black text-gray-900">Brewnode</h1>
             </div>
-            <div className="w-14" /> {/* Spacer for centering */}
+            <div className="w-16" /> {/* Spacer for centering */}
           </div>
         </header>
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-10">
+          <div className="container mx-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-12">
             {children}
           </div>
         </main>

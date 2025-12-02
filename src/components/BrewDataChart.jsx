@@ -145,45 +145,45 @@ const BrewDataChart = () => {
   }, [])
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-gray-100">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
-        <h3 className="text-lg font-semibold flex items-center">
-          <BarChart3 className="w-5 h-5 mr-2 text-gray-600" />
+        <h3 className="text-2xl font-black flex items-center">
+          <BarChart3 className="w-8 h-8 mr-3 text-gray-600" />
           Brew Data Chart
         </h3>
         
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-          <div className="flex items-center space-x-2 w-full sm:w-auto">
-            <Calendar className="w-4 h-4 text-gray-500 flex-shrink-0" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex items-center space-x-3 w-full sm:w-auto">
+            <Calendar className="w-8 h-8 text-gray-500 flex-shrink-0" />
             <input
               type="datetime-local"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="text-sm border border-gray-300 rounded px-2 py-1 flex-1 sm:flex-initial"
+              className="text-xl font-bold border-4 border-gray-300 rounded-2xl px-4 py-3 flex-1 sm:flex-initial focus:ring-4 focus:ring-brewery-200 focus:border-brewery-500"
             />
           </div>
           
-          <div className="flex items-center space-x-2 justify-center sm:justify-start">
+          <div className="flex items-center space-x-3 justify-center sm:justify-start">
             <button
               onClick={() => setEnableZoom(!enableZoom)}
-              className={`flex items-center space-x-1 px-3 py-2 text-xs rounded transition-colors ${
+              className={`flex items-center space-x-2 px-5 py-4 text-lg font-bold rounded-2xl transition-all shadow-md hover:scale-105 ${
                 enableZoom 
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300' 
-                  : 'bg-gray-100 text-gray-600 border border-gray-300'
+                  ? 'bg-blue-200 text-blue-900 border-4 border-blue-400' 
+                  : 'bg-gray-200 text-gray-700 border-4 border-gray-400'
               }`}
               title={enableZoom ? 'Disable zoom' : 'Enable zoom'}
             >
-              <ZoomIn className="w-3 h-3" />
-              <span className="hidden sm:inline">Zoom</span>
+              <ZoomIn className="w-6 h-6" />
+              <span>Zoom</span>
             </button>
             {zoomDomain && (
               <button
                 onClick={resetZoom}
-                className="flex items-center space-x-1 px-3 py-2 text-xs rounded bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200 transition-colors"
+                className="flex items-center space-x-2 px-5 py-4 text-lg font-bold rounded-2xl bg-gray-200 text-gray-700 border-4 border-gray-400 hover:bg-gray-300 transition-all shadow-md hover:scale-105"
                 title="Reset zoom"
               >
-                <RotateCcw className="w-3 h-3" />
-                <span className="hidden sm:inline">Reset</span>
+                <RotateCcw className="w-6 h-6" />
+                <span>Reset</span>
               </button>
             )}
           </div>
@@ -191,7 +191,7 @@ const BrewDataChart = () => {
           <select
             value={selectedBrew}
             onChange={(e) => setSelectedBrew(e.target.value)}
-            className="text-sm border border-gray-300 rounded px-2 py-1 w-full sm:w-auto min-w-0 sm:min-w-[150px]"
+            className="text-xl font-bold border-4 border-gray-300 rounded-2xl px-4 py-3 w-full sm:w-auto min-w-0 sm:min-w-[200px] focus:ring-4 focus:ring-brewery-200 focus:border-brewery-500"
           >
             <option value="">Select a brew...</option>
             {brewnames?.data?.map((name, index) => (
@@ -202,20 +202,20 @@ const BrewDataChart = () => {
       </div>
 
       {!selectedBrew ? (
-        <div className="h-64 flex items-center justify-center text-gray-500">
-          <p>Select a brew to view temperature data</p>
+        <div className="h-80 flex items-center justify-center text-gray-500">
+          <p className="text-2xl font-bold">Select a brew to view temperature data</p>
         </div>
       ) : isLoading ? (
-        <div className="h-64 flex items-center justify-center">
+        <div className="h-80 flex items-center justify-center">
           <LoadingSpinner text="Loading brew data..." />
         </div>
       ) : chartData.length === 0 ? (
-        <div className="h-64 flex items-center justify-center text-gray-500">
-          <p>No data available for selected brew</p>
+        <div className="h-80 flex items-center justify-center text-gray-500">
+          <p className="text-2xl font-bold">No data available for selected brew</p>
         </div>
       ) : (
-        <div className="h-64 sm:h-80 lg:h-96">
-          <p className="text-sm text-gray-600 mb-2">
+        <div className="h-80 sm:h-96 lg:h-[32rem]">
+          <p className="text-xl font-bold text-gray-700 mb-4">
             Showing {chartData.length} data points for {selectedBrew}
           </p>
           <ResponsiveContainer width="100%" height="100%">
@@ -223,21 +223,25 @@ const BrewDataChart = () => {
               data={chartData}
               onMouseDown={(e) => enableZoom && e && setZoomDomain(null)}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#ccc" strokeWidth={2} />
               <XAxis 
                 dataKey="time" 
                 domain={zoomDomain ? [zoomDomain.startIndex, zoomDomain.endIndex] : ['dataMin', 'dataMax']}
                 type="category"
+                tick={{ fontSize: 16, fontWeight: 'bold' }}
               />
-              <YAxis label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Legend />
+              <YAxis 
+                label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft', style: { fontSize: 18, fontWeight: 'bold' } }} 
+                tick={{ fontSize: 16, fontWeight: 'bold' }}
+              />
+              <Tooltip contentStyle={{ fontSize: '18px', fontWeight: 'bold', borderRadius: '12px', border: '3px solid #ccc' }} />
+              <Legend wrapperStyle={{ fontSize: '18px', fontWeight: 'bold' }} />
               <Line 
                 type="monotone" 
                 dataKey="kettleTemp" 
                 stroke="#ef4444" 
                 name="Kettle"
-                strokeWidth={2}
+                strokeWidth={4}
                 dot={false}
               />
               <Line 
@@ -245,7 +249,7 @@ const BrewDataChart = () => {
                 dataKey="mashTemp" 
                 stroke="#f97316" 
                 name="Mash"
-                strokeWidth={2}
+                strokeWidth={4}
                 dot={false}
               />
               <Line 
@@ -253,7 +257,7 @@ const BrewDataChart = () => {
                 dataKey="fermenterTemp" 
                 stroke="#3b82f6" 
                 name="Fermenter"
-                strokeWidth={2}
+                strokeWidth={4}
                 dot={false}
               />
               <Line 
@@ -261,13 +265,13 @@ const BrewDataChart = () => {
                 dataKey="glycolTemp" 
                 stroke="#06b6d4" 
                 name="Glycol"
-                strokeWidth={2}
+                strokeWidth={4}
                 dot={false}
               />
               {enableZoom && chartData.length > 10 && (
                 <Brush 
                   dataKey="time" 
-                  height={30} 
+                  height={40} 
                   stroke="#3b82f6"
                   fill="#dbeafe"
                   onChange={handleZoom}
