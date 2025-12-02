@@ -20,7 +20,7 @@ const Login = () => {
       setAuth(credentials.username, credentials.password)
       
       // Test authentication by making a simple API call
-      const response = await fetch('/api/sensorStatus?name=All', {
+      const response = await fetch('/sensorStatus?name=All', {
         headers: {
           'Authorization': `Basic ${btoa(`${credentials.username}:${credentials.password}`)}`
         }
