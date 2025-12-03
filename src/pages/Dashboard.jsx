@@ -16,11 +16,61 @@ import BrewDataChart from '../components/BrewDataChart'
 import SystemStatus from '../components/SystemStatus'
 
 const Dashboard = () => {
-  const { data: sensorData, isLoading: sensorsLoading } = useQuery(
+  const { data: sensorData, isLoading: sensorsLoading, refetch: refetchSensors } = useQuery(
     'sensorStatus',
     () => brewnodeAPI.getSensorStatus(),
     { refetchInterval: 2000 }
   )
+
+  const handleToggleEquipment = async (key, currentValue) => {
+    try {
+      const isActive = typeof currentValue === 'number' ? currentValue > 0 : (currentValue === 'On' || currentValue === 'Open')
+      const newState = isActive ? 'Off' : 'On'
+      
+      // Map equipment keys to API functions
+      const keyLower = key.toLowerCase()
+      
+      if (keyLower.includes('fan')) {
+        await brewnodeAPI.setFan(newState)
+      } else if (keyLower.includes('kettlepump') || keyLower.includes('pump') && keyLower.includes('kettle')) {
+        await brewnodeAPI.setKettlePump(newState)
+      } else if (keyLower.includes('mashpump') || keyLower.includes('pump') && keyLower.includes('mash')) {
+        await brewnodeAPI.setMashPump(newState)
+      } else if (keyLower.includes('glycolpump') || keyLower.includes('pump') && keyLower.includes('glycol')) {
+        await brewnodeAPI.setGlycolPump(newState)
+      } else if (keyLower.includes('kettleheater') || keyLower.includes('heat') && !keyLower.includes('glycol')) {
+        await brewnodeAPI.setHeat(newState)
+      } else if (keyLower.includes('glycolheater') || keyLower.includes('glycol') && keyLower.includes('heat')) {
+        await brewnodeAPI.setGlycolHeat(newState)
+      } else if (keyLower.includes('glycolchiller') || keyLower.includes('glycol') && keyLower.includes('chill')) {
+        await brewnodeAPI.setGlycolChill(newState)
+      } else if (keyLower.includes('kettlein') || keyLower.includes('kettle') && keyLower.includes('in')) {
+        await brewnodeAPI.setKettleInValve(newState)
+      } else if (keyLower.includes('mashin') || keyLower.includes('mash') && keyLower.includes('in')) {
+        await brewnodeAPI.setMashInValve(newState)
+      } else if (keyLower.includes('chillwortin') || keyLower.includes('chillerwortin')) {
+        await brewnodeAPI.setChillWortInValve(newState)
+      } else if (keyLower.includes('chillwortout') || keyLower.includes('chillerwortout')) {
+        await brewnodeAPI.setChillWortOutValve(newState)
+      }
+      
+      // Refetch sensor data immediately after toggle
+      setTimeout(() => refetchSensors(), 500)
+    } catch (error) {
+      console.error('Failed to toggle equipment:', error)
+    }
+  }
+
+  const handleToggleFan = async () => {
+    try {
+      const isActive = (sensorData?.data?.fanPower || 0) > 0
+      const newState = isActive ? 'Off' : 'On'
+      await brewnodeAPI.setFan(newState)
+      setTimeout(() => refetchSensors(), 500)
+    } catch (error) {
+      console.error('Failed to toggle fan:', error)
+    }
+  }
 
   const { data: currentBrew } = useQuery(
     'currentBrew',
@@ -159,6 +209,7 @@ const Dashboard = () => {
           icon={Fan}
           color="purple"
           loading={sensorsLoading}
+          onClick={handleToggleFan}
         />
       </div>
 
@@ -223,18 +274,22 @@ const Dashboard = () => {
                 }
                 
                 return (
-                  <div key={key} className="flex justify-between items-center py-4 px-6 bg-gray-50 rounded-2xl shadow-sm">
+                  <button
+                    key={key}
+                    onClick={() => handleToggleEquipment(key, value)}
+                    className="flex justify-between items-center py-4 px-6 bg-gray-50 rounded-2xl shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-all hover:scale-102 cursor-pointer"
+                  >
                     <span className="text-xl font-bold text-gray-700 capitalize">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
-                    <span className={`px-5 py-3 text-lg font-black rounded-full shadow-sm ${
+                    <span className={`px-5 py-3 text-lg font-black rounded-full shadow-sm transition-colors ${
                       isActive
                         ? 'bg-green-200 text-green-900' 
                         : 'bg-gray-200 text-gray-700'
                     }`}>
                       {displayValue}
                     </span>
-                  </div>
+                  </button>
                 )
               });
             })()}
