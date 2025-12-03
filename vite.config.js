@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     port: 3001,
     proxy: {
-      '/api': {
-        target: 'http://192.168.0.105:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+      // Proxy all API routes to the backend server
+      '^/(sensorStatus|brewdata|brewing|brewname|logs|mysql|restart|streamLog|batches|inventory|recipes|stream|fan|i2c|pumps|valve|valves|boil|chill|ferment|fill|k2f|k2m|m2k|mash|kettleTemp|heat|pump|glycol|kettleVolume|speedFactor|systemStatus)': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
       }
     }
   }

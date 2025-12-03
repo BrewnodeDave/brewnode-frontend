@@ -8,16 +8,20 @@
   }
   body {
     @apply bg-gray-50 text-gray-900;
+    font-size: 16px;
+  }
+  html {
+    font-size: 16px;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+    @apply bg-white rounded-2xl shadow-lg p-8;
   }
   
   .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-colors;
+    @apply px-5 py-3 rounded-xl font-bold transition-colors text-lg shadow-md;
   }
   
   .btn-primary {
@@ -34,5 +38,15 @@
   
   .btn-success {
     @apply bg-green-500 hover:bg-green-600 text-white;
+  }
+  
+  /* Child-friendly input styles */
+  input, select, textarea {
+    @apply text-xl rounded-xl border-4 focus:border-brewery-500 focus:ring-4 focus:ring-brewery-200;
+  }
+  
+  /* Larger checkboxes and radio buttons */
+  input[type="checkbox"], input[type="radio"] {
+    @apply w-6 h-6;
   }
 }

@@ -51,17 +51,17 @@ const SensorControl = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Sensor & Equipment Control</h1>
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
-          <Gauge className="w-4 h-4" />
-          <span>Real-time Monitoring & Control</span>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900">Sensor & Equipment Control</h1>
+        <div className="flex items-center space-x-3 text-base text-gray-600">
+          <Gauge className="w-6 h-6" />
+          <span className="hidden sm:inline font-bold">Real-time Monitoring</span>
         </div>
       </div>
 
       {/* Quick Status Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <StatusCard
           title="Temperature Sensors"
           value={sensorData?.data ? Object.keys(sensorData.data).filter(k => k.includes('temp')).length : 0}
@@ -118,7 +118,7 @@ const SensorControl = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b-2 border-gray-200">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon
@@ -129,14 +129,14 @@ const SensorControl = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  flex items-center py-2 px-1 border-b-2 font-medium text-sm
+                  flex items-center py-4 px-2 border-b-4 font-bold text-lg transition-all
                   ${isActive
-                    ? 'border-brewery-500 text-brewery-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-brewery-500 text-brewery-700 scale-105'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                   }
                 `}
               >
-                <Icon className="w-4 h-4 mr-2" />
+                <Icon className="w-6 h-6 mr-3" />
                 {tab.name}
               </button>
             )
@@ -152,22 +152,22 @@ const SensorControl = () => {
 
 const StatusCard = ({ title, value, icon: Icon, color, loading, isText = false }) => {
   const colorClasses = {
-    red: 'text-red-600 bg-red-50',
-    blue: 'text-blue-600 bg-blue-50',
-    green: 'text-green-600 bg-green-50',
-    purple: 'text-purple-600 bg-purple-50',
-    orange: 'text-orange-600 bg-orange-50',
+    red: 'text-red-600 bg-red-100',
+    blue: 'text-blue-600 bg-blue-100',
+    green: 'text-green-600 bg-green-100',
+    purple: 'text-purple-600 bg-purple-100',
+    orange: 'text-orange-600 bg-orange-100',
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100 hover:shadow-xl transition-shadow">
       <div className="flex items-center">
-        <div className={`p-2 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
-          <Icon className="w-5 h-5" />
+        <div className={`p-4 rounded-xl shadow-md ${colorClasses[color] || colorClasses.blue}`}>
+          <Icon className="w-8 h-8" />
         </div>
-        <div className="ml-3">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-lg font-bold text-gray-900">
+        <div className="ml-4">
+          <p className="text-base font-bold text-gray-700 mb-1">{title}</p>
+          <p className="text-2xl font-black text-gray-900">
             {loading ? (
               <span className="animate-pulse">--</span>
             ) : (

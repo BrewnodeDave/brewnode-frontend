@@ -1,15 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from 'react-query'
 import { Beaker, Package, Bot, FileText, Plus, Search, Filter } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { brewfatherAPI } from '../services/brewfather'
+import { isAuthenticated } from '../services/api'
 import BatchList from '../components/BatchList'
 import RecipeList from '../components/RecipeList'
 import InventoryManager from '../components/InventoryManager'
 
 const Brewfather = () => {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('batches')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+
+  // Don't render anything if not authenticated
+  if (!isAuthenticated()) {
+    // Redirect only if we're actually on the brewfather page
+    if (window.location.pathname === '/brewfather') {
+      navigate('/login')
+    }
+    return null
+  }
 
   const tabs = [
     { id: 'batches', name: 'Batches', icon: Beaker },

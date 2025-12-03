@@ -80,51 +80,51 @@ const Simulator = () => {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Simulator Controls</h1>
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
-          <Settings className="w-4 h-4" />
+        <h1 className="text-4xl font-black text-gray-900">Simulator Controls</h1>
+        <div className="flex items-center space-x-3 text-xl font-bold text-gray-600">
+          <Settings className="w-8 h-8" />
           <span>Hardware Simulation Settings</span>
         </div>
       </div>
 
       {/* Simulation Status */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center">
-          <Gauge className="w-5 h-5 mr-2 text-blue-600" />
+      <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8">
+        <h2 className="text-2xl font-black mb-6 flex items-center">
+          <Gauge className="w-8 h-8 mr-3 text-blue-600" />
           Current Simulation Status
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <Clock className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-            <p className="text-sm text-gray-600">Speed Factor</p>
-            <p className="text-2xl font-bold text-blue-900">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center p-6 bg-blue-50 rounded-2xl border-2 border-blue-100">
+            <Clock className="w-12 h-12 mx-auto mb-3 text-blue-600" />
+            <p className="text-base font-bold text-gray-700">Speed Factor</p>
+            <p className="text-3xl font-black text-blue-900">
               {currentSpeed?.data?.factor || '--'}x
             </p>
           </div>
           
-          <div className={`text-center p-4 rounded-lg ${
-            systemStatus?.data?.isSimulation ? 'bg-green-50' : 'bg-gray-50'
+          <div className={`text-center p-6 rounded-2xl border-2 ${
+            systemStatus?.data?.isSimulation ? 'bg-green-50 border-green-100' : 'bg-gray-50 border-gray-100'
           }`}>
-            <Play className={`w-8 h-8 mx-auto mb-2 ${
+            <Play className={`w-12 h-12 mx-auto mb-3 ${
               systemStatus?.data?.isSimulation ? 'text-green-600' : 'text-gray-400'
             }`} />
-            <p className="text-sm text-gray-600">Simulation Mode</p>
-            <p className="text-lg font-semibold text-green-900">
+            <p className="text-base font-bold text-gray-700">Simulation Mode</p>
+            <p className="text-xl font-black text-green-900">
               {systemStatus?.data?.isSimulation ? 'Active' : 'Inactive'}
             </p>
           </div>
           
-          <div className={`text-center p-4 rounded-lg ${
-            systemStatus?.data?.isHardware ? 'bg-green-50' : 'bg-orange-50'
+          <div className={`text-center p-6 rounded-2xl border-2 ${
+            systemStatus?.data?.isHardware ? 'bg-green-50 border-green-100' : 'bg-orange-50 border-orange-100'
           }`}>
-            <Zap className={`w-8 h-8 mx-auto mb-2 ${
+            <Zap className={`w-12 h-12 mx-auto mb-3 ${
               systemStatus?.data?.isHardware ? 'text-green-600' : 'text-orange-600'
             }`} />
-            <p className="text-sm text-gray-600">Hardware Status</p>
-            <p className={`text-lg font-semibold ${
+            <p className="text-base font-bold text-gray-700">Hardware Status</p>
+            <p className={`text-xl font-black ${
               systemStatus?.data?.isHardware ? 'text-green-900' : 'text-orange-900'
             }`}>
               {systemStatus?.data?.mode || 'Unknown'}
@@ -133,32 +133,32 @@ const Simulator = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Kettle Volume Control */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold flex items-center">
-              <Droplets className="w-5 h-5 mr-2 text-blue-600" />
+        <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+          <div className="px-8 py-6 border-b-2 border-gray-200">
+            <h3 className="text-2xl font-black flex items-center">
+              <Droplets className="w-8 h-8 mr-3 text-blue-600" />
               Kettle Volume Control
             </h3>
           </div>
           
-          <div className="p-6 space-y-4">
-            <form onSubmit={handleVolumeSubmit} className="space-y-4">
+          <div className="p-8 space-y-6">
+            <form onSubmit={handleVolumeSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-bold text-gray-800 mb-3">
                   Volume (Litres)
                 </label>
                 <input
                   type="number"
                   value={kettleVolume}
                   onChange={(e) => setKettleVolume(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brewery-500 focus:border-brewery-500"
+                  className="w-full px-5 py-4 border-3 border-gray-300 rounded-xl text-xl font-bold focus:ring-4 focus:ring-brewery-400 focus:border-brewery-500 shadow-md"
                   placeholder="25"
                   min="1"
                   max="49"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-bold text-gray-600 mt-2">
                   Range: 1-49 litres
                 </p>
               </div>
@@ -166,10 +166,10 @@ const Simulator = () => {
               <button
                 type="submit"
                 disabled={volumeMutation.isLoading}
-                className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
+                className={`w-full py-5 px-6 rounded-xl text-xl font-black transition-all shadow-lg ${
                   volumeMutation.isLoading
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105'
                 }`}
               >
                 {volumeMutation.isLoading ? 'Setting Volume...' : 'Set Kettle Volume'}
@@ -178,16 +178,16 @@ const Simulator = () => {
 
             {/* Preset Volume Buttons */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-lg font-bold text-gray-800 mb-3">
                 Quick Presets:
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 {presetVolumes.map((preset) => (
                   <button
                     key={preset.value}
                     onClick={() => volumeMutation.mutate(preset.value)}
                     disabled={volumeMutation.isLoading}
-                    className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md disabled:opacity-50"
+                    className="px-4 py-4 text-base font-bold bg-gray-100 hover:bg-gray-200 hover:scale-105 text-gray-800 rounded-xl disabled:opacity-50 transition-all shadow-md border-2 border-gray-200"
                   >
                     {preset.label}
                   </button>
@@ -198,30 +198,30 @@ const Simulator = () => {
         </div>
 
         {/* Speed Factor Control */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-orange-600" />
+        <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+          <div className="px-8 py-6 border-b-2 border-gray-200">
+            <h3 className="text-2xl font-black flex items-center">
+              <Clock className="w-8 h-8 mr-3 text-orange-600" />
               Simulation Speed
             </h3>
           </div>
           
-          <div className="p-6 space-y-4">
-            <form onSubmit={handleSpeedSubmit} className="space-y-4">
+          <div className="p-8 space-y-6">
+            <form onSubmit={handleSpeedSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-bold text-gray-800 mb-3">
                   Speed Factor
                 </label>
                 <input
                   type="number"
                   value={speedFactor}
                   onChange={(e) => setSpeedFactor(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brewery-500 focus:border-brewery-500"
+                  className="w-full px-5 py-4 border-3 border-gray-300 rounded-xl text-xl font-bold focus:ring-4 focus:ring-brewery-400 focus:border-brewery-500 shadow-md"
                   placeholder="10"
                   min="1"
                   max="100"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-bold text-gray-600 mt-2">
                   Range: 1-100x (higher = faster simulation)
                 </p>
               </div>
@@ -229,10 +229,10 @@ const Simulator = () => {
               <button
                 type="submit"
                 disabled={speedMutation.isLoading}
-                className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
+                className={`w-full py-5 px-6 rounded-xl text-xl font-black transition-all shadow-lg ${
                   speedMutation.isLoading
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                    : 'bg-orange-600 text-white hover:bg-orange-700 hover:scale-105'
                 }`}
               >
                 {speedMutation.isLoading ? 'Setting Speed...' : 'Set Speed Factor'}
@@ -241,19 +241,19 @@ const Simulator = () => {
 
             {/* Preset Speed Buttons */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-lg font-bold text-gray-800 mb-3">
                 Speed Presets:
               </label>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {presetSpeeds.map((preset) => (
                   <button
                     key={preset.value}
                     onClick={() => speedMutation.mutate(preset.value)}
                     disabled={speedMutation.isLoading}
-                    className="w-full p-3 text-left bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md disabled:opacity-50"
+                    className="w-full p-5 text-left bg-gray-100 hover:bg-gray-200 hover:scale-105 text-gray-800 rounded-xl disabled:opacity-50 transition-all shadow-md border-2 border-gray-200"
                   >
-                    <div className="font-medium">{preset.label}</div>
-                    <div className="text-sm text-gray-600">{preset.description}</div>
+                    <div className="text-lg font-black">{preset.label}</div>
+                    <div className="text-base font-bold text-gray-600">{preset.description}</div>
                   </button>
                 ))}
               </div>
@@ -263,28 +263,28 @@ const Simulator = () => {
       </div>
 
       {/* Information Panel */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold flex items-center">
-            <Info className="w-5 h-5 mr-2 text-gray-600" />
+      <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+        <div className="px-8 py-6 border-b-2 border-gray-200">
+          <h3 className="text-2xl font-black flex items-center">
+            <Info className="w-8 h-8 mr-3 text-gray-600" />
             Simulation Information
           </h3>
         </div>
         
-        <div className="p-6 space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900 mb-2">About Hardware Simulation</h4>
-            <p className="text-sm text-blue-800">
+        <div className="p-8 space-y-6">
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
+            <h4 className="text-lg font-black text-blue-900 mb-3">About Hardware Simulation</h4>
+            <p className="text-base font-bold text-blue-800">
               When not running on a Raspberry Pi with physical brewing hardware, 
               all brewing processes are simulated. This allows the software to be 
               tested and debugged on any platform without requiring actual brewing equipment.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Kettle Volume</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <h4 className="text-lg font-black text-gray-900 mb-3">Kettle Volume</h4>
+              <ul className="text-base font-bold text-gray-700 space-y-2">
                 <li>• Simulates vessel liquid levels</li>
                 <li>• Required for accurate transfer simulation</li>
                 <li>• Prevents heating empty vessels</li>
@@ -293,8 +293,8 @@ const Simulator = () => {
             </div>
 
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Speed Factor</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <h4 className="text-lg font-black text-gray-900 mb-3">Speed Factor</h4>
+              <ul className="text-base font-bold text-gray-700 space-y-2">
                 <li>• Accelerates time-based processes</li>
                 <li>• 10x default for reasonable testing</li>
                 <li>• Higher values for rapid iteration</li>
@@ -303,12 +303,12 @@ const Simulator = () => {
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
+          <div className="bg-yellow-50 border-3 border-yellow-300 rounded-2xl p-6 shadow-md">
+            <div className="flex items-start space-x-4">
+              <AlertTriangle className="w-8 h-8 text-yellow-600 mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="font-medium text-yellow-800">Important Notes</h4>
-                <ul className="text-sm text-yellow-700 mt-1 space-y-1">
+                <h4 className="text-lg font-black text-yellow-900">Important Notes</h4>
+                <ul className="text-base font-bold text-yellow-800 mt-2 space-y-2">
                   <li>• Simulation settings only affect virtual hardware behavior</li>
                   <li>• Real hardware operations ignore simulation settings</li>
                   <li>• Always verify settings match your actual equipment capacity</li>

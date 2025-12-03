@@ -447,10 +447,10 @@ const EquipmentControl = ({ sensorData }) => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Section Filter */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex flex-wrap gap-3">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-gray-100">
+        <div className="flex flex-wrap gap-4">
           {equipmentSections.map((section) => {
             const Icon = section.icon
             const isActive = activeSection === section.id
@@ -459,13 +459,13 @@ const EquipmentControl = ({ sensorData }) => {
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className={`flex items-center px-4 py-3 rounded-md text-base font-medium transition-colors ${
+                className={`flex items-center px-6 py-5 rounded-2xl text-xl font-black transition-all shadow-md hover:scale-105 ${
                   isActive 
-                    ? 'bg-brewery-100 text-brewery-700' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-brewery-200 text-brewery-900 border-4 border-brewery-400' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 border-4 border-gray-300'
                 }`}
               >
-                <Icon className="w-5 h-5 mr-3" />
+                <Icon className="w-8 h-8 mr-4" />
                 {section.name}
               </button>
             )
@@ -737,14 +737,14 @@ const EquipmentSection = ({ title, icon: Icon, color, children }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="px-8 py-6 border-b border-gray-200">
-        <h3 className="text-xl font-semibold flex items-center">
-          <Icon className={`w-6 h-6 mr-3 ${colorClasses[color]}`} />
+    <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+      <div className="px-8 py-6 border-b-2 border-gray-200">
+        <h3 className="text-2xl font-black flex items-center">
+          <Icon className={`w-8 h-8 mr-3 ${colorClasses[color]}`} />
           {title}
         </h3>
       </div>
-      <div className="p-8">
+      <div className="p-10">
         {children}
       </div>
     </div>
@@ -781,18 +781,18 @@ const ControlCard = ({
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6">
+    <div className="bg-gray-50 rounded-xl p-6 shadow-md border-2 border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <Icon className="w-6 h-6 text-gray-600" />
-          <span className="text-lg font-medium text-gray-900">{name}</span>
+          <Icon className="w-8 h-8 text-gray-600" />
+          <span className="text-xl font-black text-gray-900">{name}</span>
         </div>
-        <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+        <span className={`px-4 py-2 text-lg font-black rounded-full shadow-sm ${
           isTransitioning
-            ? 'bg-yellow-100 text-yellow-800'
+            ? 'bg-yellow-200 text-yellow-900'
             : isOn 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-gray-100 text-gray-800'
+            ? 'bg-green-200 text-green-900' 
+            : 'bg-gray-200 text-gray-700'
         }`}>
           {displayStatus}
         </span>
@@ -801,24 +801,24 @@ const ControlCard = ({
       <button
         onClick={handleToggle}
         disabled={isLoading || isTransitioning}
-        className={`w-full flex items-center justify-center space-x-3 py-3 px-6 rounded-md text-lg font-medium transition-colors ${
+        className={`w-full flex items-center justify-center space-x-3 py-4 px-6 rounded-xl text-xl font-black transition-all shadow-lg ${
           isLoading
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
             : isTransitioning
             ? 'bg-yellow-500 text-white cursor-not-allowed'
             : isOn
-            ? 'bg-green-600 text-white hover:bg-green-700'
-            : 'bg-red-600 text-white hover:bg-red-700'
+            ? 'bg-green-600 text-white hover:bg-green-700 hover:scale-105'
+            : 'bg-red-600 text-white hover:bg-red-700 hover:scale-105'
         }`}
       >
         {isLoading ? (
           <>
-            <div className="w-6 h-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <div className="w-8 h-8 animate-spin rounded-full border-4 border-white border-t-transparent" />
             <span>Processing...</span>
           </>
         ) : isTransitioning ? (
           <>
-            <div className="w-6 h-6 animate-pulse">
+            <div className="w-8 h-8 animate-pulse">
               <div className="w-full h-full bg-white rounded-full opacity-60"></div>
             </div>
             <span>Updating...</span>
@@ -826,12 +826,12 @@ const ControlCard = ({
         ) : (
           <>
             {isOn ? (
-              <ToggleRight className="w-6 h-6" />
+              <ToggleRight className="w-8 h-8" />
             ) : (
-              <ToggleLeft className="w-6 h-6" />
+              <ToggleLeft className="w-8 h-8" />
             )}
             <span>
-              {isOn ? stateLabels.off || 'Off' : stateLabels.on || 'On'}
+              {isOn ? stateLabels.off || 'OFF' : stateLabels.on || 'ON'}
             </span>
           </>
         )}

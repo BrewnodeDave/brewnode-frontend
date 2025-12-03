@@ -1,8 +1,21 @@
 import axios from 'axios'
 
+// Determine the base URL based on environment
+const getBaseURL = () => {
+  // In development, Vite proxy handles routing, so use empty baseURL
+  if (import.meta.env.DEV) {
+    return ''
+  }
+  
+  // In production, connect directly to the backend server on port 8080
+  // Use the same hostname but change the port
+  const { protocol, hostname } = window.location
+  return `${protocol}//${hostname}:8080`
+}
+
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '',
+  baseURL: getBaseURL(),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -13,8 +26,13 @@ const api = axios.create({
 let authCredentials = null
 
 export const setAuth = (username, password) => {
-  authCredentials = { username, password }
-  api.defaults.auth = authCredentials
+  if (username === null || password === null) {
+    authCredentials = null
+    delete api.defaults.auth
+  } else {
+    authCredentials = { username, password }
+    api.defaults.auth = authCredentials
+  }
 }
 
 export const clearAuth = () => {
@@ -61,7 +79,8 @@ api.interceptors.response.use(
       responseData: error.response?.data,
       message: error.message
     })
-    if (error.response?.status === 401) {
+    // Only redirect to login if we get 401 AND we were actually authenticated
+    if (error.response?.status === 401 && authCredentials) {
       clearAuth()
       window.location.href = '/login'
     }

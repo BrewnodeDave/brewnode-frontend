@@ -66,46 +66,46 @@ const I2CControl = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* I2C Control Form */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold flex items-center">
-            <Zap className="w-5 h-5 mr-2 text-yellow-600" />
+      <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+        <div className="px-8 py-6 border-b-2 border-gray-200">
+          <h3 className="text-2xl font-black flex items-center">
+            <Zap className="w-8 h-8 mr-3 text-yellow-600" />
             I2C Pin Control
           </h3>
         </div>
         
-        <div className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-bold text-gray-800 mb-3">
                   Bit Number
                 </label>
                 <input
                   type="number"
                   value={bit}
                   onChange={(e) => setBit(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brewery-500 focus:border-brewery-500"
+                  className="w-full px-5 py-4 border-3 border-gray-300 rounded-xl text-xl font-bold focus:ring-4 focus:ring-brewery-400 focus:border-brewery-500 shadow-md"
                   placeholder="0-4294967295"
                   min="0"
                   max="4294967295"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm font-bold text-gray-600 mt-2">
                   Enter bit position (0x0 to 0xFFFFFFFF)
                 </p>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-lg font-bold text-gray-800 mb-3">
                   Value
                 </label>
                 <select
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-brewery-500 focus:border-brewery-500"
+                  className="w-full px-5 py-4 border-3 border-gray-300 rounded-xl text-xl font-bold focus:ring-4 focus:ring-brewery-400 focus:border-brewery-500 shadow-md"
                   required
                 >
                   <option value="">Select value...</option>
@@ -118,7 +118,7 @@ const I2CControl = () => {
             <button
               type="submit"
               disabled={i2cMutation.isLoading}
-              className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-md font-medium transition-colors ${
+              className={`w-full flex items-center justify-center space-x-3 py-5 px-6 rounded-xl text-xl font-black transition-all shadow-lg ${
                 i2cMutation.isLoading
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-yellow-600 text-white hover:bg-yellow-700'
@@ -126,12 +126,12 @@ const I2CControl = () => {
             >
               {i2cMutation.isLoading ? (
                 <>
-                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <div className="w-6 h-6 animate-spin rounded-full border-3 border-white border-t-transparent" />
                   <span>Setting...</span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <Send className="w-6 h-6" />
                   <span>Set I2C Pin</span>
                 </>
               )}
@@ -141,30 +141,30 @@ const I2CControl = () => {
       </div>
 
       {/* Preset Controls */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold flex items-center">
-            <RotateCcw className="w-5 h-5 mr-2 text-blue-600" />
+      <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+        <div className="px-8 py-6 border-b-2 border-gray-200">
+          <h3 className="text-2xl font-black flex items-center">
+            <RotateCcw className="w-8 h-8 mr-3 text-blue-600" />
             Preset Controls
           </h3>
         </div>
         
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {presetControls.map((preset, index) => (
               <button
                 key={index}
                 onClick={() => handlePreset(preset)}
                 disabled={i2cMutation.isLoading}
-                className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+                className="p-6 border-3 border-gray-200 rounded-xl hover:bg-gray-50 hover:scale-105 transition-all text-left disabled:opacity-50 shadow-md"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-gray-900">{preset.name}</h4>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-lg font-black text-gray-900">{preset.name}</h4>
+                  <span className="text-base font-bold text-gray-600">
                     Bit: {preset.bit}, Val: {preset.value}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">{preset.description}</p>
+                <p className="text-base font-bold text-gray-600">{preset.description}</p>
               </button>
             ))}
           </div>
@@ -172,47 +172,47 @@ const I2CControl = () => {
       </div>
 
       {/* Command History */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold flex items-center">
-            <Info className="w-5 h-5 mr-2 text-gray-600" />
+      <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100">
+        <div className="px-8 py-6 border-b-2 border-gray-200">
+          <h3 className="text-2xl font-black flex items-center">
+            <Info className="w-8 h-8 mr-3 text-gray-600" />
             Command History
           </h3>
         </div>
         
-        <div className="p-6">
+        <div className="p-8">
           {history.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
+            <p className="text-gray-600 text-center py-6 text-xl font-bold">
               No commands sent yet
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {history.map((entry, index) => (
                 <div
                   key={index}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
+                  className={`flex items-center justify-between p-5 rounded-xl ${
                     entry.success ? 'bg-green-50 border-l-4 border-green-400' : 'bg-red-50 border-l-4 border-red-400'
                   }`}
                 >
                   <div className="flex items-center space-x-4">
-                    <span className="text-sm font-mono">
+                    <span className="text-base font-mono font-bold">
                       Bit: {entry.bit}, Value: {entry.value}
                     </span>
                     {!entry.success && (
-                      <span className="text-sm text-red-600">
+                      <span className="text-base font-bold text-red-600">
                         Error: {entry.error}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  <div className="flex items-center space-x-3">
+                    <span className={`px-4 py-2 text-sm font-black rounded-full ${
                       entry.success 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-red-100 text-red-800'
                     }`}>
                       {entry.success ? 'Success' : 'Failed'}
                     </span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-base font-bold text-gray-600">
                       {entry.timestamp}
                     </span>
                   </div>
@@ -224,12 +224,12 @@ const I2CControl = () => {
       </div>
 
       {/* Safety Warning */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <Info className="w-5 h-5 text-yellow-600 mt-0.5" />
+      <div className="bg-yellow-50 border-3 border-yellow-300 rounded-2xl p-6 shadow-md">
+        <div className="flex items-start space-x-4">
+          <Info className="w-8 h-8 text-yellow-600 mt-0.5 flex-shrink-0" />
           <div>
-            <h4 className="text-sm font-medium text-yellow-800">Safety Warning</h4>
-            <p className="text-sm text-yellow-700 mt-1">
+            <h4 className="text-lg font-black text-yellow-900">Safety Warning</h4>
+            <p className="text-base font-bold text-yellow-800 mt-2">
               I2C pin control directly manipulates hardware. Incorrect usage may damage equipment 
               or cause unexpected behavior. Only use if you understand the hardware configuration.
             </p>

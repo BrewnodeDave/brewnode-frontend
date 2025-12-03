@@ -16,11 +16,61 @@ import BrewDataChart from '../components/BrewDataChart'
 import SystemStatus from '../components/SystemStatus'
 
 const Dashboard = () => {
-  const { data: sensorData, isLoading: sensorsLoading } = useQuery(
+  const { data: sensorData, isLoading: sensorsLoading, refetch: refetchSensors } = useQuery(
     'sensorStatus',
     () => brewnodeAPI.getSensorStatus(),
     { refetchInterval: 2000 }
   )
+
+  const handleToggleEquipment = async (key, currentValue) => {
+    try {
+      const isActive = typeof currentValue === 'number' ? currentValue > 0 : (currentValue === 'On' || currentValue === 'Open')
+      const newState = isActive ? 'Off' : 'On'
+      
+      // Map equipment keys to API functions
+      const keyLower = key.toLowerCase()
+      
+      if (keyLower.includes('fan')) {
+        await brewnodeAPI.setFan(newState)
+      } else if (keyLower.includes('kettlepump') || keyLower.includes('pump') && keyLower.includes('kettle')) {
+        await brewnodeAPI.setKettlePump(newState)
+      } else if (keyLower.includes('mashpump') || keyLower.includes('pump') && keyLower.includes('mash')) {
+        await brewnodeAPI.setMashPump(newState)
+      } else if (keyLower.includes('glycolpump') || keyLower.includes('pump') && keyLower.includes('glycol')) {
+        await brewnodeAPI.setGlycolPump(newState)
+      } else if (keyLower.includes('kettleheater') || keyLower.includes('heat') && !keyLower.includes('glycol')) {
+        await brewnodeAPI.setHeat(newState)
+      } else if (keyLower.includes('glycolheater') || keyLower.includes('glycol') && keyLower.includes('heat')) {
+        await brewnodeAPI.setGlycolHeat(newState)
+      } else if (keyLower.includes('glycolchiller') || keyLower.includes('glycol') && keyLower.includes('chill')) {
+        await brewnodeAPI.setGlycolChill(newState)
+      } else if (keyLower.includes('kettlein') || keyLower.includes('kettle') && keyLower.includes('in')) {
+        await brewnodeAPI.setKettleInValve(newState)
+      } else if (keyLower.includes('mashin') || keyLower.includes('mash') && keyLower.includes('in')) {
+        await brewnodeAPI.setMashInValve(newState)
+      } else if (keyLower.includes('chillwortin') || keyLower.includes('chillerwortin')) {
+        await brewnodeAPI.setChillWortInValve(newState)
+      } else if (keyLower.includes('chillwortout') || keyLower.includes('chillerwortout')) {
+        await brewnodeAPI.setChillWortOutValve(newState)
+      }
+      
+      // Refetch sensor data immediately after toggle
+      setTimeout(() => refetchSensors(), 500)
+    } catch (error) {
+      console.error('Failed to toggle equipment:', error)
+    }
+  }
+
+  const handleToggleFan = async () => {
+    try {
+      const isActive = (sensorData?.data?.fanPower || 0) > 0
+      const newState = isActive ? 'Off' : 'On'
+      await brewnodeAPI.setFan(newState)
+      setTimeout(() => refetchSensors(), 500)
+    } catch (error) {
+      console.error('Failed to toggle fan:', error)
+    }
+  }
 
   const { data: currentBrew } = useQuery(
     'currentBrew',
@@ -43,41 +93,41 @@ const Dashboard = () => {
   )
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-8 sm:space-y-10">
       <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-brewery-100 rounded-xl shadow-sm flex items-center justify-center">
-            <img src="/logo-40x40.png" alt="Brewnode" className="w-8 h-8 sm:w-10 sm:h-10" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-brewery-100 to-brewery-200 rounded-2xl shadow-lg flex items-center justify-center">
+            <img src="/logo-40x40.png" alt="Brewnode" className="w-10 h-10 sm:w-12 sm:h-12" />
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Brewnode Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900">Brewnode Dashboard</h1>
         </div>
-        <div className="flex items-center space-x-3 text-base sm:text-lg text-gray-500">
-          <Clock className="w-6 h-6" />
-          <span className="hidden sm:inline">{new Date().toLocaleString()}</span>
-          <span className="sm:hidden">{new Date().toLocaleTimeString()}</span>
+        <div className="flex items-center space-x-4 text-xl text-gray-600">
+          <Clock className="w-8 h-8" />
+          <span className="hidden sm:inline font-bold">{new Date().toLocaleString()}</span>
+          <span className="sm:hidden font-bold">{new Date().toLocaleTimeString()}</span>
         </div>
       </div>
 
       {/* Current Brew Status */}
-      <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
-        <h2 className="text-xl sm:text-2xl font-semibold mb-6 flex items-center">
+      <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-brewery-100">
+        <h2 className="text-2xl font-black mb-6 flex items-center">
           <Beaker className="w-8 h-8 mr-3 text-brewery-600" />
           Current Brew
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-lg font-medium text-gray-600 mb-2">Recipe</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">{currentBrew?.data?.name || 'No active brew'}</p>
+          <div className="text-center p-5 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md">
+            <p className="text-lg font-bold text-gray-700 mb-2">Recipe</p>
+            <p className="text-xl sm:text-2xl font-black text-gray-900 break-words overflow-wrap-anywhere">{currentBrew?.data?.name || 'No active brew'}</p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-lg font-medium text-gray-600 mb-2">Status</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">
+          <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-md">
+            <p className="text-xl font-bold text-gray-700 mb-3">Status</p>
+            <p className="text-2xl sm:text-3xl font-black text-gray-900 break-words">
               {currentBrew?.data ? 'Brewing/Fermenting' : 'System Ready'}
             </p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-lg font-medium text-gray-600 mb-2">Latest Brew</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900">
+          <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-md">
+            <p className="text-xl font-bold text-gray-700 mb-3">Latest Brew</p>
+            <p className="text-2xl sm:text-3xl font-black text-gray-900 break-words overflow-wrap-anywhere">
               {brewnames?.data && brewnames.data.length > 0 
                 ? brewnames.data[0] 
                 : 'No brews found'
@@ -91,7 +141,7 @@ const Dashboard = () => {
       <SystemStatus sensorData={sensorData} />
 
       {/* Sensor Status Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <SensorStatusCard
           title="Kettle Temperature"
           icon={Thermometer}
@@ -151,7 +201,7 @@ const Dashboard = () => {
       </div>
 
       {/* Fan Status */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <EquipmentStatusCard
           name="Fan"
           isActive={(sensorData?.data?.fanPower || 0) > 0}
@@ -159,25 +209,26 @@ const Dashboard = () => {
           icon={Fan}
           color="purple"
           loading={sensorsLoading}
+          onClick={handleToggleFan}
         />
       </div>
 
       {/* Equipment Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
-          <h3 className="text-xl font-semibold mb-6 flex items-center">
-            <Server className="w-7 h-7 mr-3 text-gray-600" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 border-4 border-gray-100">
+          <h3 className="text-2xl font-black mb-8 flex items-center">
+            <Server className="w-10 h-10 mr-4 text-gray-600" />
             Equipment Status
           </h3>
-          <div className="space-y-4">
-            {sensorData?.data && (() => {
+          <div className="space-y-4">{sensorData?.data && (() => {
               const equipmentEntries = Object.entries(sensorData.data);
               const shownEquipment = new Set();
               
               return equipmentEntries.filter(([key, value]) => {
                 // Show equipment (pumps, heaters, valves, fan)
-                if (key.includes('pump') || key.includes('heater') || key.includes('fan') ||
-                    key.includes('valve') || key.includes('In') || key.includes('Out')) {
+                // Include power readings for heaters even if they don't have 'heater' in lowercase
+                if (key.includes('pump') || key.includes('heater') || key.includes('Heater') || 
+                    key.includes('fan') || key.includes('valve') || key.includes('In') || key.includes('Out')) {
                   
                   // For valve duplicates, prefer camelCase version over prefixed version
                   if (key.startsWith('valve')) {
@@ -211,11 +262,11 @@ const Dashboard = () => {
                   isActive = value > 0;
                   if (key.toLowerCase().includes('valve') || key.includes('In') || key.includes('Out')) {
                     displayValue = isActive ? `Open (${value}W)` : 'Closed';
-                  } else if (key.includes('pump')) {
+                  } else if (key.includes('pump') || key.includes('Pump')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
-                  } else if (key.includes('heater')) {
+                  } else if (key.includes('heater') || key.includes('Heater')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
-                  } else if (key.includes('fan')) {
+                  } else if (key.includes('fan') || key.includes('Fan')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
                   }
                 } else if (typeof value === 'string') {
@@ -224,32 +275,36 @@ const Dashboard = () => {
                 }
                 
                 return (
-                  <div key={key} className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg">
-                    <span className="text-base font-medium text-gray-700 capitalize">
+                  <button
+                    key={key}
+                    onClick={() => handleToggleEquipment(key, value)}
+                    className="flex justify-between items-center py-4 px-6 bg-gray-50 rounded-2xl shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-all hover:scale-102 cursor-pointer"
+                  >
+                    <span className="text-xl font-bold text-gray-700 capitalize">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
                     </span>
-                    <span className={`px-4 py-2 text-sm font-semibold rounded-full ${
+                    <span className={`px-5 py-3 text-lg font-black rounded-full shadow-sm transition-colors ${
                       isActive
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-green-200 text-green-900' 
+                        : 'bg-gray-200 text-gray-700'
                     }`}>
                       {displayValue}
                     </span>
-                  </div>
+                  </button>
                 )
               });
             })()}
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
-          <h3 className="text-xl font-semibold mb-6 flex items-center">
-            <AlertCircle className="w-7 h-7 mr-3 text-gray-600" />
+        <div className="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 border-4 border-gray-100">
+          <h3 className="text-2xl font-black mb-8 flex items-center">
+            <AlertCircle className="w-10 h-10 mr-4 text-gray-600" />
             Recent Brews
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {brewnames?.data?.slice(0, 5).map((name, index) => (
-              <div key={index} className="text-base font-medium text-gray-700 py-3 px-4 bg-gray-50 rounded-lg">
+              <div key={index} className="text-xl font-bold text-gray-700 py-4 px-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl shadow-sm">
                 {name}
               </div>
             ))}
