@@ -40,6 +40,13 @@ const Login = () => {
     }
   }
 
+  const handleSkipLogin = () => {
+    // Clear any existing auth
+    setAuth(null, null)
+    // Navigate to dashboard without authentication
+    navigate('/')
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brewery-50 to-brewery-100 py-10 px-6 sm:py-12 sm:px-6 lg:px-8">
       <div className="max-w-lg w-full space-y-10">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { 
   Beaker, 
@@ -8,9 +8,10 @@ import {
   LogOut,
   BarChart3,
   Menu,
-  X
+  X,
+  Lock
 } from 'lucide-react'
-import { clearAuth } from '../services/api'
+import { clearAuth, isAuthenticated } from '../services/api'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: BarChart3 },
@@ -23,9 +24,24 @@ const navigation = [
 const Layout = ({ children }) => {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [authState, setAuthState] = useState(isAuthenticated())
+
+  // Update auth state when location changes
+  useEffect(() => {
+    setAuthState(isAuthenticated())
+  }, [location])
+
+  // Filter navigation based on authentication
+  const filteredNavigation = navigation.filter(item => {
+    if (item.name === 'Brewfather') {
+      return authState
+    }
+    return true
+  })
 
   const handleLogout = () => {
     clearAuth()
+    setAuthState(false)
     window.location.href = '/login'
   }
 
@@ -58,7 +74,7 @@ const Layout = ({ children }) => {
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
-          {navigation.map((item) => {
+          {filteredNavigation.map((item) => {
             const isActive = location.pathname === item.href
             const Icon = item.icon
             
@@ -77,13 +93,23 @@ const Layout = ({ children }) => {
         </nav>
         
         <div className="px-5 py-8 border-t-4 border-gray-200">
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full px-7 py-6 text-xl font-bold text-gray-600 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all shadow-md hover:scale-105"
-          >
-            <LogOut className="w-10 h-10 mr-6 flex-shrink-0" />
-            Logout
-          </button>
+          {authState ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full px-7 py-6 text-xl font-bold text-gray-600 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all shadow-md hover:scale-105"
+            >
+              <LogOut className="w-10 h-10 mr-6 flex-shrink-0" />
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center w-full px-7 py-6 text-xl font-bold text-gray-600 rounded-2xl hover:bg-brewery-50 hover:text-brewery-600 transition-all shadow-md hover:scale-105"
+            >
+              <Lock className="w-10 h-10 mr-6 flex-shrink-0" />
+              Login
+            </Link>
+          )}
         </div>
       </div>
 

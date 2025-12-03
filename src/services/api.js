@@ -26,8 +26,13 @@ const api = axios.create({
 let authCredentials = null
 
 export const setAuth = (username, password) => {
-  authCredentials = { username, password }
-  api.defaults.auth = authCredentials
+  if (username === null || password === null) {
+    authCredentials = null
+    delete api.defaults.auth
+  } else {
+    authCredentials = { username, password }
+    api.defaults.auth = authCredentials
+  }
 }
 
 export const clearAuth = () => {
@@ -74,7 +79,8 @@ api.interceptors.response.use(
       responseData: error.response?.data,
       message: error.message
     })
-    if (error.response?.status === 401) {
+    // Only redirect to login if we get 401 AND we were actually authenticated
+    if (error.response?.status === 401 && authCredentials) {
       clearAuth()
       window.location.href = '/login'
     }

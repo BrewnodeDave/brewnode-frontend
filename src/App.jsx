@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Brewfather from './pages/Brewfather'
@@ -7,12 +7,6 @@ import ProcessControl from './pages/ProcessControl'
 import SensorControl from './pages/SensorControl'
 import Simulator from './pages/Simulator'
 import Login from './pages/Login'
-import { isAuthenticated } from './services/api'
-
-// Protected route wrapper
-const ProtectedRoute = ({ children }) => {
-  return isAuthenticated() ? children : <Navigate to="/login" />
-}
 
 function App() {
   return (
@@ -20,39 +14,29 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <Dashboard />
+          </Layout>
         } />
         <Route path="/brewfather" element={
-          <ProtectedRoute>
-            <Layout>
-              <Brewfather />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <Brewfather />
+          </Layout>
         } />
         <Route path="/process" element={
-          <ProtectedRoute>
-            <Layout>
-              <ProcessControl />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <ProcessControl />
+          </Layout>
         } />
         <Route path="/sensors" element={
-          <ProtectedRoute>
-            <Layout>
-              <SensorControl />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <SensorControl />
+          </Layout>
         } />
         <Route path="/simulator" element={
-          <ProtectedRoute>
-            <Layout>
-              <Simulator />
-            </Layout>
-          </ProtectedRoute>
+          <Layout>
+            <Simulator />
+          </Layout>
         } />
       </Routes>
     </div>
