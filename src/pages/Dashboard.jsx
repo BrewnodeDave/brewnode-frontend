@@ -226,8 +226,9 @@ const Dashboard = () => {
               
               return equipmentEntries.filter(([key, value]) => {
                 // Show equipment (pumps, heaters, valves, fan)
-                if (key.includes('pump') || key.includes('heater') || key.includes('fan') ||
-                    key.includes('valve') || key.includes('In') || key.includes('Out')) {
+                // Include power readings for heaters even if they don't have 'heater' in lowercase
+                if (key.includes('pump') || key.includes('heater') || key.includes('Heater') || 
+                    key.includes('fan') || key.includes('valve') || key.includes('In') || key.includes('Out')) {
                   
                   // For valve duplicates, prefer camelCase version over prefixed version
                   if (key.startsWith('valve')) {
@@ -261,11 +262,11 @@ const Dashboard = () => {
                   isActive = value > 0;
                   if (key.toLowerCase().includes('valve') || key.includes('In') || key.includes('Out')) {
                     displayValue = isActive ? `Open (${value}W)` : 'Closed';
-                  } else if (key.includes('pump')) {
+                  } else if (key.includes('pump') || key.includes('Pump')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
-                  } else if (key.includes('heater')) {
+                  } else if (key.includes('heater') || key.includes('Heater')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
-                  } else if (key.includes('fan')) {
+                  } else if (key.includes('fan') || key.includes('Fan')) {
                     displayValue = isActive ? `On (${value}W)` : 'Off';
                   }
                 } else if (typeof value === 'string') {

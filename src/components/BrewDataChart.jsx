@@ -7,15 +7,14 @@ import LoadingSpinner from './LoadingSpinner'
 
 const BrewDataChart = () => {
   const [selectedBrew, setSelectedBrew] = useState('')
-  const [dateRange, setDateRange] = useState('')
   const [zoomDomain, setZoomDomain] = useState(null)
   const [enableZoom, setEnableZoom] = useState(true)
 
   const { data: brewnames, error: brewnamesError } = useQuery('brewnames', () => brewnodeAPI.getBrewnames())
   
   const { data: brewData, isLoading, error: brewDataError } = useQuery(
-    ['brewData', selectedBrew, dateRange],
-    () => brewnodeAPI.getBrewData(selectedBrew, dateRange),
+    ['brewData', selectedBrew],
+    () => brewnodeAPI.getBrewData(selectedBrew, ''),
     { 
       enabled: !!selectedBrew,
       refetchOnWindowFocus: false
@@ -153,16 +152,6 @@ const BrewDataChart = () => {
         </h3>
         
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-          <div className="flex items-center space-x-3 w-full sm:w-auto">
-            <Calendar className="w-8 h-8 text-gray-500 flex-shrink-0" />
-            <input
-              type="datetime-local"
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="text-xl font-bold border-4 border-gray-300 rounded-2xl px-4 py-3 flex-1 sm:flex-initial focus:ring-4 focus:ring-brewery-200 focus:border-brewery-500"
-            />
-          </div>
-          
           <div className="flex items-center space-x-3 justify-center sm:justify-start">
             <button
               onClick={() => setEnableZoom(!enableZoom)}
