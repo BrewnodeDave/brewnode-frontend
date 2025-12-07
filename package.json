@@ -1,8 +1,26 @@
 {
   "name": "brewnode-frontend",
   "version": "2.0.0",
-  "private": true,
+  "description": "BrewNode Frontend - React-based UI for brewery automation and monitoring",
   "type": "module",
+  "main": "dist/index.html",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BrewnodeDave/brewnode-frontend.git"
+  },
+  "keywords": [
+    "brewery",
+    "automation",
+    "brewing",
+    "monitoring",
+    "react",
+    "brewfather"
+  ],
+  "author": "BrewnodeDave",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
