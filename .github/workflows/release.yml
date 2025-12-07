@@ -1,0 +1,41 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release v${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Changes in v${{ steps.version.outputs.VERSION }}
+            
+            See [CHANGELOG.md](https://github.com/BrewnodeDave/brewnode-frontend/blob/main/CHANGELOG.md) for details.
+            
+            ### Installation
+            ```bash
+            npm install brewnode-frontend@${{ steps.version.outputs.VERSION }}
+            ```
+            
+            ### NPM Package
+            https://www.npmjs.com/package/brewnode-frontend/v/${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
