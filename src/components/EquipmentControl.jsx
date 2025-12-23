@@ -249,6 +249,34 @@ const EquipmentControl = ({ sensorData }) => {
         }
       }
     ),
+    kettleModulate: useMutation(
+      ({ onSecs, offSecs }) => brewnodeAPI.setKettlePumpModulate(onSecs, offSecs),
+      {
+        onSuccess: () => {
+          console.log('Kettle pump modulation started')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Kettle pump modulation failed:', error)
+          alert(`Kettle pump modulation failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    ),
+    kettleModulateStop: useMutation(
+      () => brewnodeAPI.stopKettlePumpModulate(),
+      {
+        onSuccess: () => {
+          console.log('Kettle pump modulation stopped')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Stop kettle pump modulation failed:', error)
+          alert(`Stop kettle pump modulation failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    ),
     mash: useMutation(
       (state) => brewnodeAPI.setMashPump(state),
       { 
@@ -264,6 +292,34 @@ const EquipmentControl = ({ sensorData }) => {
         onError: (error) => {
           console.error('Mash pump control failed:', error)
           alert(`Mash pump control failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    ),
+    mashModulate: useMutation(
+      ({ onSecs, offSecs }) => brewnodeAPI.setMashPumpModulate(onSecs, offSecs),
+      {
+        onSuccess: () => {
+          console.log('Mash pump modulation started')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Mash pump modulation failed:', error)
+          alert(`Mash pump modulation failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    ),
+    mashModulateStop: useMutation(
+      () => brewnodeAPI.stopMashPumpModulate(),
+      {
+        onSuccess: () => {
+          console.log('Mash pump modulation stopped')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Stop mash pump modulation failed:', error)
+          alert(`Stop mash pump modulation failed: ${error.message || 'Unknown error'}`)
         }
       }
     ),
@@ -516,27 +572,34 @@ const EquipmentControl = ({ sensorData }) => {
       {/* Pumps Control */}
       {shouldShowSection('pumps') && (
         <EquipmentSection title="Pump Control" icon={Droplets} color="blue">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <ControlCard
               name="Kettle Pump"
               status={(() => {
-                // Get kettle pump status from sensor data
+                // Get kettle pump status from sensor data  
                 let pumpPower = 0
                 if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
                   pumpPower = sensorData.data.pumpKettle || sensorData.data.kettlePump || 0
                 }
                 return pumpPower > 0 ? "On" : "Off"
-              })()} 
+              })()}
               onToggle={(state) => pumpMutations.kettle.mutate(state)}
               isLoading={pumpMutations.kettle.isLoading}
               isTransitioning={transitionStates.kettlePump}
               expectedState={expectedStates.kettlePump}
               icon={Droplets}
             />
+            <PumpModulationCard
+              name="Kettle Pump Modulation"
+              onModulate={(onSecs, offSecs) => pumpMutations.kettleModulate.mutate({ onSecs, offSecs })}
+              onStop={() => pumpMutations.kettleModulateStop.mutate()}
+              isLoading={pumpMutations.kettleModulate.isLoading}
+              isStopping={pumpMutations.kettleModulateStop.isLoading}
+            />
             <ControlCard
               name="Mash Pump"
               status={(() => {
-                // Get mash pump status from sensor data
+                // Get mash pump status from sensor data  
                 let pumpPower = 0
                 if (sensorData?.data && typeof sensorData.data === 'object' && !Array.isArray(sensorData.data)) {
                   pumpPower = sensorData.data.pumpMash || sensorData.data.mashPump || 0
@@ -548,6 +611,13 @@ const EquipmentControl = ({ sensorData }) => {
               isTransitioning={transitionStates.mashPump}
               expectedState={expectedStates.mashPump}
               icon={Droplets}
+            />
+            <PumpModulationCard
+              name="Mash Pump Modulation"
+              onModulate={(onSecs, offSecs) => pumpMutations.mashModulate.mutate({ onSecs, offSecs })}
+              onStop={() => pumpMutations.mashModulateStop.mutate()}
+              isLoading={pumpMutations.mashModulate.isLoading}
+              isStopping={pumpMutations.mashModulateStop.isLoading}
             />
             <ControlCard
               name="Glycol Pump"
@@ -836,6 +906,106 @@ const ControlCard = ({
           </>
         )}
       </button>
+    </div>
+  )
+}
+
+const PumpModulationCard = ({ name, onModulate, onStop, isLoading, isStopping }) => {
+  const [onSecs, setOnSecs] = useState(30)
+  const [offSecs, setOffSecs] = useState(10)
+
+  const handleStart = () => {
+    if (onSecs < 0.1 || onSecs > 3600 || offSecs < 0.1 || offSecs > 3600) {
+      alert('Values must be between 0.1 and 3600 seconds')
+      return
+    }
+    onModulate(onSecs, offSecs)
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 shadow-md border-2 border-blue-200">
+      <div className="flex items-center space-x-3 mb-4">
+        <Droplets className="w-8 h-8 text-blue-600" />
+        <span className="text-xl font-black text-gray-900">{name}</span>
+      </div>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            On Duration (seconds)
+          </label>
+          <input
+            type="number"
+            value={onSecs}
+            onChange={(e) => setOnSecs(parseFloat(e.target.value))}
+            min="0.1"
+            max="3600"
+            step="0.1"
+            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 font-bold text-lg"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            Off Duration (seconds)
+          </label>
+          <input
+            type="number"
+            value={offSecs}
+            onChange={(e) => setOffSecs(parseFloat(e.target.value))}
+            min="0.1"
+            max="3600"
+            step="0.1"
+            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 font-bold text-lg"
+          />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={handleStart}
+            disabled={isLoading || isStopping}
+            className={`flex items-center justify-center space-x-2 py-4 px-4 rounded-xl text-lg font-black transition-all shadow-lg ${
+              isLoading || isStopping
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105'
+            }`}
+          >
+            {isLoading ? (
+              <>
+                <div className="w-6 h-6 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                <span>Starting...</span>
+              </>
+            ) : (
+              <>
+                <Power className="w-6 h-6" />
+                <span>Start</span>
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={onStop}
+            disabled={isLoading || isStopping}
+            className={`flex items-center justify-center space-x-2 py-4 px-4 rounded-xl text-lg font-black transition-all shadow-lg ${
+              isLoading || isStopping
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-red-600 text-white hover:bg-red-700 hover:scale-105'
+            }`}
+          >
+            {isStopping ? (
+              <>
+                <div className="w-6 h-6 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                <span>Stopping...</span>
+              </>
+            ) : (
+              <>
+                <Power className="w-6 h-6" />
+                <span>Stop</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

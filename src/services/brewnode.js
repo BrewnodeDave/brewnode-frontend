@@ -223,6 +223,12 @@ export const brewnodeAPI = {
   setKettlePump: (onOff) => 
     api.put('/pump/kettle', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
+  setKettlePumpModulate: (onSecs, offSecs) => 
+    api.put('/pump/kettle/on', null, { params: { onSecs, offSecs }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  
+  stopKettlePumpModulate: () => 
+    api.put('/pump/kettle/on', null, { headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  
   setKettleInValve: (onOff) => 
     api.put('/valve/kettlein', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
@@ -239,6 +245,12 @@ export const brewnodeAPI = {
   // Mash tun controls
   setMashPump: (onOff) => 
     api.put('/pump/mash', null, { params: { onOff }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  
+  setMashPumpModulate: (onSecs, offSecs) => 
+    api.put('/pump/mash/on', null, { params: { onSecs, offSecs }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  
+  stopMashPumpModulate: () => 
+    api.put('/pump/mash/on', null, { headers: { 'accept': '*/*', 'Content-Type': undefined } }),
   
   setMashInValve: (onOff) => 
     api.put('/valve/mashin', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
