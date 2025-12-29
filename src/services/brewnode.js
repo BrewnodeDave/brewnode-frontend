@@ -255,6 +255,19 @@ export const brewnodeAPI = {
   setMashInValve: (onOff) => 
     api.put('/valve/mashin', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 
+  // Recirculation controls
+  startRecirculation: (tempC, dutyCycle = 50) => 
+    api.put('/recirculate', null, { params: { onOff: 'On', tempC, dutyCycle }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  
+  stopRecirculation: () => 
+    api.put('/recirculate', null, { params: { onOff: 'Off' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+  
+  getRecirculationStatus: () => 
+    api.get('/recirculate/status'),
+  
+  updateRecirculationDutyCycle: (dutyCycle) => 
+    api.put('/recirculate/dutycycle', null, { params: { dutyCycle }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
+
   // Chiller valve controls
   setChillWortInValve: (onOff) => 
     api.put('/valve/chillwortin', null, { params: { onOff: onOff === 'On' ? 'Open' : 'Close' }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),

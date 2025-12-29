@@ -33,6 +33,13 @@ A modern React-based web interface for controlling and monitoring the Brewnode b
 - **Fermentation**: Multi-stage temperature control over days
 - **Transfers**: Automated vessel-to-vessel transfers (K2M, M2K, K2F)
 - **Temperature Control**: Precision heating and cooling
+- **RIMS Recirculation**: Complete recirculating infusion mash system control
+  - Start/stop with target mash temperature
+  - Duty cycle control (1-99%, default 50%)
+  - Dynamic duty cycle updates during operation
+  - State persistence across page navigation
+  - Real-time status monitoring (3-second polling)
+  - Inline control (non-modal) for multi-page access
 
 #### Equipment Control
 - Individual pump control (kettle, mash, glycol)

@@ -343,6 +343,52 @@ const EquipmentControl = ({ sensorData }) => {
     )
   }
 
+  // Recirculation mutations
+  const recirculationMutations = {
+    start: useMutation(
+      ({ tempC, dutyCycle }) => brewnodeAPI.startRecirculation(tempC, dutyCycle),
+      {
+        onSuccess: () => {
+          console.log('Recirculation started')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Start recirculation failed:', error)
+          alert(`Start recirculation failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    ),
+    stop: useMutation(
+      () => brewnodeAPI.stopRecirculation(),
+      {
+        onSuccess: () => {
+          console.log('Recirculation stopped')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Stop recirculation failed:', error)
+          alert(`Stop recirculation failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    ),
+    updateDutyCycle: useMutation(
+      (dutyCycle) => brewnodeAPI.updateRecirculationDutyCycle(dutyCycle),
+      {
+        onSuccess: () => {
+          console.log('Duty cycle updated')
+          queryClient.invalidateQueries('pumpsStatus')
+          queryClient.invalidateQueries('sensorStatus')
+        },
+        onError: (error) => {
+          console.error('Update duty cycle failed:', error)
+          alert(`Update duty cycle failed: ${error.message || 'Unknown error'}`)
+        }
+      }
+    )
+  }
+
   const valveMutations = {
     kettlein: useMutation(
       (state) => brewnodeAPI.setKettleInValve(state),
@@ -906,6 +952,147 @@ const ControlCard = ({
           </>
         )}
       </button>
+    </div>
+  )
+}
+
+const RecirculationCard = ({ onStart, onStop, onUpdateDutyCycle, isStarting, isStopping, isUpdating }) => {
+  const [tempC, setTempC] = useState(65)
+  const [dutyCycle, setDutyCycle] = useState(50)
+  const [isRunning, setIsRunning] = useState(false)
+
+  const handleStart = () => {
+    if (tempC < 0 || tempC > 100) {
+      alert('Temperature must be between 0 and 100°C')
+      return
+    }
+    if (dutyCycle < 1 || dutyCycle > 99) {
+      alert('Duty cycle must be between 1 and 99%')
+      return
+    }
+    setIsRunning(true)
+    onStart(tempC, dutyCycle)
+  }
+
+  const handleStop = () => {
+    setIsRunning(false)
+    onStop()
+  }
+
+  const handleUpdateDutyCycle = () => {
+    if (dutyCycle < 1 || dutyCycle > 99) {
+      alert('Duty cycle must be between 1 and 99%')
+      return
+    }
+    onUpdateDutyCycle(dutyCycle)
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 shadow-md border-2 border-purple-200">
+      <div className="flex items-center space-x-3 mb-4">
+        <Droplets className="w-8 h-8 text-purple-600" />
+        <span className="text-xl font-black text-gray-900">RIMS Recirculation</span>
+      </div>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            Target Temperature (°C)
+          </label>
+          <input
+            type="number"
+            value={tempC}
+            onChange={(e) => setTempC(parseFloat(e.target.value))}
+            min="0"
+            max="100"
+            step="0.5"
+            disabled={isRunning}
+            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 font-bold text-lg disabled:bg-gray-100"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-2">
+            Kettle Pump Duty Cycle (%)
+          </label>
+          <input
+            type="number"
+            value={dutyCycle}
+            onChange={(e) => setDutyCycle(parseFloat(e.target.value))}
+            min="1"
+            max="99"
+            step="1"
+            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 font-bold text-lg"
+          />
+        </div>
+        
+        {!isRunning ? (
+          <button
+            onClick={handleStart}
+            disabled={isStarting || isStopping}
+            className={`w-full flex items-center justify-center space-x-2 py-4 px-4 rounded-xl text-lg font-black transition-all shadow-lg ${
+              isStarting || isStopping
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-purple-600 text-white hover:bg-purple-700 hover:scale-105'
+            }`}
+          >
+            {isStarting ? (
+              <>
+                <div className="w-6 h-6 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                <span>Starting...</span>
+              </>
+            ) : (
+              <>
+                <Power className="w-6 h-6" />
+                <span>Start Recirculation</span>
+              </>
+            )}
+          </button>
+        ) : (
+          <div className="space-y-3">
+            <button
+              onClick={handleUpdateDutyCycle}
+              disabled={isUpdating || isStopping}
+              className={`w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-base font-black transition-all shadow-lg ${
+                isUpdating || isStopping
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105'
+              }`}
+            >
+              {isUpdating ? (
+                <>
+                  <div className="w-5 h-5 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                  <span>Updating...</span>
+                </>
+              ) : (
+                <span>Update Duty Cycle</span>
+              )}
+            </button>
+            
+            <button
+              onClick={handleStop}
+              disabled={isStarting || isStopping}
+              className={`w-full flex items-center justify-center space-x-2 py-4 px-4 rounded-xl text-lg font-black transition-all shadow-lg ${
+                isStarting || isStopping
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-red-600 text-white hover:bg-red-700 hover:scale-105'
+              }`}
+            >
+              {isStopping ? (
+                <>
+                  <div className="w-6 h-6 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                  <span>Stopping...</span>
+                </>
+              ) : (
+                <>
+                  <Power className="w-6 h-6" />
+                  <span>Stop Recirculation</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

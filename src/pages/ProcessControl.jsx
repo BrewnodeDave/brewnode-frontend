@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useMutation, useQueryClient } from 'react-query'
+import React, { useState, useEffect } from 'react'
+import { useMutation, useQueryClient, useQuery } from 'react-query'
 import { 
   Play, 
   Thermometer, 
@@ -8,7 +8,8 @@ import {
   ArrowRight,
   Flame,
   Snowflake,
-  Beaker
+  Beaker,
+  Recycle
 } from 'lucide-react'
 import { brewnodeAPI } from '../services/brewnode'
 import ProcessCard from '../components/ProcessCard'
@@ -78,6 +79,35 @@ const ProcessControl = () => {
       (steps) => brewnodeAPI.mash(steps),
       { onSuccess: () => queryClient.invalidateQueries() }
     ),
+    recirculate: {
+      start: useMutation(
+        ({ tempC, dutyCycle }) => brewnodeAPI.startRecirculation(tempC, dutyCycle),
+        { 
+          onSuccess: () => {
+            queryClient.invalidateQueries('recirculationStatus')
+            queryClient.invalidateQueries()
+          }
+        }
+      ),
+      stop: useMutation(
+        () => brewnodeAPI.stopRecirculation(),
+        { 
+          onSuccess: () => {
+            queryClient.invalidateQueries('recirculationStatus')
+            queryClient.invalidateQueries()
+          }
+        }
+      ),
+      updateDutyCycle: useMutation(
+        (dutyCycle) => brewnodeAPI.updateRecirculationDutyCycle(dutyCycle),
+        { 
+          onSuccess: () => {
+            queryClient.invalidateQueries('recirculationStatus')
+            queryClient.invalidateQueries()
+          }
+        }
+      ),
+    },
     chill: useMutation(
       (profile) => brewnodeAPI.chill(profile),
       { onSuccess: () => queryClient.invalidateQueries() }
@@ -141,6 +171,15 @@ const ProcessControl = () => {
           Quick Temperature Control
         </h3>
         <KettleTempControl onSubmit={processHandlers.kettleTemp} />
+      </div>
+
+      {/* RIMS Recirculation Control */}
+      <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
+        <h3 className="text-xl font-semibold mb-6 flex items-center">
+          <Recycle className="w-7 h-7 mr-3 text-purple-600" />
+          RIMS Recirculation
+        </h3>
+        <RecirculationControl handlers={processHandlers.recirculate} />
       </div>
 
       {/* Process Modals */}
@@ -361,6 +400,141 @@ const ChillModal = ({ onClose, onSubmit }) => {
           </div>
         </form>
       </div>
+    </div>
+  )
+}
+
+const RecirculationControl = ({ handlers }) => {
+  const [tempC, setTempC] = useState(65)
+  const [dutyCycle, setDutyCycle] = useState(50)
+  const [isRunning, setIsRunning] = useState(false)
+
+  // Query recirculation status from backend
+  const { data: statusData } = useQuery(
+    'recirculationStatus',
+    () => brewnodeAPI.getRecirculationStatus(),
+    { 
+      refetchInterval: 3000 // Poll every 3 seconds
+    }
+  )
+
+  // Sync local state with backend status
+  useEffect(() => {
+    if (statusData?.data) {
+      const status = statusData.data
+      setIsRunning(status.active)
+      if (status.active && status.targetTemp !== null) {
+        setTempC(status.targetTemp)
+      }
+      if (status.active && status.dutyCycle !== null) {
+        setDutyCycle(status.dutyCycle)
+      }
+    }
+  }, [statusData])
+
+  const handleStart = (e) => {
+    e.preventDefault()
+    if (tempC < 0 || tempC > 100) {
+      alert('Temperature must be between 0 and 100°C')
+      return
+    }
+    if (dutyCycle < 1 || dutyCycle > 99) {
+      alert('Duty cycle must be between 1 and 99%')
+      return
+    }
+    handlers.start.mutate({ tempC, dutyCycle })
+  }
+
+  const handleStop = () => {
+    handlers.stop.mutate()
+  }
+
+  const handleUpdateDutyCycle = (e) => {
+    e.preventDefault()
+    if (dutyCycle < 1 || dutyCycle > 99) {
+      alert('Duty cycle must be between 1 and 99%')
+      return
+    }
+    handlers.updateDutyCycle.mutate(dutyCycle)
+  }
+
+  return (
+    <div className="space-y-4">
+      <form onSubmit={handleStart} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Target Mash Temperature (°C)
+          </label>
+          <input
+            type="number"
+            value={tempC}
+            onChange={(e) => setTempC(parseFloat(e.target.value))}
+            min="0"
+            max="100"
+            step="0.5"
+            disabled={isRunning}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Kettle Pump Duty Cycle (%)
+          </label>
+          <input
+            type="number"
+            value={dutyCycle}
+            onChange={(e) => setDutyCycle(parseFloat(e.target.value))}
+            min="1"
+            max="99"
+            step="1"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            required
+          />
+        </div>
+
+        {!isRunning ? (
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              disabled={handlers.start.isLoading}
+              className="w-full btn btn-primary"
+            >
+              {handlers.start.isLoading ? 'Starting...' : 'Start Recirculation'}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Mash pump runs continuously. Kettle pump duty cycle controls recirculation rate.
+            </p>
+          </div>
+        ) : (
+          <div className="md:col-span-2 space-y-2">
+            <div className="bg-green-50 border border-green-200 rounded-md p-3">
+              <p className="text-sm font-medium text-green-800">
+                ✓ Recirculation Active - Target: {tempC}°C, Duty Cycle: {dutyCycle}%
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={handleUpdateDutyCycle}
+                disabled={handlers.updateDutyCycle.isLoading}
+                className="btn btn-secondary"
+              >
+                {handlers.updateDutyCycle.isLoading ? 'Updating...' : 'Update Duty Cycle'}
+              </button>
+              <button
+                type="button"
+                onClick={handleStop}
+                disabled={handlers.stop.isLoading}
+                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
+              >
+                {handlers.stop.isLoading ? 'Stopping...' : 'Stop Recirculation'}
+              </button>
+            </div>
+          </div>
+        )}
+      </form>
     </div>
   )
 }
