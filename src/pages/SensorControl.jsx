@@ -15,6 +15,7 @@ import { brewnodeAPI } from '../services/brewnode'
 import EquipmentControl from '../components/EquipmentControl'
 import SensorMonitor from '../components/SensorMonitor'
 import I2CControl from '../components/I2CControl'
+import FermenterSelector from '../components/FermenterSelector'
 
 const SensorControl = () => {
   const [activeTab, setActiveTab] = useState('sensors')
@@ -36,7 +37,12 @@ const SensorControl = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'sensors':
-        return <SensorMonitor data={sensorData} isLoading={isLoading} />
+        return (
+          <div className="space-y-6">
+            <FermenterSelector />
+            <SensorMonitor data={sensorData} isLoading={isLoading} />
+          </div>
+        )
       case 'equipment':
         return (
           <EquipmentControl 

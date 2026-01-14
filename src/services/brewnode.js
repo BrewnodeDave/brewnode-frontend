@@ -288,4 +288,11 @@ export const brewnodeAPI = {
   // System status
   getSystemStatus: () =>
     api.get('/systemStatus'),
+
+  // Active Fermenter
+  getActiveFermenter: () =>
+    api.get('/activeFermenter'),
+
+  setActiveFermenter: (vessel) =>
+    api.put('/activeFermenter', null, { params: { vessel }, headers: { 'accept': '*/*', 'Content-Type': undefined } }),
 }
