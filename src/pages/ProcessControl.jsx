@@ -438,8 +438,8 @@ const RecirculationControl = ({ handlers }) => {
       alert('Temperature must be between 0 and 100°C')
       return
     }
-    if (dutyCycle < 1 || dutyCycle > 99) {
-      alert('Duty cycle must be between 1 and 99%')
+    if (dutyCycle < 50 || dutyCycle > 99) {
+      alert('Duty cycle must be between 50 and 99%')
       return
     }
     handlers.start.mutate({ tempC, dutyCycle })
@@ -451,8 +451,8 @@ const RecirculationControl = ({ handlers }) => {
 
   const handleUpdateDutyCycle = (e) => {
     e.preventDefault()
-    if (dutyCycle < 1 || dutyCycle > 99) {
-      alert('Duty cycle must be between 1 and 99%')
+    if (dutyCycle < 50 || dutyCycle > 99) {
+      alert('Duty cycle must be between 50 and 99%')
       return
     }
     handlers.updateDutyCycle.mutate(dutyCycle)
@@ -486,7 +486,7 @@ const RecirculationControl = ({ handlers }) => {
             type="number"
             value={dutyCycle}
             onChange={(e) => setDutyCycle(parseFloat(e.target.value))}
-            min="1"
+            min="50"
             max="99"
             step="1"
             className="w-full px-3 py-2 border border-gray-300 rounded-md"
