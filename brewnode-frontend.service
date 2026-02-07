@@ -1,12 +1,13 @@
 [Unit]
 Description=BrewNode Frontend Web Server
-After=network.target
+After=network.target brewnode-server.service
+Wants=brewnode-server.service
 
 [Service]
 Type=simple
-User=dave
-WorkingDirectory=/home/dave/git/brewnode-frontend
-ExecStart=/usr/bin/npx http-server dist -p 80 --cors
+User=drinkdeuchars
+WorkingDirectory=/home/drinkdeuchars/git/brewnode-frontend
+ExecStart=/usr/bin/node server.cjs
 Restart=always
 RestartSec=10
 StandardOutput=journal

@@ -8,8 +8,8 @@ echo "🚀 Setting up BrewNode Frontend as a system service..."
 # Configuration
 SERVICE_NAME="brewnode-frontend"
 SERVICE_FILE="${SERVICE_NAME}.service"
-INSTALL_DIR="/home/pi/brewnode-frontend"
-USER="pi"
+INSTALL_DIR="$(pwd)"
+USER="$(logname 2>/dev/null || echo $SUDO_USER)"
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
@@ -24,22 +24,8 @@ if [ ! -d "$INSTALL_DIR" ]; then
     chown $USER:$USER "$INSTALL_DIR"
 fi
 
-# Check if dist folder exists in current directory
-if [ ! -d "./dist" ]; then
-    echo "❌ Error: dist folder not found. Please run 'npm run build' first."
-    exit 1
-fi
-
-# Copy files to installation directory
-echo "📦 Copying files to $INSTALL_DIR..."
-cp -r ./dist "$INSTALL_DIR/"
-cp package.json "$INSTALL_DIR/" 2>/dev/null || true
-
-# Install dependencies as the service user
-echo "📥 Installing dependencies..."
-cd "$INSTALL_DIR"
-sudo -u $USER npm install --production 2>/dev/null || true
-sudo -u $USER npm install -g http-server 2>/dev/null || npm install -g http-server
+# Skip copying since we're already in the project directory
+echo "📦 Using current directory: $INSTALL_DIR"
 
 # Copy service file to systemd
 echo "⚙️  Installing systemd service..."
