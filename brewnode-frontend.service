@@ -1,0 +1,21 @@
+[Unit]
+Description=BrewNode Frontend Web Server
+After=network.target brewnode-server.service
+Wants=brewnode-server.service
+
+[Service]
+Type=simple
+User=drinkdeuchars
+WorkingDirectory=/home/drinkdeuchars/git/brewnode-frontend
+ExecStart=/usr/bin/node server.cjs
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=brewnode-frontend
+
+# Environment
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
