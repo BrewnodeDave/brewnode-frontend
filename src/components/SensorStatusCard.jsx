@@ -20,35 +20,35 @@ const SensorStatusCard = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-2 border border-gray-100 hover:shadow-xl transition-shadow">
-      <div className="flex items-center">
-        <div className={`p-2 rounded-lg ${colorClasses[color] || colorClasses.blue} shadow-sm`}>
-          <Icon className="w-4 h-4" />
-        </div>
-        <div className="ml-2 flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-xs font-bold text-gray-700 truncate">{title}</p>
-            {showStatusIndicator && (
-              <div className={`px-1 py-0.5 text-xxs font-black rounded-full shadow-sm ${
-                isActive
-                  ? 'bg-green-200 text-green-900' 
-                  : 'bg-gray-200 text-gray-700'
-              }`}>
-                {statusText || (isActive ? 'ON' : 'OFF')}
-              </div>
-            )}
+    <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-gray-100 hover:shadow-xl transition-shadow">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3 flex-1">
+          <div className={`p-3 rounded-xl ${colorClasses[color] || colorClasses.blue} shadow-md`}>
+            <Icon className="w-8 h-8" />
           </div>
-          <p className="text-base font-black text-gray-900 break-words">
-            {loading ? (
-              <span className="animate-pulse">--</span>
-            ) : (
-              <>
-                {value}
-                {unit && <span className="text-xs font-bold text-gray-500 ml-1">{unit}</span>}
-              </>
-            )}
-          </p>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-gray-700 mb-1">{title}</p>
+            <p className="text-2xl font-black text-gray-900">
+              {loading ? (
+                <span className="animate-pulse">--</span>
+              ) : (
+                <>
+                  {value}
+                  {unit && <span className="text-lg font-bold text-gray-500 ml-1">{unit}</span>}
+                </>
+              )}
+            </p>
+          </div>
         </div>
+        {showStatusIndicator && (
+          <div className={`px-3 py-1.5 text-sm font-black rounded-full shadow-sm ml-2 ${
+            isActive
+              ? 'bg-green-200 text-green-900' 
+              : 'bg-gray-200 text-gray-700'
+          }`}>
+            {statusText || (isActive ? 'ON' : 'OFF')}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -41,49 +41,41 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-xl p-3 border border-gray-100">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-base font-black flex items-center">
-          <Server className="w-4 h-4 mr-2 text-gray-600" />
-          System Status
+    <div className="bg-white rounded-xl shadow-xl p-4 border-2 border-gray-100">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-black flex items-center">
+          <Server className="w-6 h-6 mr-2 text-gray-600" />
+          System
         </h2>
         
-        <div className="flex items-center space-x-1">
-          <button
-            onClick={handleClearLogs}
-            className="flex items-center space-x-1 px-2 py-1 text-xs font-bold bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-all shadow-sm"
-          >
-            <Trash2 className="w-3 h-3" />
-            <span>Clear Logs</span>
-          </button>
-          
+        <div className="flex items-center space-x-2">
           <button
             onClick={handleRestart}
-            className="flex items-center space-x-1 px-2 py-1 text-xs font-bold bg-red-200 hover:bg-red-300 text-red-800 rounded-lg transition-all shadow-sm"
+            className="flex items-center space-x-2 px-3 py-2 text-sm font-bold bg-red-200 hover:bg-red-300 text-red-800 rounded-xl transition-all shadow-md"
           >
-            <RefreshCw className="w-3 h-3" />
+            <RefreshCw className="w-5 h-5" />
             <span>Restart</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-3">
         {/* Hardware Status */}
-        <div className="flex items-center space-x-2">
-          <div className={`p-2 rounded-lg shadow-sm ${
+        <div className="flex items-center space-x-3">
+          <div className={`p-3 rounded-xl shadow-md ${
             systemStatus?.data?.isHardware 
               ? 'bg-green-200' 
               : 'bg-orange-200'
           }`}>
-            <Server className={`w-4 h-4 ${
+            <Server className={`w-6 h-6 ${
               systemStatus?.data?.isHardware 
                 ? 'text-green-700' 
                 : 'text-orange-700'
             }`} />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-900">Hardware</p>
-            <p className={`text-xs font-black ${
+            <p className="text-sm font-bold text-gray-900">Hardware</p>
+            <p className={`text-base font-black ${
               systemStatus?.data?.isHardware 
                 ? 'text-green-700' 
                 : 'text-orange-700'
@@ -94,41 +86,19 @@ const SystemStatus = ({ sensorData: propSensorData }) => {
         </div>
 
         {/* Connection Status */}
-        <div className="flex items-center space-x-2">
-          <div className="p-2 bg-green-200 rounded-lg shadow-sm">
-            <Wifi className="w-4 h-4 text-green-700" />
+        <div className="flex items-center space-x-3">
+          <div className="p-3 bg-green-200 rounded-xl shadow-md">
+            <Wifi className="w-6 h-6 text-green-700" />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-900">Connection</p>
-            <p className="text-xs font-black text-green-700">Connected</p>
-          </div>
-        </div>
-
-        {/* System Health */}
-        <div className="flex items-center space-x-2">
-          <div className="p-2 bg-green-200 rounded-lg shadow-sm">
-            <CheckCircle className="w-4 h-4 text-green-700" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-gray-900">System Health</p>
-            <p className="text-xs font-black text-green-700">Operational</p>
-          </div>
-        </div>
-
-        {/* Alert Status */}
-        <div className="flex items-center space-x-2">
-          <div className="p-2 bg-yellow-200 rounded-lg shadow-sm">
-            <AlertTriangle className="w-4 h-4 text-yellow-700" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-gray-900">Alerts</p>
-            <p className="text-xs font-black text-yellow-700">0 Active</p>
+            <p className="text-sm font-bold text-gray-900\">Connection</p>
+            <p className="text-base font-black text-green-700">Connected</p>
           </div>
         </div>
       </div>
 
-      {/* Detailed Status */}
-      <div className="mt-2 border-t pt-2 border-gray-200">
+      {/* Hide detailed stats on small screens - only show on larger displays */}
+      <div className="hidden lg:block mt-4 border-t pt-4 border-gray-200">
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div>
             <h4 className="text-xs font-black text-gray-900 mb-1">Fan Status</h4>
