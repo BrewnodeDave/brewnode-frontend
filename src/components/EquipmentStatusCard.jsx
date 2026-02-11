@@ -30,15 +30,15 @@ const EquipmentStatusCard = ({
 
   const CardContent = () => (
     <>
-      <div className="flex items-center">
-        <div className={`p-4 rounded-2xl ${colorClasses[color] || colorClasses.blue} shadow-md`}>
-          <Icon className="w-10 h-10" />
+      <div className="flex items-center flex-1">
+        <div className={`p-3 rounded-xl ${colorClasses[color] || colorClasses.blue} shadow-md`}>
+          <Icon className="w-8 h-8" />
         </div>
-        <div className="ml-5">
-          <p className="text-xl font-black text-gray-900 capitalize">
+        <div className="ml-3 flex-1">
+          <p className="text-base font-black text-gray-900 capitalize">
             {name.replace(/([A-Z])/g, ' $1').trim()}
           </p>
-          <p className="text-lg font-bold text-gray-600 mt-1">
+          <p className="text-sm font-bold text-gray-600 mt-1">
             {loading ? (
               <span className="animate-pulse">--</span>
             ) : (
@@ -47,7 +47,7 @@ const EquipmentStatusCard = ({
           </p>
         </div>
       </div>
-      <div className={`px-5 py-3 text-lg font-black rounded-full shadow-sm ${
+      <div className={`px-3 py-2 text-sm font-black rounded-full shadow-sm ml-3 ${
         isActive && !loading
           ? 'bg-green-200 text-green-900' 
           : 'bg-gray-200 text-gray-700'
@@ -61,7 +61,7 @@ const EquipmentStatusCard = ({
     return (
       <button
         onClick={onClick}
-        className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 border-4 border-gray-100 hover:shadow-2xl hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer w-full"
+        className="bg-white rounded-xl shadow-xl p-4 border-2 border-gray-100 hover:shadow-2xl hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer w-full"
       >
         <div className="flex items-center justify-between">
           <CardContent />
@@ -71,7 +71,7 @@ const EquipmentStatusCard = ({
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 border-4 border-gray-100 hover:shadow-2xl transition-shadow">
+    <div className="bg-white rounded-xl shadow-xl p-4 border-2 border-gray-100 hover:shadow-2xl transition-shadow">
       <div className="flex items-center justify-between">
         <CardContent />
       </div>
