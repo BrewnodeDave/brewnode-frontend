@@ -58,22 +58,22 @@ const Layout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between h-24 px-6 bg-gradient-to-r from-brewery-500 to-brewery-600">
+      <div className={`fixed inset-y-0 left-0 z-50 w-48 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between h-14 px-3 bg-gradient-to-r from-brewery-500 to-brewery-600">
           <div className="flex items-center">
-            <img src="/logo-40x40.png" alt="Brewnode" className="w-14 h-14 mr-4 drop-shadow-lg" />
-            <h1 className="text-3xl font-black text-white drop-shadow-md">Brewnode</h1>
+            <img src="/logo-40x40.png" alt="Brewnode" className="w-8 h-8 mr-2 drop-shadow-lg" />
+            <h1 className="text-lg font-black text-white drop-shadow-md">Brewnode</h1>
           </div>
           {/* Mobile close button */}
           <button
             onClick={closeSidebar}
-            className="lg:hidden text-white hover:text-gray-100 p-3 rounded-xl hover:bg-white/20 transition-colors"
+            className="lg:hidden text-white hover:text-gray-100 p-1 rounded-lg hover:bg-white/20 transition-colors"
           >
-            <X className="w-14 h-14" />
+            <X className="w-6 h-6" />
           </button>
         </div>
         
-        <nav className="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
+        <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
           {filteredNavigation.map((item) => {
             const isActive = location.pathname === item.href
             const Icon = item.icon
@@ -83,30 +83,30 @@ const Layout = ({ children }) => {
                 key={item.name}
                 to={item.href}
                 onClick={closeSidebar}
-                className={`flex items-center px-5 py-4 text-lg font-bold rounded-xl transition-all shadow-md ${isActive ? 'bg-brewery-100 text-brewery-900 scale-105' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:scale-105'}`}
+                className={`flex items-center px-2 py-2 text-sm font-bold rounded-lg transition-all shadow-sm ${isActive ? 'bg-brewery-100 text-brewery-900' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'}`}
               >
-                <Icon className="w-8 h-8 mr-4 flex-shrink-0" />
+                <Icon className="w-5 h-5 mr-2 flex-shrink-0" />
                 {item.name}
               </Link>
             )
           })}
         </nav>
         
-        <div className="px-5 py-8 border-t-4 border-gray-200">
+        <div className="px-2 py-3 border-t-2 border-gray-200">
           {authState ? (
             <button
               onClick={handleLogout}
-              className="flex items-center w-full px-7 py-6 text-xl font-bold text-gray-600 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all shadow-md hover:scale-105"
+              className="flex items-center w-full px-2 py-2 text-sm font-bold text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all shadow-sm"
             >
-              <LogOut className="w-10 h-10 mr-6 flex-shrink-0" />
+              <LogOut className="w-5 h-5 mr-2 flex-shrink-0" />
               Logout
             </button>
           ) : (
             <Link
               to="/login"
-              className="flex items-center w-full px-7 py-6 text-xl font-bold text-gray-600 rounded-2xl hover:bg-brewery-50 hover:text-brewery-600 transition-all shadow-md hover:scale-105"
+              className="flex items-center w-full px-2 py-2 text-sm font-bold text-gray-600 rounded-lg hover:bg-brewery-50 hover:text-brewery-600 transition-all shadow-sm"
             >
-              <Lock className="w-10 h-10 mr-6 flex-shrink-0" />
+              <Lock className="w-5 h-5 mr-2 flex-shrink-0" />
               Login
             </Link>
           )}
@@ -116,24 +116,24 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
         {/* Mobile header */}
-        <header className="lg:hidden bg-white shadow-lg border-b-4 border-brewery-200">
-          <div className="flex items-center justify-between px-8 py-8">
+        <header className="lg:hidden bg-white shadow-lg border-b-2 border-brewery-200">
+          <div className="flex items-center justify-between px-3 py-2">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="text-gray-600 hover:text-gray-900 p-3 rounded-xl hover:bg-gray-100 transition-colors"
+              className="text-gray-600 hover:text-gray-900 p-1 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <Menu className="w-12 h-12" />
+              <Menu className="w-6 h-6" />
             </button>
             <div className="flex items-center">
-              <img src="/logo-40x40.png" alt="Brewnode" className="w-12 h-12 mr-4" />
-              <h1 className="text-3xl font-black text-gray-900">Brewnode</h1>
+              <img src="/logo-40x40.png" alt="Brewnode" className="w-6 h-6 mr-2" />
+              <h1 className="text-base font-black text-gray-900">Brewnode</h1>
             </div>
-            <div className="w-16" /> {/* Spacer for centering */}
+            <div className="w-8" /> {/* Spacer for centering */}
           </div>
         </header>
 
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-          <div className="container mx-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-12">
+          <div className="container mx-auto px-2 sm:px-3 py-2 sm:py-3">
             {children}
           </div>
         </main>
