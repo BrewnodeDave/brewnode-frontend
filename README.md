@@ -2,6 +2,9 @@
 
 A modern React-based web interface for controlling and monitoring the Brewnode brewery automation system.
 
+**Package**: `@brewnode/frontend` v2.1.0  
+**Branch**: `rims`
+
 ## Features
 
 ### 🍺 Complete Brewery Control
@@ -9,6 +12,7 @@ A modern React-based web interface for controlling and monitoring the Brewnode b
 - **Brewfather Integration**: Full access to batches, recipes, and inventory
 - **Process Control**: Automated mashing, boiling, fermentation, and transfers
 - **Equipment Control**: Individual control of pumps, valves, heaters, and sensors
+- **Sensor Control**: Fermenter temperature monitoring and control
 - **Simulator**: Hardware simulation for testing and development
 
 ### 🎯 Key Capabilities
@@ -41,6 +45,11 @@ A modern React-based web interface for controlling and monitoring the Brewnode b
   - Real-time status monitoring (3-second polling)
   - Inline control (non-modal) for multi-page access
 
+#### Sensor Control
+- Single fermenter temperature monitoring and control
+- Real-time sensor readings with configurable polling
+- I2C pin control for custom hardware
+
 #### Equipment Control
 - Individual pump control (kettle, mash, glycol)
 - Valve management (kettle-in, mash-in, chiller valves)  
@@ -56,7 +65,7 @@ A modern React-based web interface for controlling and monitoring the Brewnode b
 
 ## Technology Stack
 
-- **Frontend**: React 18 + Vite
+- **Frontend**: React 18 + Vite 4
 - **Styling**: Tailwind CSS with custom brewery theme
 - **State Management**: React Query for server state
 - **Charts**: Recharts for temperature and process visualization
@@ -64,20 +73,23 @@ A modern React-based web interface for controlling and monitoring the Brewnode b
 - **Forms**: React Hook Form for complex brewing process forms
 - **Routing**: React Router for SPA navigation
 - **HTTP Client**: Axios with authentication and error handling
+- **Testing**: Vitest + React Testing Library (38 tests)
+- **Server**: Express (`server.cjs`) with http-proxy for production serving
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ 
-- npm or yarn
-- Running Brewnode server (backend API)
+- npm
+- Running `brewnode-server` backend (port 8080)
 
 ### Installation
 
-1. Navigate to the frontend directory:
+1. Clone the repository:
 ```bash
-cd frontend
+git clone https://github.com/BrewnodeDave/brewnode-frontend.git
+cd brewnode-frontend
 ```
 
 2. Install dependencies:
@@ -90,11 +102,20 @@ npm install
 npm run dev
 ```
 
-4. Open http://localhost:3000 in your browser
+4. Open http://localhost:5173 in your browser
+
+### Production Server
+
+The included `server.cjs` serves the built `dist/` folder on port 3000 and proxies all API requests to the Brewnode backend on port 8080:
+
+```bash
+npm run build
+node server.cjs
+```
 
 ### Configuration
 
-The frontend is configured to proxy API requests to the Brewnode server running on port 8080. If your server runs on a different port, update the `vite.config.js` proxy configuration.
+The Vite dev server proxies API requests to `localhost:8080`. For production, `server.cjs` handles the proxy. If your backend runs on a different port, update both `vite.config.js` and `server.cjs`.
 
 ## Usage
 
@@ -122,7 +143,7 @@ Create multi-step mash schedules:
 - Mash out (78°C, 10min)
 
 #### Fermentation Control
-Set up complex fermentation schedules:
+Set up complex fermentation schedules for a single fermenter:
 - Primary fermentation (18°C, 7 days)
 - Diacetyl rest (20°C, 2 days)
 - Cold crash (2°C, 2 days)
@@ -170,9 +191,24 @@ src/
 - **SensorStatusCard**: Reusable sensor display component
 - **ProcessCard**: Interactive process control cards
 - **EquipmentControl**: Individual equipment control interfaces
+- **FermenterSelector**: Single fermenter status display
 - **MashProfile/FermentationProfile**: Complex brewing process forms
 - **BatchList/RecipeList**: Brewfather data management
 - **InventoryManager**: Stock level management
+
+### Running Tests
+
+```bash
+npm test
+```
+
+38 tests across 6 test files using Vitest + React Testing Library.
+
+### Linting
+
+```bash
+npm run lint
+```
 
 ### Styling
 
@@ -196,13 +232,45 @@ React Query manages all server state with:
 npm run build
 ```
 
-### Production Deployment
-1. Build the application: `npm run build`
-2. Serve the `dist` folder with any static file server
-3. Ensure API proxy is configured for production
+### Production Deployment on Raspberry Pi
 
-### Docker Deployment
-The frontend can be containerized and deployed alongside the Brewnode server for a complete brewery automation solution.
+1. Install the package globally from npm:
+```bash
+npm install -g @brewnode/frontend
+```
+
+2. Or clone and build locally:
+```bash
+git clone https://github.com/BrewnodeDave/brewnode-frontend.git
+cd brewnode-frontend
+npm install && npm run build
+node server.cjs
+```
+
+### systemd Service
+
+A `brewnode-frontend.service` file is included for running as a systemd daemon:
+
+```bash
+# Install (adjust User= to match your system user)
+sudo cp brewnode-frontend.service /etc/systemd/system/
+sudo systemd-reload
+sudo systemctl start brewnode-frontend
+sudo systemctl enable brewnode-frontend  # optional: start on boot
+```
+
+The service serves the app on port 3000 and proxies API calls to `localhost:8080`.
+
+### npm Publishing
+
+Tagged releases are automatically published to npm via GitHub Actions:
+
+```bash
+npm version patch   # or minor / major
+git push && git push --tags
+```
+
+Requires an `NPM_TOKEN` secret set in the GitHub repository settings.
 
 ## Browser Compatibility
 
