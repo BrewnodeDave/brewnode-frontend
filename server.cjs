@@ -17,13 +17,41 @@ const backendEndpoints = [
   '/sensorStatus',
   '/systemStatus',
   '/brewing',
+  '/brewdata',
+  '/brewname',
   '/equipment',
   '/mysql',
   '/i2c',
   '/restart',
   '/deleteLogs',
   '/docs',
-  '/api-docs'
+  '/api-docs',
+  '/batches',
+  '/recipes',
+  '/inventory',
+  '/stream',
+  '/fan',
+  '/pumps',
+  '/pump',
+  '/valve',
+  '/valves',
+  '/boil',
+  '/chill',
+  '/ferment',
+  '/fill',
+  '/k2f',
+  '/k2m',
+  '/m2k',
+  '/mash',
+  '/kettleTemp',
+  '/heat',
+  '/glycol',
+  '/kettleVolume',
+  '/speedFactor',
+  '/recirculate',
+  '/activeFermenter',
+  '/logs',
+  '/streamLog'
 ];
 
 // Serve static files from dist
@@ -32,7 +60,7 @@ app.use(express.static(DIST_DIR));
 // Proxy API requests to backend - any request starting with these paths
 app.use((req, res, next) => {
   const shouldProxy = backendEndpoints.some(endpoint => req.url.startsWith(endpoint));
-  if (shouldProxy || req.url.startsWith('/api')) {
+  if (shouldProxy) {
     proxy.web(req, res, { target: BACKEND_URL });
   } else {
     next();

@@ -9,20 +9,39 @@ const api = axios.create({
   },
 })
 
-// Auth state management
+// Auth state management - persist in sessionStorage so it survives navigation
 let authCredentials = null
 
+// Restore from sessionStorage on module load
+const stored = sessionStorage.getItem('brewnode_auth')
+if (stored) {
+  try {
+    authCredentials = JSON.parse(stored)
+    api.defaults.auth = authCredentials
+  } catch {
+    sessionStorage.removeItem('brewnode_auth')
+  }
+}
+
 export const setAuth = (username, password) => {
+  if (!username && !password) {
+    authCredentials = null
+    delete api.defaults.auth
+    sessionStorage.removeItem('brewnode_auth')
+    return
+  }
   authCredentials = { username, password }
   api.defaults.auth = authCredentials
+  sessionStorage.setItem('brewnode_auth', JSON.stringify(authCredentials))
 }
 
 export const clearAuth = () => {
   authCredentials = null
   delete api.defaults.auth
+  sessionStorage.removeItem('brewnode_auth')
 }
 
-export const isAuthenticated = () => !!authCredentials
+export const isAuthenticated = () => !!authCredentials?.username
 
 // Request interceptor for auth
 api.interceptors.request.use(

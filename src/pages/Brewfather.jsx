@@ -14,14 +14,11 @@ const Brewfather = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
 
-  // Don't render anything if not authenticated
-  if (!isAuthenticated()) {
-    // Redirect only if we're actually on the brewfather page
-    if (window.location.pathname === '/brewfather') {
+  useEffect(() => {
+    if (!isAuthenticated()) {
       navigate('/login')
     }
-    return null
-  }
+  }, [navigate])
 
   const tabs = [
     { id: 'batches', name: 'Batches', icon: Beaker },

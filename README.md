@@ -169,7 +169,7 @@ The frontend integrates with all Brewnode server endpoints:
 ### Brewfather Endpoints  
 - `/batches` - Batch management and readings
 - `/batches/recipes` - Recipe library
-- `/inventory/*` - Ingredient inventory management
+- `/inventory/*` - Ingredient inventory management (fermentables, hops, yeasts, miscs)
 - `/stream/*` - Custom device data streaming
 
 ## Development

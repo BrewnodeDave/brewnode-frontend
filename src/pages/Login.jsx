@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
-import { setAuth } from '../services/api'
+import { setAuth, clearAuth } from '../services/api'
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' })
@@ -30,20 +30,18 @@ const Login = () => {
         navigate('/')
       } else {
         setError('Invalid username or password')
-        setAuth(null, null)
+        clearAuth()
       }
     } catch (err) {
       setError('Connection error. Please check if the server is running.')
-      setAuth(null, null)
+      clearAuth()
     } finally {
       setLoading(false)
     }
   }
 
   const handleSkipLogin = () => {
-    // Clear any existing auth
-    setAuth(null, null)
-    // Navigate to dashboard without authentication
+    clearAuth()
     navigate('/')
   }
 
